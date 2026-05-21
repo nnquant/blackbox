@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blackbox Agent Workflow"
+  short_description: "Operate Blackbox via bbox, SDK, and WebUI"
+  default_prompt: "Use $blackbox-agent-workflow to run a Blackbox agent experiment workflow."

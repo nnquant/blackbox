@@ -1,0 +1,9 @@
+.pytest_cache
+**/__pycache__
+**/*.pyc
+webui/node_modules
+webui/dist
+webui/.vite
+.git
+.gitignore
+*.log

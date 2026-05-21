@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Run Detail Page - Blackbox Quant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#c1c7ce",
+                        "secondary-fixed": "#dde3ea",
+                        "surface-variant": "#e2e3e0",
+                        "on-primary-fixed-variant": "#44474a",
+                        "on-primary-container": "#84868a",
+                        "on-tertiary-fixed-variant": "#344b47",
+                        "surface-container-highest": "#e2e3e0",
+                        "light-surface-muted": "#E3E4E0",
+                        "tertiary": "#000605",
+                        "primary": "#040608",
+                        "inverse-surface": "#2e312f",
+                        "on-error": "#ffffff",
+                        "warning": "#8B744E",
+                        "outline-variant": "#c5c6ca",
+                        "on-secondary-fixed": "#161c21",
+                        "outline": "#75777a",
+                        "surface-container": "#edeeeb",
+                        "on-primary-fixed": "#191c1f",
+                        "surface-tint": "#5c5f62",
+                        "primary-container": "#1c1f22",
+                        "error": "#ba1a1a",
+                        "background": "#f9faf7",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f4f1",
+                        "light-bg": "#F6F6F2",
+                        "primary-fixed": "#e1e2e6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b221f",
+                        "secondary": "#595f65",
+                        "tertiary-fixed": "#cee8e2",
+                        "inverse-primary": "#c5c6ca",
+                        "surface": "#f9faf7",
+                        "tertiary-fixed-dim": "#b3ccc7",
+                        "on-background": "#1a1c1b",
+                        "surface-container-lowest": "#ffffff",
+                        "info": "#637486",
+                        "positive": "#5F7A68",
+                        "on-tertiary-fixed": "#081f1c",
+                        "negative": "#8A5B56",
+                        "on-tertiary-container": "#738b86",
+                        "on-secondary-container": "#5f656b",
+                        "secondary-container": "#dde3ea",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "dark-surface-raised": "#25282B",
+                        "light-surface-raised": "#F2F2EF",
+                        "surface-dim": "#d9dad7",
+                        "on-secondary-fixed-variant": "#41474d",
+                        "surface-bright": "#f9faf7",
+                        "dark-bg": "#15171A",
+                        "on-surface-variant": "#44474a",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f0f1ee",
+                        "primary-fixed-dim": "#c5c6ca",
+                        "on-surface": "#1a1c1b",
+                        "dark-surface-muted": "#2D3033",
+                        "surface-container-high": "#e7e8e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "12px",
+                        "sm": "8px",
+                        "xxs": "2px",
+                        "xxxl": "48px",
+                        "xl": "24px",
+                        "xs": "4px",
+                        "lg": "16px",
+                        "xxl": "32px"
+                    },
+                    "fontFamily": {
+                        "label": ["Noto Sans"],
+                        "metric-md": ["Noto Sans"],
+                        "label-caps": ["Noto Sans"],
+                        "metric-lg": ["Noto Sans"],
+                        "h3": ["Noto Sans"],
+                        "body-sm": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "h1": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "h2": ["Noto Sans"],
+                        "display": ["Noto Sans"],
+                        "table-cell": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "label": ["0.75rem", { "lineHeight": "1.2", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "metric-md": ["1.25rem", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-caps": ["0.6875rem", { "lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600" }],
+                        "metric-lg": ["2rem", { "lineHeight": "1.1", "letterSpacing": "-0.035em", "fontWeight": "600" }],
+                        "h3": ["1.125rem", { "lineHeight": "1.35", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+                        "body-sm": ["0.75rem", { "lineHeight": "1.45", "letterSpacing": "0.005em", "fontWeight": "400" }],
+                        "body-md": ["0.875rem", { "lineHeight": "1.55", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h1": ["2.25rem", { "lineHeight": "1.15", "letterSpacing": "-0.035em", "fontWeight": "600" }],
+                        "body-lg": ["1rem", { "lineHeight": "1.6", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+                        "h2": ["1.5rem", { "lineHeight": "1.25", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+                        "display": ["3rem", { "lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "600" }],
+                        "table-cell": ["0.8125rem", { "lineHeight": "1.35", "letterSpacing": "0em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Noto Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-dark-bg fixed top-0 w-full z-50 flex justify-between items-center px-lg h-14 border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-xl h-full">
+<div class="font-h3 text-h3 font-bold text-primary dark:text-primary-fixed">Blackbox</div>
+<div class="hidden md:flex h-full gap-lg">
+<a class="flex items-center text-secondary dark:text-secondary-fixed font-label text-label hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out px-sm" href="#">Production</a>
+<a class="flex items-center text-secondary dark:text-secondary-fixed font-label text-label hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out px-sm" href="#">Market Open</a>
+<a class="flex items-center text-primary dark:text-primary-fixed font-label text-label font-bold border-b-2 border-primary hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out px-sm" href="#">Quant Workspace</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-secondary hover:bg-surface-container-low rounded-DEFAULT">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm text-secondary hover:bg-surface-container-low rounded-DEFAULT">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden ml-sm">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A small circular avatar showing a professional portrait of a person in a minimalist modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAznUkXeifk4Qop49U9KC0voIFHj5P1477f5ALkLQHrbcwixct2SghVC8RyukEOj6aJiZmTGHro6dtVBYTLEouabyB-4mxVEfb-2DjsWgB_5WcyY1huTWOlYSbDknSQoMCbzm2fLQXyWXwvcTePEJgrPB_VXB5k4MvvjyGLk1fV9QyygpYxO9zdU0V97K3XxhzbTgfizyovzmz3_q48JvMwZ4IMm0HDPK5z381dOeSlmLdMxan8GIIbflrMjjH6KlKF_iQlwTGxSnXg"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 pt-14 h-full">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low dark:bg-dark-surface-raised fixed left-0 top-14 bottom-0 flex flex-col w-64 py-md px-sm border-r border-outline-variant dark:border-outline hidden md:flex z-40">
+<div class="mb-xl px-sm flex items-center gap-sm">
+<div class="w-8 h-8 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-size: 18px;">terminal</span>
+</div>
+<div>
+<h2 class="font-label text-label text-primary">Blackbox Quant</h2>
+<p class="font-body-sm text-body-sm text-secondary">Terminal v2.4</p>
+</div>
+</div>
+<button class="mb-lg mx-sm py-sm px-md bg-primary text-on-primary rounded-DEFAULT font-label text-label hover:bg-inverse-surface transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span> New Research
+            </button>
+<div class="flex-1 overflow-y-auto">
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary dark:text-secondary-fixed-dim font-label text-label hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined">folder_open</span> Projects
+                    </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary dark:text-secondary-fixed-dim font-label text-label hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined">function</span> Factor Library
+                    </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT bg-secondary-container dark:bg-primary-container text-on-secondary-container dark:text-on-primary-container font-label text-label font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span> Strategy Backtesting
+                    </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary dark:text-secondary-fixed-dim font-label text-label hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined">bookmarks</span> Saved Views
+                    </a>
+</nav>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary font-label text-label hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span> Documentation
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary font-label text-label hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">help_outline</span> Support
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 bg-background overflow-y-auto p-xl relative">
+<!-- Header / Summary Area -->
+<div class="mb-xl flex justify-between items-end">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<a class="text-secondary hover:text-primary font-body-sm text-body-sm flex items-center" href="#"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span> Back to Project</a>
+<span class="text-outline-variant">|</span>
+<span class="bg-positive/20 text-positive px-xs py-[2px] rounded-DEFAULT font-label-caps text-label-caps flex items-center gap-xs"><span class="material-symbols-outlined" data-weight="fill" style="font-size: 12px;">check_circle</span> Finished</span>
+</div>
+<h1 class="font-h1 text-h1 text-primary mb-xs">Backtest_V4_Full_2023</h1>
+<p class="font-body-sm text-body-sm text-secondary flex items-center gap-xs">
+                        Source Run: <a class="text-primary hover:underline" href="#">Backtest_V4_Baseline</a>
+<span class="material-symbols-outlined" style="font-size: 14px;">history</span>
+</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm bg-surface-container border border-outline-variant text-primary rounded-DEFAULT font-label text-label hover:bg-surface-container-high transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">compare_arrows</span> Compare
+                    </button>
+<button class="px-md py-sm bg-primary text-on-primary rounded-DEFAULT font-label text-label hover:bg-inverse-surface transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">play_arrow</span> Re-run
+                    </button>
+</div>
+</div>
+<!-- Key Metrics Cards (Bento style row) -->
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-md mb-xl">
+<div class="bg-light-surface-raised border border-outline-variant rounded-lg p-md">
+<div class="font-label-caps text-label-caps text-secondary mb-xs uppercase tracking-wider">Annual Return</div>
+<div class="font-metric-lg text-metric-lg text-positive">18.5%</div>
+</div>
+<div class="bg-light-surface-raised border border-outline-variant rounded-lg p-md">
+<div class="font-label-caps text-label-caps text-secondary mb-xs uppercase tracking-wider">Sharpe Ratio</div>
+<div class="font-metric-lg text-metric-lg text-primary">2.1</div>
+</div>
+<div class="bg-light-surface-raised border border-outline-variant rounded-lg p-md">
+<div class="font-label-caps text-label-caps text-secondary mb-xs uppercase tracking-wider">Max Drawdown</div>
+<div class="font-metric-lg text-metric-lg text-negative">5.2%</div>
+</div>
+<div class="bg-light-surface-raised border border-outline-variant rounded-lg p-md">
+<div class="font-label-caps text-label-caps text-secondary mb-xs uppercase tracking-wider">IC Mean</div>
+<div class="font-metric-lg text-metric-lg text-primary">0.045</div>
+</div>
+<div class="bg-light-surface-raised border border-outline-variant rounded-lg p-md">
+<div class="font-label-caps text-label-caps text-secondary mb-xs uppercase tracking-wider">Turnover</div>
+<div class="font-metric-lg text-metric-lg text-primary">12%</div>
+</div>
+</div>
+<!-- Main Chart Area Placeholder -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg mb-xl h-96 flex flex-col relative overflow-hidden">
+<div class="flex justify-between items-center mb-md z-10">
+<h3 class="font-h3 text-h3 text-primary">Equity Curve &amp; Drawdown</h3>
+<div class="flex gap-sm">
+<button class="font-label-caps text-label-caps text-secondary hover:text-primary px-sm py-xs bg-surface-container rounded-DEFAULT">Log Scale</button>
+<button class="font-label-caps text-label-caps text-secondary hover:text-primary px-sm py-xs bg-surface-container rounded-DEFAULT"><span class="material-symbols-outlined" style="font-size: 14px;">download</span></button>
+</div>
+</div>
+<!-- Abstract Chart Graphic -->
+<div class="absolute inset-0 top-16 opacity-30 flex items-end px-lg pb-lg pointer-events-none" style="background: linear-gradient(180deg, rgba(249,250,247,0) 0%, rgba(243,244,241,1) 100%);">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0 100 L0 80 Q 10 70, 20 60 T 40 40 T 60 50 T 80 20 T 100 10 L 100 100 Z" fill="#e2e3e0" opacity="0.5"></path>
+<path d="M0 80 Q 10 70, 20 60 T 40 40 T 60 50 T 80 20 T 100 10" fill="none" stroke="#040608" stroke-linejoin="round" stroke-width="0.5"></path>
+<path d="M0 100 L0 95 Q 15 95, 25 85 T 45 90 T 65 95 T 85 90 T 100 95 L 100 100 Z" fill="#ffdad6" opacity="0.6"></path>
+</svg>
+</div>
+<div class="mt-auto z-10 flex gap-xl pt-sm border-t border-outline-variant/50">
+<div class="font-table-cell text-table-cell text-secondary"><span class="inline-block w-2 h-2 rounded-full bg-primary mr-xs"></span> Cumulative Returns</div>
+<div class="font-table-cell text-table-cell text-secondary"><span class="inline-block w-2 h-2 rounded-full bg-error-container mr-xs border border-error"></span> Drawdown</div>
+</div>
+</div>
+<!-- Tabs Section -->
+<div class="mb-lg">
+<nav class="flex gap-lg border-b border-outline-variant">
+<a class="font-label text-label text-primary border-b-2 border-primary pb-sm px-xs" href="#">Metrics</a>
+<a class="font-label text-label text-secondary hover:text-primary pb-sm px-xs transition-colors" href="#">Events</a>
+<a class="font-label text-label text-secondary hover:text-primary pb-sm px-xs transition-colors" href="#">Artifacts</a>
+<a class="font-label text-label text-secondary hover:text-primary pb-sm px-xs transition-colors" href="#">Config</a>
+<a class="font-label text-label text-secondary hover:text-primary pb-sm px-xs transition-colors" href="#">Notes</a>
+</nav>
+</div>
+<!-- Tab Content (Metrics Table) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="font-label-caps text-label-caps text-secondary py-sm px-md uppercase tracking-wider">Metric Category</th>
+<th class="font-label-caps text-label-caps text-secondary py-sm px-md uppercase tracking-wider">Metric Name</th>
+<th class="font-label-caps text-label-caps text-secondary py-sm px-md uppercase tracking-wider text-right">Value</th>
+<th class="font-label-caps text-label-caps text-secondary py-sm px-md uppercase tracking-wider text-right">Benchmark</th>
+<th class="font-label-caps text-label-caps text-secondary py-sm px-md uppercase tracking-wider text-center">Trend</th>
+</tr>
+</thead>
+<tbody class="font-table-cell text-table-cell text-primary">
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-sm px-md text-secondary">Risk</td>
+<td class="py-sm px-md font-medium">Volatility (Ann.)</td>
+<td class="py-sm px-md text-right">8.4%</td>
+<td class="py-sm px-md text-right text-secondary">12.1%</td>
+<td class="py-sm px-md text-center"><span class="material-symbols-outlined text-positive" style="font-size: 16px;">trending_down</span></td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-sm px-md text-secondary">Return</td>
+<td class="py-sm px-md font-medium">Alpha (vs SPX)</td>
+<td class="py-sm px-md text-right text-positive">4.2%</td>
+<td class="py-sm px-md text-right text-secondary">-</td>
+<td class="py-sm px-md text-center"><span class="material-symbols-outlined text-positive" style="font-size: 16px;">trending_up</span></td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-sm px-md text-secondary">Execution</td>
+<td class="py-sm px-md font-medium">Slippage Est.</td>
+<td class="py-sm px-md text-right">5 bps</td>
+<td class="py-sm px-md text-right text-secondary">5 bps</td>
+<td class="py-sm px-md text-center"><span class="material-symbols-outlined text-secondary" style="font-size: 16px;">horizontal_rule</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+</body></html>

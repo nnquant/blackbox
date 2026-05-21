@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #202326;
+    background: #f6f6f2;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: #f6f6f2;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  ::selection {
+    background: #dce3ea;
+  }
+}
+
+@layer components {
+  .bento-panel {
+    @apply rounded-bento border border-line bg-panel shadow-none;
+  }
+
+  .icon-button {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-muted transition hover:border-line hover:bg-white/50 hover:text-ink;
+  }
+
+  .primary-button {
+    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md bg-charcoal px-3 text-sm font-semibold text-white transition hover:bg-ink;
+  }
+
+  .secondary-button {
+    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-white/60 px-3 text-sm font-semibold text-ink transition hover:border-lineStrong hover:bg-white;
+  }
+
+  .form-control {
+    @apply w-full rounded-md border border-line bg-white/80 px-3 py-2 text-sm font-medium text-ink outline-none transition placeholder:text-muted/70 focus:border-lineStrong focus:bg-white;
+  }
+
+  .metric-value {
+    @apply font-semibold tabular-nums tracking-normal;
+  }
+
+  .table-head {
+    @apply border-b border-line bg-[#f3f4f1] text-left text-[11px] font-semibold uppercase tracking-normal text-muted;
+  }
+
+  .table-cell {
+    @apply border-b border-line/70 px-4 py-3 text-sm tabular-nums;
+  }
+
+  .dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .dashboard-stats-grid .bento-panel {
+    min-height: 86px;
+    padding: 1rem;
+  }
+
+  .dashboard-stats-grid .metric-value {
+    margin-top: 0.75rem;
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+table th,
+table td,
+table .table-cell,
+table .table-head th {
+  text-align: left !important;
+}
+
+table td button {
+  text-align: left;
+}

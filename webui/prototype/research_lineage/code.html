@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alpha Factors Research - Blackbox Quant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#c1c7ce",
+                        "secondary-fixed": "#dde3ea",
+                        "surface-variant": "#e2e3e0",
+                        "on-primary-fixed-variant": "#44474a",
+                        "on-primary-container": "#84868a",
+                        "on-tertiary-fixed-variant": "#344b47",
+                        "surface-container-highest": "#e2e3e0",
+                        "light-surface-muted": "#E3E4E0",
+                        "tertiary": "#000605",
+                        "primary": "#040608",
+                        "inverse-surface": "#2e312f",
+                        "on-error": "#ffffff",
+                        "warning": "#8B744E",
+                        "outline-variant": "#c5c6ca",
+                        "on-secondary-fixed": "#161c21",
+                        "outline": "#75777a",
+                        "surface-container": "#edeeeb",
+                        "on-primary-fixed": "#191c1f",
+                        "surface-tint": "#5c5f62",
+                        "primary-container": "#1c1f22",
+                        "error": "#ba1a1a",
+                        "background": "#f9faf7",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f4f1",
+                        "light-bg": "#F6F6F2",
+                        "primary-fixed": "#e1e2e6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b221f",
+                        "secondary": "#595f65",
+                        "tertiary-fixed": "#cee8e2",
+                        "inverse-primary": "#c5c6ca",
+                        "surface": "#f9faf7",
+                        "tertiary-fixed-dim": "#b3ccc7",
+                        "on-background": "#1a1c1b",
+                        "surface-container-lowest": "#ffffff",
+                        "info": "#637486",
+                        "positive": "#5F7A68",
+                        "on-tertiary-fixed": "#081f1c",
+                        "negative": "#8A5B56",
+                        "on-tertiary-container": "#738b86",
+                        "on-secondary-container": "#5f656b",
+                        "secondary-container": "#dde3ea",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "dark-surface-raised": "#25282B",
+                        "light-surface-raised": "#F2F2EF",
+                        "surface-dim": "#d9dad7",
+                        "on-secondary-fixed-variant": "#41474d",
+                        "surface-bright": "#f9faf7",
+                        "dark-bg": "#15171A",
+                        "on-surface-variant": "#44474a",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f0f1ee",
+                        "primary-fixed-dim": "#c5c6ca",
+                        "on-surface": "#1a1c1b",
+                        "dark-surface-muted": "#2D3033",
+                        "surface-container-high": "#e7e8e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "12px",
+                        "sm": "8px",
+                        "xxs": "2px",
+                        "xxxl": "48px",
+                        "xl": "24px",
+                        "xs": "4px",
+                        "lg": "16px",
+                        "xxl": "32px"
+                    },
+                    "fontFamily": {
+                        "label": ["Noto Sans"],
+                        "metric-md": ["Noto Sans"],
+                        "label-caps": ["Noto Sans"],
+                        "metric-lg": ["Noto Sans"],
+                        "h3": ["Noto Sans"],
+                        "body-sm": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "h1": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "h2": ["Noto Sans"],
+                        "display": ["Noto Sans"],
+                        "table-cell": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "label": ["0.75rem", { "lineHeight": "1.2", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "metric-md": ["1.25rem", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-caps": ["0.6875rem", { "lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600" }],
+                        "metric-lg": ["2rem", { "lineHeight": "1.1", "letterSpacing": "-0.035em", "fontWeight": "600" }],
+                        "h3": ["1.125rem", { "lineHeight": "1.35", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+                        "body-sm": ["0.75rem", { "lineHeight": "1.45", "letterSpacing": "0.005em", "fontWeight": "400" }],
+                        "body-md": ["0.875rem", { "lineHeight": "1.55", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h1": ["2.25rem", { "lineHeight": "1.15", "letterSpacing": "-0.035em", "fontWeight": "600" }],
+                        "body-lg": ["1rem", { "lineHeight": "1.6", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+                        "h2": ["1.5rem", { "lineHeight": "1.25", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+                        "display": ["3rem", { "lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "600" }],
+                        "table-cell": ["0.8125rem", { "lineHeight": "1.35", "letterSpacing": "0em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (from JSON) -->
+<aside class="bg-surface-container-low dark:bg-dark-surface-raised docked left-0 h-full w-64 border-r border-outline-variant dark:border-outline flat no shadows flex flex-col fixed top-14 bottom-0 py-md px-sm hidden md:flex z-40">
+<div class="mb-xl px-sm">
+<h2 class="font-h2 text-h2 text-primary dark:text-primary-fixed mb-xs">Blackbox Quant</h2>
+<p class="font-body-sm text-body-sm text-secondary">Terminal v2.4</p>
+</div>
+<button class="bg-primary text-on-primary rounded font-label text-label py-sm px-md mb-xl flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+            New Research
+        </button>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 bg-secondary-container text-on-secondary-container font-bold font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                Projects
+            </a>
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="function">function</span>
+                Factor Library
+            </a>
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Strategy Backtesting
+            </a>
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="bookmarks">bookmarks</span>
+                Saved Views
+            </a>
+</nav>
+<div class="mt-auto space-y-xs pt-md border-t border-outline-variant">
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+                Documentation
+            </a>
+<a class="flex items-center gap-sm px-md py-sm rounded transition-all duration-200 text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant font-label text-label" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- TopNavBar (from JSON) -->
+<header class="bg-surface-container-lowest dark:bg-dark-bg docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows fixed top-0 w-full z-50 flex justify-between items-center px-lg h-14">
+<div class="flex items-center gap-xl">
+<div class="font-h3 text-h3 font-bold text-primary dark:text-primary-fixed mr-xl">Blackbox</div>
+<nav class="hidden md:flex space-x-lg h-full items-center">
+<a class="h-full flex items-center transition-colors duration-150 ease-in-out font-label text-label text-secondary dark:text-secondary-fixed hover:bg-surface-container-low px-sm" href="#">Production</a>
+<a class="h-full flex items-center transition-colors duration-150 ease-in-out font-label text-label text-secondary dark:text-secondary-fixed hover:bg-surface-container-low px-sm" href="#">Market Open</a>
+<a class="h-full flex items-center transition-colors duration-150 ease-in-out font-label text-label text-primary dark:text-primary-fixed font-bold border-b-2 border-primary px-sm" href="#">Quant Workspace</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 transform -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-sm pl-xl pr-sm py-[4px] text-body-sm font-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-48" placeholder="Search..." type="text"/>
+</div>
+<button class="text-secondary hover:text-primary transition-colors duration-150 p-xs">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors duration-150 p-xs">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A close up professional headshot of a user. Corporate minimalist style, bright high-key lighting, grayscale background. Used as a placeholder profile avatar in a digital platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEhRc2jLraO2xuiLo8-HPFziCr3M8rzkp3fEuyCFkb4yXbHSXapGmZKwFE3W6QvJMCgljplbzzn4ESJkb2KHc7avZfq4YIuS9r9p2ZZR1fp5HhfUG5neiwJt6gLVkAqtp_7TNtcHOWhxbDU4ZvMciLEzuq3pssCs6hamFlli4lFmUPA9JYl3qqi8LNppu73G2k101-uXskCp3G3P57hOaWxJRNyzbZ6QrqORQW42pJSkhjDcC5tapA_e3GPkEONgRDkKZAwJNJtnqK"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 pt-14 min-h-screen overflow-x-hidden">
+<div class="max-w-[1400px] mx-auto p-lg md:p-xl space-y-lg">
+<!-- Top Information Area -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded p-lg space-y-md shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="font-h1 text-h1 text-primary mb-xs">Alpha Factors Research</h1>
+<div class="flex gap-sm mb-md">
+<span class="bg-surface-container-low text-secondary font-label-caps text-label-caps px-sm py-xs rounded border border-outline-variant">MOMENTUM</span>
+<span class="bg-surface-container-low text-secondary font-label-caps text-label-caps px-sm py-xs rounded border border-outline-variant">LOW-VOL</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-variant hover:bg-surface-dim text-primary border border-outline-variant rounded font-label text-label py-sm px-md transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            Edit
+                        </button>
+<button class="bg-primary hover:bg-inverse-surface text-on-primary rounded font-label text-label py-sm px-md transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">play_arrow</span>
+                            Run Backtest
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md border-t border-outline-variant pt-md">
+<div>
+<h3 class="font-label text-label text-secondary uppercase mb-xs tracking-wider">Goal</h3>
+<p class="font-body-md text-body-md text-on-surface">Explore cross-sectional price-volume momentum across Russell 3000 universe, focusing on medium-term horizons (3-6 months).</p>
+</div>
+<div>
+<h3 class="font-label text-label text-secondary uppercase mb-xs tracking-wider">Hypothesis</h3>
+<p class="font-body-md text-body-md text-on-surface">Low volatility high momentum stocks outperform in stable regimes due to reduced idiosyncratic risk drag during factor rotation periods.</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Branch Lineage (DAG) Area -->
+<section class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded p-lg shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-md pb-sm border-b border-outline-variant">
+<h2 class="font-h2 text-h2 text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined">account_tree</span>
+                            Branch Lineage
+                        </h2>
+<span class="text-secondary font-body-sm text-body-sm">Visual Graph</span>
+</div>
+<div class="flex-1 bg-surface-container-low border border-outline-variant rounded relative p-xl flex items-center justify-center min-h-[400px] overflow-hidden">
+<!-- Abstract DAG Representation using CSS/Flexbox -->
+<!-- Connecting Lines (Simplified background svg approach for demo, usually done with canvas/d3) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;">
+<path d="M 200 200 L 400 100" fill="none" stroke="#c5c6ca" stroke-width="2"></path>
+<path d="M 200 200 L 400 300" fill="none" stroke="#c5c6ca" stroke-width="2"></path>
+<path d="M 400 100 L 600 200" fill="none" stroke="#c5c6ca" stroke-dasharray="4" stroke-width="2"></path>
+<path d="M 400 300 L 600 200" fill="none" stroke="#c5c6ca" stroke-width="2"></path>
+</svg>
+<div class="relative z-10 w-full max-w-4xl flex justify-between items-center px-xl">
+<!-- Node 1: Baseline -->
+<div class="bg-surface-container-lowest border-2 border-outline-variant rounded p-md w-48 shadow-sm text-center relative group cursor-pointer hover:border-primary transition-colors">
+<div class="font-label text-label font-bold text-primary mb-xs">Baseline_v1</div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Raw Momentum</div>
+<div class="flex justify-between border-t border-outline-variant pt-xs mt-xs">
+<div class="text-left">
+<div class="font-label-caps text-label-caps text-secondary">RUNS</div>
+<div class="font-metric-md text-metric-md text-primary">12</div>
+</div>
+<div class="text-right">
+<div class="font-label-caps text-label-caps text-secondary">SHARPE</div>
+<div class="font-metric-md text-metric-md text-primary">0.82</div>
+</div>
+</div>
+</div>
+<!-- Middle Column Nodes -->
+<div class="flex flex-col gap-xxl">
+<!-- Node 2: Neutralized -->
+<div class="bg-surface-container-lowest border-2 border-outline-variant rounded p-md w-48 shadow-sm text-center relative group cursor-pointer hover:border-primary transition-colors">
+<div class="font-label text-label font-bold text-primary mb-xs">Neutralized_v2</div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Sector/Industry</div>
+<div class="flex justify-between border-t border-outline-variant pt-xs mt-xs">
+<div class="text-left">
+<div class="font-label-caps text-label-caps text-secondary">RUNS</div>
+<div class="font-metric-md text-metric-md text-primary">45</div>
+</div>
+<div class="text-right">
+<div class="font-label-caps text-label-caps text-secondary">SHARPE</div>
+<div class="font-metric-md text-metric-md text-primary">1.15</div>
+</div>
+</div>
+</div>
+<!-- Node 3: Filtered (Failed) -->
+<div class="bg-surface-container-lowest border border-outline-variant opacity-60 rounded p-md w-48 shadow-sm text-center relative cursor-not-allowed">
+<div class="font-label text-label font-bold text-secondary mb-xs">Liq_Filtered_v2</div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Volume &gt; 5M</div>
+<div class="flex justify-between border-t border-outline-variant pt-xs mt-xs">
+<div class="text-left">
+<div class="font-label-caps text-label-caps text-secondary">RUNS</div>
+<div class="font-body-sm text-body-sm text-secondary">8</div>
+</div>
+<div class="text-right">
+<div class="font-label-caps text-label-caps text-negative">SHARPE</div>
+<div class="font-body-sm text-body-sm text-negative">-0.12</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Node 4: Scaled (Champion) -->
+<div class="bg-light-surface-raised border-2 border-primary rounded p-md w-56 shadow-md text-center relative group cursor-pointer ring-4 ring-primary-fixed-dim">
+<div class="absolute -top-3 -right-3 bg-primary text-on-primary rounded-full w-6 h-6 flex items-center justify-center shadow">
+<span class="material-symbols-outlined" style="font-size: 14px;">star</span>
+</div>
+<div class="font-h3 text-h3 font-bold text-primary mb-xs">Scaled_Alpha_v4</div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Vol-Scaled + Neutral</div>
+<div class="flex justify-between border-t border-outline-variant pt-sm mt-sm">
+<div class="text-left">
+<div class="font-label-caps text-label-caps text-secondary">RUNS</div>
+<div class="font-metric-md text-metric-md text-primary">128</div>
+</div>
+<div class="text-right">
+<div class="font-label-caps text-label-caps text-positive">BEST SHARPE</div>
+<div class="font-metric-lg text-metric-lg text-positive">1.85</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Champion & Timeline -->
+<div class="lg:col-span-4 space-y-lg flex flex-col">
+<!-- Champion Area -->
+<section class="bg-light-surface-raised border border-primary rounded p-lg shadow-sm">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-h3 text-h3 text-primary font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-warning" data-weight="fill" style="font-size: 20px;">emoji_events</span>
+                                Champion Branch
+                            </h2>
+<span class="bg-primary-container text-on-primary-container font-label-caps text-label-caps px-sm py-xs rounded">ACTIVE</span>
+</div>
+<div class="mb-md">
+<div class="font-h2 text-h2 text-primary">Alpha-V4</div>
+<div class="font-body-sm text-body-sm text-secondary">Vol-Scaled + Barra Risk Neutralization</div>
+</div>
+<div class="grid grid-cols-2 gap-sm mb-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-sm">
+<div class="font-label-caps text-label-caps text-secondary mb-xxs">IS SHARPE</div>
+<div class="font-metric-lg text-metric-lg text-primary">1.85</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-sm">
+<div class="font-label-caps text-label-caps text-secondary mb-xxs">TURNOVER (ANN)</div>
+<div class="font-metric-lg text-metric-lg text-primary">15.2%</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-sm">
+<div class="font-label-caps text-label-caps text-secondary mb-xxs">MAX DRAWDOWN</div>
+<div class="font-metric-md text-metric-md text-negative">-4.1%</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-sm">
+<div class="font-label-caps text-label-caps text-secondary mb-xxs">CAPACITY</div>
+<div class="font-metric-md text-metric-md text-primary">$250M</div>
+</div>
+</div>
+<button class="w-full bg-surface-container-highest hover:bg-surface-variant text-primary border border-outline-variant rounded font-label text-label py-sm transition-colors">
+                            View Detailed Tearsheet
+                        </button>
+</section>
+<!-- Research Timeline -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded p-lg shadow-sm flex-1 overflow-hidden flex flex-col">
+<div class="flex justify-between items-center mb-md pb-sm border-b border-outline-variant">
+<h2 class="font-h3 text-h3 text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined">history</span>
+                                Key Decisions
+                            </h2>
+</div>
+<div class="flex-1 overflow-y-auto pr-sm space-y-md">
+<!-- Timeline Item 1 -->
+<div class="relative pl-xl">
+<div class="absolute left-[7px] top-1 bottom-[-16px] w-[2px] bg-outline-variant"></div>
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-primary bg-surface-container-lowest"></div>
+<div class="font-label text-label text-secondary mb-xxs">Oct 24, 2023 • 14:30 EST</div>
+<div class="font-body-md text-body-md text-primary font-bold">Switched fee model to 5bps</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Adjusted transaction cost assumptions to better reflect current institutional execution capabilities. Impact: +0.15 Sharpe.</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-xl">
+<div class="absolute left-[7px] top-1 bottom-[-16px] w-[2px] bg-outline-variant"></div>
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-outline bg-surface-container-lowest"></div>
+<div class="font-label text-label text-secondary mb-xxs">Oct 12, 2023 • 09:15 EST</div>
+<div class="font-body-md text-body-md text-primary font-bold">Added Barra risk neutralization</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Implemented strict sector and style constraints using USE4 model to isolate pure momentum alpha.</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative pl-xl">
+<div class="absolute left-[7px] top-1 bottom-[-16px] w-[2px] bg-outline-variant"></div>
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-outline bg-surface-container-lowest"></div>
+<div class="font-label text-label text-secondary mb-xxs">Sep 28, 2023 • 16:45 EST</div>
+<div class="font-body-md text-body-md text-primary font-bold">Dropped liquidity filter v2</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Over-constrained the universe. Reverted to baseline Top 3000 market cap filter.</div>
+</div>
+<!-- Timeline Item 4 (Last) -->
+<div class="relative pl-xl">
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-outline bg-surface-container-lowest"></div>
+<div class="font-label text-label text-secondary mb-xxs">Sep 15, 2023 • 10:00 EST</div>
+<div class="font-body-md text-body-md text-primary font-bold">Initial Project Setup</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Defined universe and core cross-sectional hypothesis.</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</body></html>

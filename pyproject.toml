@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blackbox"
+version = "0.1.0"
+description = "Experiment graph system for quantitative research."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "httpx>=0.26",
+  "pydantic>=2.5",
+  "PyYAML>=6.0",
+  "sqlalchemy>=2.0",
+  "uvicorn>=0.25",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+]
+data = [
+  "pandas>=2.0",
+  "pyarrow>=14.0",
+]
+s3 = [
+  "boto3>=1.34",
+]
+postgres = [
+  "psycopg[binary]>=3.1",
+]
+
+[project.scripts]
+bbox = "blackbox_cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["packages/common", "packages/sdk", "packages/cli", "apps/server"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["packages/common", "packages/sdk", "packages/cli", "apps/server"]

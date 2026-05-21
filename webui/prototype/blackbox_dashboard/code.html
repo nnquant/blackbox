@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blackbox Quant Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#c1c7ce",
+                    "secondary-fixed": "#dde3ea",
+                    "surface-variant": "#e2e3e0",
+                    "on-primary-fixed-variant": "#44474a",
+                    "on-primary-container": "#84868a",
+                    "on-tertiary-fixed-variant": "#344b47",
+                    "surface-container-highest": "#e2e3e0",
+                    "light-surface-muted": "#E3E4E0",
+                    "tertiary": "#000605",
+                    "primary": "#040608",
+                    "inverse-surface": "#2e312f",
+                    "on-error": "#ffffff",
+                    "warning": "#8B744E",
+                    "outline-variant": "#c5c6ca",
+                    "on-secondary-fixed": "#161c21",
+                    "outline": "#75777a",
+                    "surface-container": "#edeeeb",
+                    "on-primary-fixed": "#191c1f",
+                    "surface-tint": "#5c5f62",
+                    "primary-container": "#1c1f22",
+                    "error": "#ba1a1a",
+                    "background": "#f9faf7",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f3f4f1",
+                    "light-bg": "#F6F6F2",
+                    "primary-fixed": "#e1e2e6",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#0b221f",
+                    "secondary": "#595f65",
+                    "tertiary-fixed": "#cee8e2",
+                    "inverse-primary": "#c5c6ca",
+                    "surface": "#f9faf7",
+                    "tertiary-fixed-dim": "#b3ccc7",
+                    "on-background": "#1a1c1b",
+                    "surface-container-lowest": "#ffffff",
+                    "info": "#637486",
+                    "positive": "#5F7A68",
+                    "on-tertiary-fixed": "#081f1c",
+                    "negative": "#8A5B56",
+                    "on-tertiary-container": "#738b86",
+                    "on-secondary-container": "#5f656b",
+                    "secondary-container": "#dde3ea",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "dark-surface-raised": "#25282B",
+                    "light-surface-raised": "#F2F2EF",
+                    "surface-dim": "#d9dad7",
+                    "on-secondary-fixed-variant": "#41474d",
+                    "surface-bright": "#f9faf7",
+                    "dark-bg": "#15171A",
+                    "on-surface-variant": "#44474a",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f1ee",
+                    "primary-fixed-dim": "#c5c6ca",
+                    "on-surface": "#1a1c1b",
+                    "dark-surface-muted": "#2D3033",
+                    "surface-container-high": "#e7e8e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "12px",
+                    "sm": "8px",
+                    "xxs": "2px",
+                    "xxxl": "48px",
+                    "xl": "24px",
+                    "xs": "4px",
+                    "lg": "16px",
+                    "xxl": "32px"
+            },
+            "fontFamily": {
+                    "label": ["Noto Sans"],
+                    "metric-md": ["Noto Sans"],
+                    "label-caps": ["Noto Sans"],
+                    "metric-lg": ["Noto Sans"],
+                    "h3": ["Noto Sans"],
+                    "body-sm": ["Noto Sans"],
+                    "body-md": ["Noto Sans"],
+                    "h1": ["Noto Sans"],
+                    "body-lg": ["Noto Sans"],
+                    "h2": ["Noto Sans"],
+                    "display": ["Noto Sans"],
+                    "table-cell": ["Noto Sans"]
+            },
+            "fontSize": {
+                    "label": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                    "metric-md": ["1.25rem", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-caps": ["0.6875rem", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+                    "metric-lg": ["2rem", {"lineHeight": "1.1", "letterSpacing": "-0.035em", "fontWeight": "600"}],
+                    "h3": ["1.125rem", {"lineHeight": "1.35", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+                    "body-sm": ["0.75rem", {"lineHeight": "1.45", "letterSpacing": "0.005em", "fontWeight": "400"}],
+                    "body-md": ["0.875rem", {"lineHeight": "1.55", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h1": ["2.25rem", {"lineHeight": "1.15", "letterSpacing": "-0.035em", "fontWeight": "600"}],
+                    "body-lg": ["1rem", {"lineHeight": "1.6", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+                    "h2": ["1.5rem", {"lineHeight": "1.25", "letterSpacing": "-0.025em", "fontWeight": "600"}],
+                    "display": ["3rem", {"lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "600"}],
+                    "table-cell": ["0.8125rem", {"lineHeight": "1.35", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-dark-bg text-primary dark:text-primary-fixed font-label text-label border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50 flex justify-between items-center px-lg h-14">
+<div class="flex items-center gap-xl h-full">
+<div class="font-h3 text-h3 font-bold text-primary dark:text-primary-fixed">
+                Blackbox
+            </div>
+<nav class="hidden md:flex h-full items-center">
+<a class="h-full flex items-center px-md text-secondary dark:text-secondary-fixed hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out" href="#">
+                    Production
+                </a>
+<a class="h-full flex items-center px-md text-secondary dark:text-secondary-fixed hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out" href="#">
+                    Market Open
+                </a>
+<a class="h-full flex items-center px-md text-primary dark:text-primary-fixed font-bold border-b-2 border-primary hover:bg-surface-container-low dark:hover:bg-dark-surface-muted transition-colors duration-150 ease-in-out" href="#">
+                    Quant Workspace
+                </a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-secondary hover:text-primary hover:bg-surface-container-low rounded transition-colors duration-150 ease-in-out flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-secondary hover:text-primary hover:bg-surface-container-low rounded transition-colors duration-150 ease-in-out flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant overflow-hidden ml-sm flex-shrink-0">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5YLSLN5gUKUu8TIY66Cu16-CwpqRepCXvNlyyJ_vNOvCSIxl1FJM4GiAtBrNFhH4sXscjyLWls_sqtBSi2ippfRjsuq_zKCpnIa0ukgzLj8cIKzxDUiOcJizq7KY3DdZmkjB4LOeRTMDc_HCESQCAfcCQt5o9kzcsYqrpUYg6mP9w_WO46WXwOPlv2xQJ6kI_5XI846AJ7eMUA_0fNYPTxfD4Oi-PmiTFixl2aGYOs38-pFSJBEDTzwYzMuCztpfm02HPbcKAfy0G"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-14 h-full">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col bg-surface-container-low dark:bg-dark-surface-raised border-r border-outline-variant dark:border-outline fixed left-0 top-14 bottom-0 w-64 py-md px-sm z-40 transition-all duration-200">
+<div class="px-md pb-xl mb-md border-b border-outline-variant flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-primary text-on-primary flex items-center justify-center font-bold font-h3 text-h3 flex-shrink-0">
+                    BQ
+                </div>
+<div>
+<div class="font-h2 text-h2 text-primary dark:text-primary-fixed leading-tight">Blackbox Quant</div>
+<div class="font-label text-label text-secondary leading-tight mt-xs">Terminal v2.4</div>
+</div>
+</div>
+<div class="px-sm mb-md">
+<button class="w-full bg-primary text-on-primary font-label text-label py-sm px-md rounded flex items-center justify-center gap-sm hover:bg-inverse-surface transition-colors duration-200">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Research
+                </button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded bg-secondary-container dark:bg-primary-container text-on-secondary-container dark:text-on-primary-container font-bold hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_open</span>
+<span class="font-label text-label">Projects</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">function</span>
+<span class="font-label text-label">Factor Library</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="font-label text-label">Strategy Backtesting</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">bookmarks</span>
+<span class="font-label text-label">Saved Views</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="pt-md border-t border-outline-variant mt-auto">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+<span class="font-label text-label">Documentation</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-dark-surface-muted transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span class="font-label text-label">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 md:ml-64 bg-background overflow-y-auto p-lg lg:p-xl flex flex-col gap-lg">
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col justify-between">
+<div class="font-label text-label text-secondary mb-sm uppercase tracking-wider">Active Projects</div>
+<div class="font-metric-lg text-metric-lg text-primary">12</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col justify-between">
+<div class="font-label text-label text-secondary mb-sm uppercase tracking-wider">New Runs Today</div>
+<div class="font-metric-lg text-metric-lg text-primary">156</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col justify-between">
+<div class="font-label text-label text-secondary mb-sm uppercase tracking-wider">Running</div>
+<div class="font-metric-lg text-metric-lg text-primary flex items-center gap-sm">
+                        24
+                        <span class="flex h-3 w-3 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-info opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-info"></span>
+</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col justify-between border-l-4 border-l-error">
+<div class="font-label text-label text-secondary mb-sm uppercase tracking-wider">Failed 24h</div>
+<div class="font-metric-lg text-metric-lg text-error">3</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col justify-between">
+<div class="font-label text-label text-secondary mb-sm uppercase tracking-wider">New Branches</div>
+<div class="font-metric-lg text-metric-lg text-primary">8</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-lg flex-1 min-h-0">
+<!-- Top Winning Results Table (Dense) -->
+<div class="xl:col-span-8 bg-surface-container-lowest border border-outline-variant rounded flex flex-col overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-h3 text-h3 text-primary">Top Winning Results</h2>
+<button class="font-label text-label text-secondary hover:text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                        </button>
+</div>
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-lowest sticky top-0 border-b border-outline-variant z-10">
+<tr>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold truncate">Name</th>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold truncate">Research/Branch</th>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold text-right truncate">Sharpe</th>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold text-right truncate">Max Drawdown</th>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold text-right truncate">IC Mean</th>
+<th class="font-label text-label text-secondary py-sm px-md font-semibold text-right truncate">Last Updated</th>
+</tr>
+</thead>
+<tbody class="font-table-cell text-table-cell divide-y divide-outline-variant text-on-surface">
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">Eq_Mom_Alpha_v3</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">Global_Equities / main</td>
+<td class="py-sm px-md text-right text-positive font-semibold">2.41</td>
+<td class="py-sm px-md text-right text-secondary">-8.2%</td>
+<td class="py-sm px-md text-right text-secondary">0.045</td>
+<td class="py-sm px-md text-right text-secondary text-xs">10m ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">StatArb_FX_G10</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">FX_MeanRev / experiment_beta</td>
+<td class="py-sm px-md text-right text-positive font-semibold">1.95</td>
+<td class="py-sm px-md text-right text-secondary">-12.1%</td>
+<td class="py-sm px-md text-right text-secondary">0.031</td>
+<td class="py-sm px-md text-right text-secondary text-xs">1h ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">Macro_Rates_Carry</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">FixedIncome / carry_opt</td>
+<td class="py-sm px-md text-right text-primary font-semibold">1.62</td>
+<td class="py-sm px-md text-right text-secondary">-4.5%</td>
+<td class="py-sm px-md text-right text-secondary">0.022</td>
+<td class="py-sm px-md text-right text-secondary text-xs">3h ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">Vol_Dispersion_US</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">Options_Vol / main</td>
+<td class="py-sm px-md text-right text-primary font-semibold">1.45</td>
+<td class="py-sm px-md text-right text-negative">-18.4%</td>
+<td class="py-sm px-md text-right text-secondary">0.018</td>
+<td class="py-sm px-md text-right text-secondary text-xs">5h ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">Crypto_Trend_Intraday</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">Digital_Assets / trend_hft</td>
+<td class="py-sm px-md text-right text-primary font-semibold">1.20</td>
+<td class="py-sm px-md text-right text-secondary">-22.1%</td>
+<td class="py-sm px-md text-right text-secondary">0.012</td>
+<td class="py-sm px-md text-right text-secondary text-xs">Yesterday</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-sm px-md font-medium text-primary">Comm_Curve_Roll</td>
+<td class="py-sm px-md text-secondary truncate max-w-[150px]">Commodities / term_structure</td>
+<td class="py-sm px-md text-right text-warning font-semibold">0.85</td>
+<td class="py-sm px-md text-right text-secondary">-6.7%</td>
+<td class="py-sm px-md text-right text-secondary">0.009</td>
+<td class="py-sm px-md text-right text-secondary text-xs">Yesterday</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recent Activity Stream -->
+<div class="xl:col-span-4 bg-surface-container-lowest border border-outline-variant rounded flex flex-col overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-h3 text-h3 text-primary">Recent Activity Stream</h2>
+<button class="p-xs text-secondary hover:text-primary rounded">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-md">
+<div class="relative border-l border-outline-variant ml-sm space-y-lg pb-md">
+<!-- Activity Item 1 -->
+<div class="relative pl-lg">
+<div class="absolute w-3 h-3 bg-primary rounded-full -left-[6.5px] top-1 ring-4 ring-surface-container-lowest"></div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Just now</div>
+<div class="font-body-md text-body-md text-primary font-medium">New branch Alpha-V2 created</div>
+<div class="font-body-sm text-body-sm text-secondary mt-xs">in project <span class="text-primary font-semibold">Global_Equities</span> by You</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="relative pl-lg">
+<div class="absolute w-3 h-3 bg-error rounded-full -left-[6.5px] top-1 ring-4 ring-surface-container-lowest"></div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">45 mins ago</div>
+<div class="font-body-md text-body-md text-primary font-medium">Run Backtest_6552 failed</div>
+<div class="font-body-sm text-body-sm text-secondary mt-xs bg-error-container text-on-error-container p-sm rounded mt-sm border border-error/20 font-mono text-xs">
+                                    Exception: Data pipeline timeout reading from prod_ticks_db.
+                                </div>
+</div>
+<!-- Activity Item 3 -->
+<div class="relative pl-lg">
+<div class="absolute w-3 h-3 bg-info rounded-full -left-[6.5px] top-1 ring-4 ring-surface-container-lowest"></div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">2 hours ago</div>
+<div class="font-body-md text-body-md text-primary font-medium">Agent wrote decision note for Gamma</div>
+<div class="font-body-sm text-body-sm text-secondary mt-xs bg-surface-container p-sm rounded mt-sm border border-outline-variant italic">
+                                    "Identified decaying alpha in momentum factor across Asian markets. Recommending parameter tuning cycle."
+                                </div>
+</div>
+<!-- Activity Item 4 -->
+<div class="relative pl-lg">
+<div class="absolute w-3 h-3 bg-surface-tint rounded-full -left-[6.5px] top-1 ring-4 ring-surface-container-lowest"></div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">5 hours ago</div>
+<div class="font-body-md text-body-md text-primary font-medium">Factor Library synced</div>
+<div class="font-body-sm text-body-sm text-secondary mt-xs">12 new factors pulled from Core Repo.</div>
+</div>
+<!-- Activity Item 5 -->
+<div class="relative pl-lg">
+<div class="absolute w-3 h-3 bg-surface-tint rounded-full -left-[6.5px] top-1 ring-4 ring-surface-container-lowest"></div>
+<div class="font-body-sm text-body-sm text-secondary mb-xs">Yesterday</div>
+<div class="font-body-md text-body-md text-primary font-medium">Optimization suite completed</div>
+<div class="font-body-sm text-body-sm text-secondary mt-xs">for branch <span class="text-primary font-semibold">experiment_beta</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
