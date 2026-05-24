@@ -1,8 +1,13 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import ReactECharts from 'echarts-for-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Activity,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   BarChart3,
   Boxes,
   CheckCircle2,
@@ -125,9 +130,9 @@ function TopBar({ data, onCreated, onSearch }) {
         <span className="text-lg font-semibold text-ink">Blackbox</span>
       </div>
       <div className="flex items-center gap-2">
-        <form className="hidden items-center gap-1 sm:flex" onSubmit={submitSearch}>
+        <form className="relative hidden items-center sm:flex" onSubmit={submitSearch}>
           <input
-            className="h-9 w-52 rounded-md border border-line bg-white/70 px-3 py-2 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-lineStrong focus:bg-white lg:w-72"
+            className="h-9 w-56 rounded-md border border-line bg-white/70 py-2 pl-3 pr-10 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-lineStrong focus:bg-white lg:w-80"
             aria-label="Search runs"
             autoComplete="off"
             name="global_search"
@@ -135,7 +140,7 @@ function TopBar({ data, onCreated, onSearch }) {
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
           />
-          <button className="icon-button" type="submit" aria-label="Search runs" title="Search runs">
+          <button className="absolute right-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-md text-muted transition hover:bg-white hover:text-ink" type="submit" aria-label="Search runs" title="Search runs">
             <Search className="h-4 w-4" />
           </button>
         </form>
@@ -1629,6 +1634,80 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
   );
 }
 
+function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch }) {
+  const pageSize = 10;
+  const [page, setPage] = useState(1);
+  const sortedRuns = useMemo(() => [...(runs || [])].sort((a, b) => (
+    dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at)
+    - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at)
+  )), [runs]);
+  const pageCount = Math.max(1, Math.ceil(sortedRuns.length / pageSize));
+
+  useEffect(() => {
+    setPage(1);
+  }, [scopeKey]);
+
+  useEffect(() => {
+    setPage((current) => Math.min(Math.max(current, 1), pageCount));
+  }, [pageCount]);
+
+  const pageRuns = sortedRuns.slice((page - 1) * pageSize, page * pageSize);
+
+  return (
+    <Panel className="overflow-hidden">
+      <PanelHeader
+        title="Recent Runs"
+        action={(
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted">
+            <span>{sortedRuns.length} runs</span>
+            {pageCount > 1 ? <span>Page {page} / {pageCount}</span> : null}
+          </div>
+        )}
+      />
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[920px] border-collapse">
+          <thead className="table-head">
+            <tr>
+              <th className="px-4 py-3">BRANCH</th>
+              <th className="px-4 py-3">RUN</th>
+              <th className="px-4 py-3">STATUS</th>
+              <th className="px-4 py-3">CREATOR</th>
+              <th className="px-4 py-3 text-right">SHARPE</th>
+              <th className="px-4 py-3 text-right">RUNTIME</th>
+              <th className="px-4 py-3 text-right">UPDATED</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageRuns.length ? pageRuns.map((run) => (
+              <tr className="transition hover:bg-white/45" key={run.id}>
+                <td className="table-cell">
+                  <button className="font-semibold text-ink hover:underline" onClick={() => onSelectBranch(run.branch_id)}>{run.branch_key || run.branch_id || '--'}</button>
+                </td>
+                <td className="table-cell">
+                  <button className="font-semibold text-ink hover:underline" onClick={() => onSelectRun(run.id)}>{run.name}</button>
+                </td>
+                <td className="table-cell"><StatusBadge status={run.status} /></td>
+                <td className="table-cell text-muted">{runCreator(run)}</td>
+                <td className="table-cell text-right font-semibold text-positive">{formatMetric(metricValue(run, 'strategy.summary', 'sharpe'))}</td>
+                <td className="table-cell text-right text-muted">{runRuntime(run)}</td>
+                <td className="table-cell text-right text-muted">{formatDate(run.updated_at || run.ended_at || run.started_at || run.created_at)}</td>
+              </tr>
+            )) : (
+              <tr><td className="table-cell text-muted" colSpan="7">No runs found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {pageCount > 1 ? (
+        <div className="flex items-center justify-end gap-2 border-t border-line px-5 py-3">
+          <button className="secondary-button" type="button" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+          <button className="secondary-button" type="button" disabled={page >= pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>Next</button>
+        </div>
+      ) : null}
+    </Panel>
+  );
+}
+
 function ArtifactSummary({ run }) {
   const count = Number(run.artifact_count || 0);
   const kinds = (run.artifact_kinds || []).slice(0, 2);
@@ -1710,7 +1789,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, onCha
         <ResearchChampionPanel research={research} branches={lineageBranches} runs={lineageRuns} onSelectRun={selectRun} />
       </div>
       {lineageExpanded ? <LineageChartModal option={lineageChartOption} onClose={() => setLineageExpanded(false)} /> : null}
-      <ResearchLineageEdgesPanel edges={lineage?.edges || []} branches={lineageBranches} runs={lineageRuns} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+      <ResearchRecentRunsPanel runs={lineageRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
       <QuickCompareCard
         title="Compare"
         targets={lineageBranches.map((branch) => ({ type: 'branch', id: branch.id }))}
@@ -2252,7 +2331,7 @@ function QuickCompareCard({ title = 'Compare', targets, emptyText = 'No targets 
         const payload = await apiPost('/api/v1/quick-compare', {
           targets: normalizedTargets,
           metrics: quickCompareMetrics,
-          series: ['equity_curve', 'returns_series'],
+          series: ['equity_curve', 'returns_series', 'pnl_series', 'absolute_return_series'],
         });
         if (!cancelled) {
           setResult(payload);
@@ -2399,7 +2478,7 @@ function sortQuickCompareRows(rows, metrics, sort) {
 }
 
 function preferredQuickCompareSeries(series) {
-  for (const name of ['equity_curve', 'returns_series']) {
+  for (const name of ['equity_curve', 'returns_series', 'pnl_series', 'absolute_return_series']) {
     if (series?.[name]) return { name, byRun: series[name] };
   }
   const first = Object.entries(series || {})[0];
@@ -2993,13 +3072,16 @@ function SweepParetoPanel({ summary, runs, onSelectRun }) {
 }
 
 function RunPage({ runDetail, data, onRunChanged }) {
-  const [activeTab, setActiveTab] = useState('metrics');
+  const [activeTab, setActiveTab] = useState('results');
   if (!runDetail) return <EmptyState title="No run selected" detail="Select a run from Dashboard, Research, or Branch." />;
   const metrics = runDetail.metrics || [];
   const artifacts = runDetail.artifacts || [];
   const events = runDetail.events || [];
   const notes = runDetail.notes || [];
-  const keyMetrics = runKeyMetricTiles(runDetail);
+  const seriesArtifacts = runSeriesArtifacts(runDetail);
+  const equityChart = runEquityChartData(seriesArtifacts);
+  const resultItems = runResultItems(runDetail);
+  const keyMetrics = runKeyMetricTiles(runDetail, equityChart);
   return (
     <div className="space-y-5">
       <Hero
@@ -3009,20 +3091,19 @@ function RunPage({ runDetail, data, onRunChanged }) {
         action={<StatusBadge status={runDetail.status} />}
       />
       <RunSummaryStrip run={runDetail} />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-8">
-        {keyMetrics.map((item) => <StatTile key={item.label} label={item.label} value={item.value} tone={item.tone} />)}
-      </div>
-      <RunPrimaryChart run={runDetail} />
-      <RunWritePanel run={runDetail} data={data} onRunChanged={onRunChanged} />
       <RunTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        resultItems={resultItems}
+        keyMetrics={keyMetrics}
+        equityChart={equityChart}
         metrics={metrics}
         events={events}
         artifacts={artifacts}
         run={runDetail}
         notes={notes}
       />
+      <RunWritePanel run={runDetail} data={data} onRunChanged={onRunChanged} />
     </div>
   );
 }
@@ -3124,27 +3205,203 @@ function RunWritePanel({ run, data, onRunChanged }) {
   );
 }
 
-function RunPrimaryChart({ run }) {
-  const seriesArtifacts = runSeriesArtifacts(run);
-  const equityChart = runEquityChartData(seriesArtifacts);
+function RunResultsPanel({ chart, resultItems, keyMetrics = [] }) {
+  const [selectedArtifact, setSelectedArtifact] = useState(null);
+  const [selectedDataMetric, setSelectedDataMetric] = useState(null);
+  const performanceItems = resultItems.filter((item) => item.domain === 'performance');
+  const domainGroups = groupRunResultsByDomain(resultItems.filter((item) => item.domain !== 'performance'));
+  return (
+    <div className="space-y-6 p-4">
+      <section>
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-ink">Performance</h3>
+            <div className="mt-1 text-xs text-muted">{performanceItems.length ? `${performanceItems.length} result artifacts` : 'primary curve and drawdown'}</div>
+          </div>
+        </div>
+        {keyMetrics.length ? (
+          <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+            {keyMetrics.map((item) => <StatTile key={item.label} label={item.label} value={item.value} tone={item.tone} />)}
+          </div>
+        ) : null}
+        <div className="rounded-md border border-line bg-white/45 p-4">
+          {chart ? (
+            <ReactECharts option={runEquityChartOption(chart)} style={{ height: 420 }} />
+          ) : <div className="p-8 text-center text-sm font-semibold text-muted">No Series Data Available</div>}
+        </div>
+      </section>
+      {domainGroups.length ? domainGroups.map((domainGroup) => (
+        <RunResultDomainSection
+          domainGroup={domainGroup}
+          key={domainGroup.domain}
+          onOpenArtifact={setSelectedArtifact}
+          onOpenDataMetric={setSelectedDataMetric}
+        />
+      )) : (
+        <div className="rounded-md border border-line bg-white/35 p-5 text-sm text-muted">
+          No typed non-performance results yet. Use result metadata for factor, factor batch, diagnostic, or custom artifacts.
+        </div>
+      )}
+      {selectedArtifact ? <ArtifactDetailModal artifact={selectedArtifact} onClose={() => setSelectedArtifact(null)} /> : null}
+      {selectedDataMetric ? <MetricDataModal item={selectedDataMetric} onClose={() => setSelectedDataMetric(null)} /> : null}
+    </div>
+  );
+}
+
+function RunResultDomainSection({ domainGroup, onOpenArtifact, onOpenDataMetric }) {
+  return (
+    <section>
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-ink">{resultDomainLabel(domainGroup.domain)}</h3>
+          <div className="mt-1 text-xs text-muted">{domainGroup.itemCount} result artifacts · {domainGroup.groups.length} groups</div>
+        </div>
+      </div>
+      <div className="space-y-3">
+        {domainGroup.groups.map((group) => (
+          <RunResultGroup
+            group={group}
+            key={group.key}
+            onOpenArtifact={onOpenArtifact}
+            onOpenDataMetric={onOpenDataMetric}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RunResultGroup({ group, onOpenArtifact, onOpenDataMetric }) {
+  const chartItems = group.items.filter(isResultSeriesChartable).slice(0, 2);
+  return (
+    <div className="rounded-md border border-line bg-white/45">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
+        <div>
+          <div className="text-sm font-semibold text-ink">{group.title}</div>
+          <div className="mt-1 text-xs text-muted">{group.items.length} artifacts</div>
+        </div>
+      </div>
+      {chartItems.length ? (
+        <div className="grid gap-3 border-b border-line p-4">
+          {chartItems.map((item) => (
+            <div className="min-w-0" key={`chart-${item.artifact.id}`}>
+              <div className="mb-2 truncate text-xs font-semibold text-muted">{item.title}</div>
+              <ReactECharts option={resultSeriesChartOption(item)} style={{ height: 380 }} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[860px] border-collapse">
+          <thead className="table-head">
+            <tr><th className="px-4 py-3">Result</th><th className="px-4 py-3">Role</th><th className="px-4 py-3">Artifact</th><th className="px-4 py-3">Abstract</th><th className="px-4 py-3 text-right">Actions</th></tr>
+          </thead>
+          <tbody>
+            {group.items.map((item) => (
+              <tr className="hover:bg-white/45" key={item.artifact.id}>
+                <td className="table-cell">
+                  <div className="font-semibold text-ink">{item.title}</div>
+                  <div className="mt-1 text-xs text-muted">{item.result.name || item.artifact.name}</div>
+                </td>
+                <td className="table-cell text-muted">{resultRoleLabel(item.role)}</td>
+                <td className="table-cell text-muted">{item.artifact.name} · {item.artifact.kind}</td>
+                <td className="table-cell max-w-[420px] text-muted"><ArtifactPreviewSummary preview={item.artifact.preview_json || {}} /></td>
+                <td className="table-cell">
+                  <div className="flex justify-end gap-2">
+                    <button className="icon-button" type="button" onClick={() => onOpenDataMetric(resultMetricModalItem(item))} aria-label={`View result ${item.title}`} title="View data">
+                      <TableProperties className="h-4 w-4" />
+                    </button>
+                    <button className="icon-button" type="button" onClick={() => onOpenArtifact(item.artifact)} aria-label={`View artifact ${item.artifact.name}`} title="View artifact">
+                      <FileText className="h-4 w-4" />
+                    </button>
+                    <a className="icon-button" href={artifactContentUrl(item.artifact.id)} target="_blank" rel="noreferrer" title="Open artifact">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function resultMetricModalItem(item) {
+  const metadata = item.artifact.metadata_json || {};
+  const metric = metadata.metric && typeof metadata.metric === 'object' ? metadata.metric : null;
+  const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
+  return {
+    id: `result-${item.artifact.id}`,
+    namespace: metric?.namespace || series?.namespace || item.domain,
+    key: metric?.key || item.result.name || item.artifact.name,
+    artifact: item.artifact,
+    metricBinding: metric,
+    seriesBinding: series,
+  };
+}
+
+function isResultSeriesChartable(item) {
+  const metadata = item.artifact.metadata_json || {};
+  const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
+  const rows = Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : [];
+  if (!series || !rows.length) return false;
+  const yKeys = Array.isArray(series.y) ? series.y : [series.y || 'series_values'].filter(Boolean);
+  return yKeys.some((key) => rows.some((row) => Number.isFinite(toNumber(row?.[key]))));
+}
+
+function resultSeriesChartOption(item) {
+  const metadata = item.artifact.metadata_json || {};
+  const seriesMeta = metadata.series || {};
+  const rows = Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : [];
+  const yKeys = (Array.isArray(seriesMeta.y) ? seriesMeta.y : [seriesMeta.y || 'series_values'])
+    .filter((key) => rows.some((row) => Number.isFinite(toNumber(row?.[key]))))
+    .slice(0, 6);
+  const seriesItem = {
+    name: seriesMeta.name || item.artifact.name,
+    mode: seriesMeta.mode || null,
+    namespace: seriesMeta.namespace || null,
+    rows,
+  };
+  return {
+    animation: false,
+    color: ['#111111', '#2563eb', '#16a34a', '#f97316', '#7c3aed', '#dc2626'],
+    tooltip: { trigger: 'axis' },
+    legend: { top: 0, left: 0, right: 8, type: 'scroll', textStyle: { color: '#6b7280' } },
+    grid: { top: 42, left: 44, right: 12, bottom: 34 },
+    xAxis: { type: 'category', boundaryGap: false, axisLabel: { color: '#6b7280', hideOverlap: true } },
+    yAxis: { type: 'value', scale: true, axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#e5e7eb' } } },
+    series: yKeys.map((key) => ({
+      name: key,
+      type: 'line',
+      showSymbol: false,
+      smooth: false,
+      data: seriesPreviewData(seriesItem.name, { ...seriesItem, y: yKeys }, key, seriesMeta.x),
+    })),
+  };
+}
+
+function RunPrimaryChart({ chart }) {
   return (
     <Panel className="overflow-hidden">
       <div className="p-4">
-        {equityChart ? (
-          <ReactECharts option={runEquityChartOption(equityChart)} style={{ height: 420 }} />
+        {chart ? (
+          <ReactECharts option={runEquityChartOption(chart)} style={{ height: 420 }} />
         ) : <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">No Series Data Available</div>}
       </div>
     </Panel>
   );
 }
 
-function RunTabs({ activeTab, setActiveTab, metrics, events, artifacts, run, notes }) {
+function RunTabs({ activeTab, setActiveTab, resultItems, keyMetrics, equityChart, metrics, events, artifacts, run, notes }) {
   const tabs = [
+    { id: 'results', label: 'Results', icon: LineChart },
     { id: 'metrics', label: 'Metrics', icon: BarChart3 },
     { id: 'events', label: 'Events', icon: Activity },
     { id: 'artifacts', label: 'Artifacts', icon: FileText },
     { id: 'config', label: 'Config', icon: GitBranch },
-    { id: 'snapshots', label: 'Code / Data / Env', icon: Database },
+    { id: 'snapshots', label: 'Context', icon: Database },
     { id: 'notes', label: 'Notes', icon: ListTree },
   ];
   return (
@@ -3160,7 +3417,8 @@ function RunTabs({ activeTab, setActiveTab, metrics, events, artifacts, run, not
           </button>
         ))}
       </div>
-      {activeTab === 'metrics' && <MetricsPanel metrics={metrics} />}
+      {activeTab === 'results' && <RunResultsPanel chart={equityChart} resultItems={resultItems || []} keyMetrics={keyMetrics || []} />}
+      {activeTab === 'metrics' && <MetricsPanel metrics={metrics} artifacts={artifacts} />}
       {activeTab === 'events' && <EventsPanel events={events} />}
       {activeTab === 'artifacts' && <ArtifactsPanel artifacts={artifacts} />}
       {activeTab === 'config' && <RunConfigPanel run={run} />}
@@ -3170,18 +3428,20 @@ function RunTabs({ activeTab, setActiveTab, metrics, events, artifacts, run, not
   );
 }
 
-function MetricsPanel({ metrics }) {
-  const namespaces = Array.from(new Set((metrics || []).map((metric) => metric.namespace || 'default'))).sort();
+function MetricsPanel({ metrics, artifacts }) {
+  const rows = useMemo(() => metricDisplayRows(metrics, artifacts), [metrics, artifacts]);
+  const namespaces = Array.from(new Set(rows.map((row) => row.namespace || 'default'))).sort();
   const [namespace, setNamespace] = useState('all');
   const [query, setQuery] = useState('');
+  const [selectedDataMetric, setSelectedDataMetric] = useState(null);
   useEffect(() => {
     if (namespace !== 'all' && !namespaces.includes(namespace)) setNamespace('all');
   }, [namespace, namespaces.join('|')]);
   const normalizedQuery = query.trim().toLowerCase();
-  const filtered = (metrics || []).filter((metric) => {
-    if (namespace !== 'all' && (metric.namespace || 'default') !== namespace) return false;
+  const filtered = rows.filter((row) => {
+    if (namespace !== 'all' && (row.namespace || 'default') !== namespace) return false;
     if (!normalizedQuery) return true;
-    return metricSearchText(metric).includes(normalizedQuery);
+    return row.searchText.includes(normalizedQuery);
   });
   return (
     <div>
@@ -3195,14 +3455,15 @@ function MetricsPanel({ metrics }) {
             </SelectInput>
           </Field>
           <Field label="Search metrics">
-            <TextInput value={query} onChange={(event) => setQuery(event.target.value)} placeholder="key, value, point, client event id" />
+            <TextInput value={query} onChange={(event) => setQuery(event.target.value)} placeholder="key, value, point, artifact" />
           </Field>
         </div>
         <div className="text-xs font-semibold text-muted">
-          {filtered.length} shown · {(metrics || []).length} total · {namespaces.length} namespaces
+          {filtered.length} shown · {rows.length} total · {namespaces.length} namespaces
         </div>
       </div>
-      <MetricsTable metrics={filtered} />
+      <MetricsTable rows={filtered} onOpenDataMetric={setSelectedDataMetric} />
+      {selectedDataMetric ? <MetricDataModal item={selectedDataMetric} onClose={() => setSelectedDataMetric(null)} /> : null}
     </div>
   );
 }
@@ -3593,10 +3854,14 @@ function MetricForm({ run, onRunChanged }) {
 function SeriesForm({ run, onRunChanged }) {
   const [form, setForm] = useState({
     name: 'returns',
-    data: '[{"date":"2026-01-01","ret":0.01}]',
+    data: '[{"date":"2026-01-01","series_values":0.01}]',
     x: 'date',
-    y: 'ret',
+    y: 'series_values',
+    mode: 'return',
     namespace: '',
+    metric_key: '',
+    metric_namespace: '',
+    metric_kind: 'series',
     kind: 'table_csv',
     filename: '',
   });
@@ -3613,7 +3878,16 @@ function SeriesForm({ run, onRunChanged }) {
         data: parseJsonArray(form.data),
         x: form.x || null,
         y: parseCsv(form.y),
+        mode: form.mode || null,
         namespace: form.namespace || null,
+        metric: form.metric_key ? {
+          namespace: form.metric_namespace || form.namespace || 'default',
+          key: form.metric_key,
+          kind: form.metric_kind || 'series',
+          x: form.x || null,
+          y: parseCsv(form.y),
+          mode: form.mode || null,
+        } : null,
         kind: form.kind || 'table_csv',
         filename: form.filename || null,
       });
@@ -3631,9 +3905,28 @@ function SeriesForm({ run, onRunChanged }) {
         <Field label="Rows JSON"><TextArea required value={form.data} onChange={(event) => update('data', event.target.value)} /></Field>
         <div className="grid grid-cols-2 gap-2">
           <Field label="X"><TextInput value={form.x} onChange={(event) => update('x', event.target.value)} /></Field>
-          <Field label="Y"><TextInput value={form.y} onChange={(event) => update('y', event.target.value)} /></Field>
+          <Field label="Value column"><TextInput value={form.y} onChange={(event) => update('y', event.target.value)} placeholder="series_values" /></Field>
         </div>
+        <Field label="Mode">
+          <SelectInput value={form.mode} onChange={(event) => update('mode', event.target.value)}>
+            <option value="nav">nav</option>
+            <option value="return">return</option>
+            <option value="pnl">pnl</option>
+            <option value="drawdown">drawdown</option>
+            <option value="level">level</option>
+          </SelectInput>
+        </Field>
         <Field label="Namespace"><TextInput value={form.namespace} onChange={(event) => update('namespace', event.target.value)} placeholder="strategy.returns" /></Field>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Metric key"><TextInput value={form.metric_key} onChange={(event) => update('metric_key', event.target.value)} placeholder="optional" /></Field>
+          <Field label="Metric namespace"><TextInput value={form.metric_namespace} onChange={(event) => update('metric_namespace', event.target.value)} placeholder="defaults to namespace" /></Field>
+        </div>
+        <Field label="Metric data type">
+          <SelectInput value={form.metric_kind} onChange={(event) => update('metric_kind', event.target.value)}>
+            <option value="series">series</option>
+            <option value="table">table</option>
+          </SelectInput>
+        </Field>
         <Field label="Kind">
           <SelectInput value={form.kind} onChange={(event) => update('kind', event.target.value)}>
             <option value="table_csv">table_csv</option>
@@ -5165,7 +5458,7 @@ function seriesChartOption(name, byRun, runById) {
     const yKeys = Array.isArray(item.y) ? item.y : [item.y].filter(Boolean);
     const xKey = item.x;
     return yKeys.map((yKey) => {
-      const data = (item.rows || []).map((row, index) => [xKey ? row[xKey] : index + 1, Number(row[yKey])]).filter((point) => Number.isFinite(point[1]));
+      const data = seriesPreviewData(name, item, yKey, xKey);
       const runName = runById[runId]?.name || runId;
       return {
         name: yKeys.length > 1 ? `${runName} / ${yKey}` : runName,
@@ -5184,6 +5477,26 @@ function seriesChartOption(name, byRun, runById) {
     yAxis: { type: 'value', scale: true },
     series: seriesItems.length ? seriesItems : [{ name, type: 'line', showSymbol: false, data: [] }],
   };
+}
+
+function seriesPreviewData(seriesName, item, yKey, xKey) {
+  const valueMode = seriesValueMode({ ...item, name: seriesName }, yKey);
+  let compounded = 1;
+  let cumulative = 0;
+  return (item.rows || []).map((row, index) => {
+    const raw = toNumber(row?.[yKey]);
+    if (!Number.isFinite(raw)) return null;
+    const x = xKey ? row[xKey] : index + 1;
+    if (valueMode === 'period_return') {
+      compounded *= 1 + raw;
+      return [x, compounded - 1];
+    }
+    if (valueMode === 'absolute_change') {
+      cumulative += raw;
+      return [x, cumulative];
+    }
+    return [x, raw];
+  }).filter(Boolean);
 }
 
 function sortComparedRuns(runs, metrics, sortMetric, sortDirection) {
@@ -5433,9 +5746,9 @@ function Hero({ eyebrow, title, description, action }) {
   );
 }
 
-function MetricsTable({ metrics }) {
-  const groups = groupMetricsByNamespace(metrics);
-  if (!metrics.length) return <div className="p-5 text-sm text-muted">No scalar metrics yet.</div>;
+function MetricsTable({ rows, onOpenDataMetric }) {
+  const groups = groupMetricRowsByNamespace(rows);
+  if (!rows.length) return <div className="p-5 text-sm text-muted">No metrics yet.</div>;
   return (
     <div className="divide-y divide-line">
       {groups.map((group) => (
@@ -5445,15 +5758,20 @@ function MetricsTable({ metrics }) {
             <div className="text-xs font-semibold text-muted">{group.rows.length} metrics</div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] border-collapse">
-              <thead className="table-head"><tr><th className="px-4 py-3">Metric</th><th className="px-4 py-3 text-right">Value</th><th className="px-4 py-3">Point</th><th className="px-4 py-3">Client event</th></tr></thead>
+            <table className="w-full min-w-[840px] border-collapse">
+              <thead className="table-head"><tr><th className="px-4 py-3">Metric</th><th className="px-4 py-3">Type</th><th className="px-4 py-3 text-right">Value / Shape</th><th className="px-4 py-3">Point</th><th className="px-4 py-3">Source</th></tr></thead>
               <tbody>
-                {group.rows.map((metric) => (
-                  <tr key={metric.id} className="hover:bg-white/45">
-                    <td className="table-cell font-semibold text-ink">{metric.key}</td>
-                    <td className="table-cell text-right">{metricDisplayValue(metric)}</td>
-                    <td className="table-cell text-muted">{metric.point_event_name || metric.point_kind || '--'}</td>
-                    <td className="table-cell text-muted">{metric.client_event_id || '--'}</td>
+                {group.rows.map((row) => (
+                  <tr key={row.id} className="hover:bg-white/45">
+                    <td className="table-cell font-semibold text-ink">
+                      {row.type === 'scalar' ? row.key : (
+                        <button className="font-semibold text-ink hover:underline" type="button" onClick={() => onOpenDataMetric(row)}>{row.key}</button>
+                      )}
+                    </td>
+                    <td className="table-cell text-muted">{row.type}</td>
+                    <td className="table-cell text-right">{row.displayValue}</td>
+                    <td className="table-cell text-muted">{row.point || '--'}</td>
+                    <td className="table-cell text-muted">{row.source || '--'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -5465,15 +5783,88 @@ function MetricsTable({ metrics }) {
   );
 }
 
-function groupMetricsByNamespace(metrics) {
+function metricDisplayRows(metrics, artifacts) {
+  const scalarRows = (metrics || []).map((metric) => {
+    const displayValue = metricDisplayValue(metric);
+    return {
+      id: `metric-${metric.id}`,
+      namespace: metric.namespace || 'default',
+      key: metric.key,
+      type: 'scalar',
+      displayValue,
+      point: metricPointLabel(metric),
+      source: metric.client_event_id || '--',
+      metric,
+      searchText: metricSearchText(metric),
+    };
+  });
+  const dataRows = (artifacts || []).map(metricArtifactRow).filter(Boolean);
+  return [...scalarRows, ...dataRows].sort((left, right) => (
+    left.namespace.localeCompare(right.namespace)
+    || left.key.localeCompare(right.key)
+    || left.type.localeCompare(right.type)
+  ));
+}
+
+function metricArtifactRow(artifact) {
+  const metadata = artifact.metadata_json || {};
+  const metric = metadata.metric && typeof metadata.metric === 'object' ? metadata.metric : null;
+  const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
+  if (!metric && !series?.namespace) return null;
+  const namespace = metric?.namespace || series?.namespace || 'default';
+  const key = metric?.key || series?.name || artifact.name;
+  const type = metric?.kind || (series ? 'series' : 'table');
+  const rows = Array.isArray(artifact.preview_json?.rows) ? artifact.preview_json.rows : [];
+  const columns = Array.isArray(artifact.preview_json?.columns) ? artifact.preview_json.columns : [];
+  const rowCount = Number(artifact.preview_json?.row_count);
+  const displayValue = [
+    Number.isFinite(rowCount) ? `${rowCount} rows` : rows.length ? `${rows.length} preview rows` : null,
+    columns.length ? `${columns.length} columns` : null,
+  ].filter(Boolean).join(' · ') || artifact.kind || '--';
+  return {
+    id: `artifact-${artifact.id}`,
+    namespace,
+    key,
+    type,
+    displayValue,
+    point: metric?.point || metric?.event || series?.mode || '--',
+    source: artifact.name,
+    artifact,
+    metricBinding: metric,
+    seriesBinding: series,
+    searchText: [
+      namespace,
+      key,
+      type,
+      displayValue,
+      artifact.name,
+      artifact.kind,
+      artifact.filename,
+      JSON.stringify(metadata),
+      JSON.stringify(artifact.preview_json || {}),
+    ].filter(Boolean).join(' ').toLowerCase(),
+  };
+}
+
+function groupMetricRowsByNamespace(rows) {
   const groups = new Map();
-  for (const metric of metrics || []) {
-    const namespace = metric.namespace || 'default';
-    groups.set(namespace, [...(groups.get(namespace) || []), metric]);
+  for (const row of rows || []) {
+    const namespace = row.namespace || 'default';
+    groups.set(namespace, [...(groups.get(namespace) || []), row]);
   }
   return Array.from(groups.entries())
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([namespace, rows]) => ({ namespace, rows }));
+}
+
+function metricPointLabel(metric) {
+  const parts = [
+    metric.point_event_name || metric.point_kind,
+    metric.point_step !== null && metric.point_step !== undefined ? `step ${metric.point_step}` : null,
+    metric.point_timestamp ? formatDate(metric.point_timestamp) : null,
+    metric.point_coord_json && Object.keys(metric.point_coord_json).length ? compactKeyValueSummary(metric.point_coord_json) : null,
+  ].filter(Boolean);
+  return parts.join(' · ') || '--';
 }
 
 function metricDisplayValue(metric) {
@@ -5496,6 +5887,298 @@ function metricSearchText(metric) {
     JSON.stringify(metric.point_coord_json || {}),
     metric.client_event_id,
   ].filter((value) => value !== null && value !== undefined && value !== '').join(' ').toLowerCase();
+}
+
+function MetricDataModal({ item, onClose }) {
+  const [activeView, setActiveView] = useState('table');
+  const [detail, setDetail] = useState(item.artifact);
+  const [rows, setRows] = useState(() => Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : []);
+  const [markdownText, setMarkdownText] = useState('');
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    setDetail(item.artifact);
+    setRows(Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : []);
+    setMarkdownText('');
+    setError(null);
+    apiGet(`/api/v1/artifacts/${item.artifact.id}`)
+      .then(async (payload) => {
+        if (cancelled) return;
+        setDetail(payload);
+        if (isMarkdownArtifact(payload)) {
+          const text = await loadArtifactText(payload);
+          if (!cancelled) setMarkdownText(text || markdownTextFromPreview(payload.preview_json));
+        } else {
+          const parsedRows = await loadArtifactRows(payload);
+          if (!cancelled) setRows(parsedRows.length ? parsedRows : (Array.isArray(payload.preview_json?.rows) ? payload.preview_json.rows : []));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      });
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [item.artifact.id, onClose]);
+  const columns = metricDataColumns(rows, detail.preview_json || {});
+  const isMarkdown = isMarkdownArtifact(detail);
+  return (
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+      <div className="max-h-[calc(100vh-8rem)] w-full max-w-5xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold text-ink">{item.namespace}.{item.key}</h2>
+            <div className="mt-1 truncate text-xs text-muted">{detail.name} · {detail.kind} · {rows.length || 0} rows</div>
+          </div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Close metric details">
+            <XCircle className="h-4 w-4" />
+          </button>
+        </div>
+        {isMarkdown ? null : (
+          <div className="flex gap-2 border-b border-line p-3">
+            {['table', 'plot'].map((view) => (
+              <button className={`secondary-button ${activeView === view ? 'border-lineStrong bg-white text-ink shadow-insetLine' : 'text-muted'}`} key={view} type="button" onClick={() => setActiveView(view)}>
+                {view === 'table' ? 'Table' : 'Plot'}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="max-h-[calc(100vh-18rem)] overflow-y-auto p-4">
+          <InlineError message={error} />
+          {isMarkdown ? <MarkdownDocument text={markdownText || markdownTextFromPreview(detail.preview_json)} /> : (
+            activeView === 'table' ? <MetricDataTable columns={columns} rows={rows} /> : <MetricDataPlot item={item} rows={rows} columns={columns} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function loadArtifactRows(artifact) {
+  try {
+    const response = await fetch(artifactContentUrl(artifact.id));
+    if (!response.ok) return [];
+    const text = await response.text();
+    if (looksLikeJsonArtifact(artifact)) return rowsFromJsonText(text);
+    if (looksLikeCsvArtifact(artifact)) return parseCsvRows(text);
+    return rowsFromJsonText(text);
+  } catch {
+    return [];
+  }
+}
+
+async function loadArtifactText(artifact) {
+  try {
+    const response = await fetch(artifactContentUrl(artifact.id));
+    if (!response.ok) return '';
+    return await response.text();
+  } catch {
+    return '';
+  }
+}
+
+function isMarkdownArtifact(artifact) {
+  const name = String(artifact?.filename || artifact?.name || '').toLowerCase();
+  const kind = String(artifact?.kind || '').toLowerCase();
+  const mimeType = String(artifact?.mime_type || '').toLowerCase();
+  return kind.includes('markdown') || mimeType.includes('markdown') || name.endsWith('.md') || name.endsWith('.markdown');
+}
+
+function markdownTextFromPreview(preview) {
+  const rows = Array.isArray(preview?.rows) ? preview.rows : [];
+  if (!rows.length) return '';
+  return rows.map((row) => {
+    if (typeof row === 'string') return row;
+    if (row && typeof row === 'object') {
+      return row.markdown || row.content || row.text || row.line || Object.values(row).join(' ');
+    }
+    return String(row ?? '');
+  }).join('\n');
+}
+
+function MarkdownDocument({ text }) {
+  if (!String(text || '').trim()) {
+    return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">No markdown content available.</div>;
+  }
+  return (
+    <div className="markdown-document max-h-[calc(100vh-18rem)] overflow-auto rounded-md border border-line bg-white/55 p-5 text-sm leading-7 text-ink">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+    </div>
+  );
+}
+
+function looksLikeJsonArtifact(artifact) {
+  const name = String(artifact.filename || '').toLowerCase();
+  return name.endsWith('.json') || String(artifact.mime_type || '').includes('json');
+}
+
+function looksLikeCsvArtifact(artifact) {
+  const name = String(artifact.filename || '').toLowerCase();
+  return name.endsWith('.csv') || String(artifact.mime_type || '').includes('csv') || String(artifact.mime_type || '').startsWith('text/');
+}
+
+function rowsFromJsonText(text) {
+  try {
+    const payload = JSON.parse(text);
+    if (Array.isArray(payload)) return payload.filter((row) => row && typeof row === 'object');
+    if (Array.isArray(payload?.rows)) return payload.rows.filter((row) => row && typeof row === 'object');
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+function parseCsvRows(text) {
+  const lines = String(text || '').split(/\r?\n/).filter((line) => line.trim() !== '');
+  if (lines.length < 2) return [];
+  const headers = parseCsvLine(lines[0]);
+  return lines.slice(1).map((line) => {
+    const values = parseCsvLine(line);
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? '']));
+  });
+}
+
+function parseCsvLine(line) {
+  const values = [];
+  let current = '';
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      current += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      values.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  values.push(current);
+  return values;
+}
+
+function metricDataColumns(rows, preview) {
+  const previewColumns = Array.isArray(preview.columns) ? preview.columns : [];
+  if (previewColumns.length) return previewColumns;
+  const columns = new Set();
+  for (const row of rows || []) {
+    Object.keys(row || {}).forEach((key) => columns.add(key));
+    if (columns.size >= 24) break;
+  }
+  return Array.from(columns);
+}
+
+function MetricDataTable({ columns, rows }) {
+  const [sort, setSort] = useState({ column: null, direction: 'asc' });
+  if (!rows.length || !columns.length) return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">No table data available.</div>;
+  const visibleColumns = columns.slice(0, 12);
+  const sortedRows = useMemo(() => sortMetricDataRows(rows, sort), [rows, sort.column, sort.direction]);
+  const toggleSort = (column) => {
+    setSort((current) => (
+      current.column === column
+        ? { column, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+        : { column, direction: 'asc' }
+    ));
+  };
+  return (
+    <div className="max-h-[520px] overflow-auto rounded-md border border-line">
+      <table className="w-full min-w-[760px] border-collapse">
+        <thead className="table-head">
+          <tr>
+            {visibleColumns.map((column) => {
+              const active = sort.column === column;
+              const SortIcon = active ? (sort.direction === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
+              return (
+                <th className="px-4 py-3" key={column} aria-sort={active ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
+                  <button
+                    className="inline-flex max-w-full items-center gap-1 text-left font-semibold text-muted transition hover:text-ink"
+                    type="button"
+                    onClick={() => toggleSort(column)}
+                    title={`Sort by ${column}`}
+                  >
+                    <span className="truncate">{formatTableHeader(column)}</span>
+                    <SortIcon className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-ink' : 'text-muted/60'}`} />
+                  </button>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {sortedRows.slice(0, 500).map((row, index) => (
+            <tr className="hover:bg-white/45" key={index}>
+              {visibleColumns.map((column) => <td className="table-cell text-muted" key={column}>{formatPreviewCell(row?.[column])}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function sortMetricDataRows(rows, sort) {
+  if (!sort?.column) return rows;
+  const direction = sort.direction === 'desc' ? -1 : 1;
+  return [...(rows || [])].map((row, index) => ({ row, index })).sort((left, right) => {
+    const compared = compareMetricDataValues(left.row?.[sort.column], right.row?.[sort.column]);
+    return compared === 0 ? left.index - right.index : compared * direction;
+  }).map((item) => item.row);
+}
+
+function compareMetricDataValues(left, right) {
+  const leftEmpty = isEmptySortValue(left);
+  const rightEmpty = isEmptySortValue(right);
+  if (leftEmpty && rightEmpty) return 0;
+  if (leftEmpty) return 1;
+  if (rightEmpty) return -1;
+  const leftNumber = toNumber(left);
+  const rightNumber = toNumber(right);
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return leftNumber - rightNumber;
+  const leftTime = Date.parse(left);
+  const rightTime = Date.parse(right);
+  if (Number.isFinite(leftTime) && Number.isFinite(rightTime)) return leftTime - rightTime;
+  return String(left).localeCompare(String(right), undefined, { numeric: true, sensitivity: 'base' });
+}
+
+function isEmptySortValue(value) {
+  return value === null || value === undefined || value === '';
+}
+
+function MetricDataPlot({ item, rows, columns }) {
+  const xKey = item.metricBinding?.x || item.seriesBinding?.x || columns[0] || null;
+  const requestedY = item.metricBinding?.y || item.seriesBinding?.y;
+  const requestedYKeys = Array.isArray(requestedY) ? requestedY : [requestedY].filter(Boolean);
+  const numericColumns = columns.filter((column) => column !== xKey && rows.some((row) => Number.isFinite(toNumber(row?.[column]))));
+  const yKeys = (requestedYKeys.length ? requestedYKeys : numericColumns).filter((column) => numericColumns.includes(column)).slice(0, 6);
+  if (!rows.length || !xKey || !yKeys.length) return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">No plottable numeric data.</div>;
+  const option = {
+    color: ['#2563eb', '#16a34a', '#f97316', '#7c3aed', '#0891b2', '#dc2626'],
+    tooltip: { trigger: 'axis' },
+    legend: { top: 0, textStyle: { color: '#6b7280' } },
+    grid: { left: 54, right: 22, top: 48, bottom: 54 },
+    xAxis: { type: 'category', data: rows.map((row, index) => String(row?.[xKey] ?? index + 1)), axisLabel: { color: '#6b7280' } },
+    yAxis: { type: 'value', axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#e5e7eb' } } },
+    series: yKeys.map((key) => ({
+      name: key,
+      type: 'line',
+      showSymbol: false,
+      smooth: false,
+      data: rows.map((row) => {
+        const value = toNumber(row?.[key]);
+        return Number.isFinite(value) ? value : null;
+      }),
+    })),
+  };
+  return <ReactECharts option={option} style={{ height: 430, width: '100%' }} />;
 }
 
 function ArtifactList({ artifacts }) {
@@ -5689,7 +6372,7 @@ function ArtifactPreviewTable({ columns, rows }) {
     <div className="max-h-[420px] overflow-auto rounded-md border border-line">
       <table className="w-full min-w-[640px] border-collapse">
         <thead className="table-head">
-          <tr>{visibleColumns.map((column) => <th className="px-4 py-3" key={column}>{column}</th>)}</tr>
+          <tr>{visibleColumns.map((column) => <th className="px-4 py-3" key={column}>{formatTableHeader(column)}</th>)}</tr>
         </thead>
         <tbody>
           {rows.slice(0, 20).map((row, index) => (
@@ -5715,13 +6398,21 @@ function formatPreviewCell(value) {
   return String(value);
 }
 
+function formatTableHeader(value) {
+  return String(value || '').toUpperCase();
+}
+
 function ArtifactPreviewSummary({ preview }) {
   const summary = [];
   if (preview.format) summary.push(preview.format);
   if (preview.title) summary.push(`title: ${preview.title}`);
   if (preview.width && preview.height) summary.push(`${preview.width}x${preview.height}`);
   if (Number.isFinite(Number(preview.row_count))) summary.push(`${preview.row_count} rows`);
-  if (Array.isArray(preview.columns) && preview.columns.length) summary.push(`columns: ${preview.columns.slice(0, 6).join(', ')}`);
+  if (Array.isArray(preview.columns) && preview.columns.length) {
+    const shownColumns = preview.columns.slice(0, 3);
+    const remaining = preview.columns.length - shownColumns.length;
+    summary.push(`columns: ${shownColumns.join(', ')}${remaining > 0 ? `, +${remaining} more` : ''}`);
+  }
   if (Array.isArray(preview.schema) && preview.schema.length) summary.push(`schema: ${preview.schema.slice(0, 4).map((field) => `${field.name}${field.type ? `:${field.type}` : ''}`).join(', ')}`);
   if (Array.isArray(preview.keys) && preview.keys.length) summary.push(`keys: ${preview.keys.slice(0, 8).join(', ')}`);
   if (preview.preview_status) summary.push(preview.preview_status);
@@ -5843,7 +6534,7 @@ function SnapshotsDetailPanel({ snapshots }) {
   const filteredCount = groups.reduce((sum, group) => sum + group.rows.length, 0);
   return (
     <div>
-      <PanelHeader title="Code / Data / Env" icon={Database} />
+      <PanelHeader title="Context" icon={Database} />
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line p-4">
         <div className="grid gap-3 sm:grid-cols-[180px_minmax(260px,1fr)]">
           <Field label="Snapshot kind">
@@ -6441,7 +7132,23 @@ function runHeroDescription(run) {
   return parts.join(' · ');
 }
 
-function runKeyMetricTiles(run) {
+function runKeyMetricTiles(run, equityChart = null) {
+  if (equityChart?.valueMode === 'absolute_change') {
+    const pnlMetrics = [
+      { label: 'Total PnL', paths: ['strategy.pnl.total_pnl', 'strategy.raw_pnl.total_pnl', 'strategy.summary.total_pnl'], tone: 'positive' },
+      { label: 'Annualized PnL', paths: ['strategy.pnl.annualized_pnl', 'strategy.raw_pnl.annualized_pnl', 'strategy.summary.annualized_pnl'], tone: 'positive' },
+      { label: 'Max Drawdown', paths: ['strategy.pnl.max_drawdown', 'strategy.raw_pnl.max_drawdown'], tone: 'negative' },
+      { label: 'Sharpe', paths: ['strategy.pnl.sharpe', 'strategy.raw_pnl.sharpe', 'strategy.summary.sharpe'], tone: 'positive' },
+      { label: 'Sortino', paths: ['strategy.pnl.sortino', 'strategy.raw_pnl.sortino', 'strategy.summary.sortino'], tone: 'positive' },
+      { label: 'Calmar', paths: ['strategy.pnl.calmar', 'strategy.raw_pnl.calmar', 'strategy.summary.calmar'], tone: 'positive' },
+    ];
+    return pnlMetrics.map((item) => ({
+      label: item.label,
+      value: formatMetric(firstRunMetric(run, item.paths)),
+      tone: item.tone,
+    }));
+  }
+  const derived = deriveRunPerformanceMetrics(equityChart);
   const preferred = [
     { label: 'Annual Return', keys: ['annual_return', 'annualized_return', 'annualized_pnl'], tone: 'positive', percent: true },
     { label: 'Annual Volatility', keys: ['annual_volatility', 'annualized_volatility', 'annualized_vol', 'volatility', 'daily_vol'], tone: 'neutral', percent: true },
@@ -6451,7 +7158,7 @@ function runKeyMetricTiles(run) {
     { label: 'Calmar', keys: ['calmar'], tone: 'positive' },
   ];
   return preferred.map((item) => {
-    const raw = firstRunSummaryMetric(run, item.keys);
+    const raw = Number.isFinite(derived[item.keys[0]]) ? derived[item.keys[0]] : firstRunSummaryMetric(run, item.keys);
     return {
       label: item.label,
       value: item.percent ? formatPercentMetric(raw) : formatMetric(raw),
@@ -6460,9 +7167,97 @@ function runKeyMetricTiles(run) {
   });
 }
 
+function deriveRunPerformanceMetrics(chart) {
+  if (!chart || chart.valueMode === 'absolute_change') return {};
+  const navPoints = (chart.equityData || [])
+    .map(([x, value]) => {
+      const number = toNumber(value);
+      return { x, nav: chart.valueAsPercent ? 1 + number : number };
+    })
+    .filter((point) => Number.isFinite(point.nav) && point.nav > 0);
+  if (navPoints.length < 2) return {};
+
+  const returns = [];
+  for (let index = 1; index < navPoints.length; index += 1) {
+    const previous = navPoints[index - 1].nav;
+    const current = navPoints[index].nav;
+    if (previous > 0 && Number.isFinite(current)) returns.push(current / previous - 1);
+  }
+  if (!returns.length) return {};
+
+  const first = navPoints[0];
+  const last = navPoints[navPoints.length - 1];
+  const elapsedDays = elapsedCalendarDays(first.x, last.x);
+  const periodsPerYear = elapsedDays > 0 ? returns.length / (elapsedDays / 365.25) : 252;
+  const annualReturn = elapsedDays > 0 && first.nav > 0
+    ? (Math.exp(Math.log(last.nav / first.nav) * (365.25 / elapsedDays)) - 1)
+    : mean(returns) * periodsPerYear;
+  const returnDeviation = standardDeviation(returns);
+  const volatility = returnDeviation * Math.sqrt(periodsPerYear);
+  const downsideDeviation = downsideRiskDeviation(returns) * Math.sqrt(periodsPerYear);
+  const averageReturn = mean(returns);
+  const maxDrawdown = minFinite((chart.drawdownData || []).map((point) => toNumber(point?.[1])));
+
+  return {
+    annual_return: annualReturn * 100,
+    annual_volatility: Number.isFinite(volatility) ? volatility * 100 : NaN,
+    max_drawdown: Number.isFinite(maxDrawdown) ? maxDrawdown * 100 : NaN,
+    sharpe: returnDeviation > 0 ? (averageReturn / returnDeviation) * Math.sqrt(periodsPerYear) : NaN,
+    sortino: downsideDeviation > 0 ? (averageReturn * periodsPerYear) / downsideDeviation : NaN,
+    calmar: Number.isFinite(maxDrawdown) && maxDrawdown < 0 ? annualReturn / Math.abs(maxDrawdown) : NaN,
+  };
+}
+
+function elapsedCalendarDays(start, end) {
+  const startDate = parseDateValue(start);
+  const endDate = parseDateValue(end);
+  if (!startDate || !endDate) return NaN;
+  const days = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+  return days > 0 ? days : NaN;
+}
+
+function mean(values) {
+  const numbers = values.filter(Number.isFinite);
+  if (!numbers.length) return NaN;
+  return numbers.reduce((total, value) => total + value, 0) / numbers.length;
+}
+
+function standardDeviation(values) {
+  const numbers = values.filter(Number.isFinite);
+  if (numbers.length < 2) return NaN;
+  const average = mean(numbers);
+  const variance = numbers.reduce((total, value) => total + (value - average) ** 2, 0) / (numbers.length - 1);
+  return Math.sqrt(variance);
+}
+
+function downsideRiskDeviation(values) {
+  const downsideSquares = values
+    .filter(Number.isFinite)
+    .map((value) => Math.min(0, value) ** 2);
+  if (!downsideSquares.length) return NaN;
+  return Math.sqrt(downsideSquares.reduce((total, value) => total + value, 0) / downsideSquares.length);
+}
+
+function minFinite(values) {
+  const numbers = values.filter(Number.isFinite);
+  return numbers.length ? Math.min(...numbers) : NaN;
+}
+
 function firstRunSummaryMetric(run, keys) {
   for (const key of keys) {
     const value = metricValue(run, 'strategy.summary', key);
+    if (value !== null && value !== undefined && value !== '') return value;
+  }
+  return null;
+}
+
+function firstRunMetric(run, paths) {
+  for (const path of paths) {
+    const parts = String(path || '').split('.');
+    const key = parts.pop();
+    const namespace = parts.join('.');
+    if (!namespace || !key) continue;
+    const value = metricValue(run, namespace, key);
     if (value !== null && value !== undefined && value !== '') return value;
   }
   return null;
@@ -6509,15 +7304,201 @@ function sweepMetricOptions(runs) {
   ];
 }
 
+function runResultItems(run) {
+  return (run.artifacts || [])
+    .map((artifact) => {
+      const result = artifactResultMetadata(artifact);
+      if (!result) return null;
+      const domain = String(result.domain || 'custom').toLowerCase();
+      const role = String(result.role || 'artifact').toLowerCase();
+      return {
+        artifact,
+        result,
+        domain,
+        role,
+        group: result.group || `${domain}.${result.name || artifact.name}`,
+        title: result.title || result.name || artifact.name,
+        order: Number.isFinite(Number(result.order)) ? Number(result.order) : 50,
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => resultDomainOrder(left.domain) - resultDomainOrder(right.domain) || left.order - right.order || left.title.localeCompare(right.title));
+}
+
+function artifactResultMetadata(artifact) {
+  const metadata = artifact.metadata_json || {};
+  if (metadata.result && typeof metadata.result === 'object' && !Array.isArray(metadata.result)) {
+    return metadata.result;
+  }
+  const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
+  const metric = metadata.metric && typeof metadata.metric === 'object' ? metadata.metric : null;
+  const name = String(series?.name || artifact.name || '').toLowerCase();
+  const namespace = String(series?.namespace || metric?.namespace || '').toLowerCase();
+  const kind = String(artifact.kind || '').toLowerCase();
+  if (['equity_curve', 'returns_series', 'returns', 'pnl_series', 'absolute_return_series'].includes(name) || namespace.startsWith('strategy.returns') || namespace.startsWith('strategy.pnl') || namespace.startsWith('strategy.equity')) {
+    return {
+      domain: 'performance',
+      name: 'primary_performance',
+      role: 'primary_curve',
+      title: 'Performance Curve',
+      group: 'performance.primary',
+      order: 10,
+      view: { default: 'performance_chart', x: series?.x, y: series?.y, mode: series?.mode, chart: 'line_drawdown' },
+    };
+  }
+  if (name === 'drawdown_series' || name === 'drawdown' || namespace.includes('drawdown') || series?.mode === 'drawdown') {
+    return {
+      domain: 'performance',
+      name: 'primary_drawdown',
+      role: 'drawdown',
+      title: 'Drawdown',
+      group: 'performance.primary',
+      order: 20,
+      view: { default: 'drawdown', x: series?.x, y: series?.y, mode: 'drawdown', chart: 'area' },
+    };
+  }
+  if (name.includes('factor_ic') || namespace.startsWith('factor.ic')) {
+    return {
+      domain: 'factor',
+      name: metric?.key || 'primary_ic',
+      role: 'ic_curve',
+      title: 'Factor IC',
+      group: 'factor.primary',
+      order: 10,
+      view: { default: 'plot', x: series?.x, y: series?.y, chart: 'line' },
+    };
+  }
+  if (name.includes('quantile') || name.includes('group_return') || namespace.startsWith('factor.quantile')) {
+    return {
+      domain: 'factor',
+      name: metric?.key || 'primary_quantile_returns',
+      role: 'quantile_returns',
+      title: 'Grouped Returns',
+      group: 'factor.primary',
+      order: 20,
+      view: { default: 'table', chart: 'bar' },
+    };
+  }
+  if (name.includes('factor_comparison') || name.includes('factor_rank') || namespace.startsWith('factor.batch')) {
+    return {
+      domain: 'factor_batch',
+      name: metric?.key || name || 'factor_comparison',
+      role: series ? 'comparison_curve' : 'comparison_table',
+      title: series ? 'Factor Return Comparison' : 'Factor Comparison',
+      group: 'factor_batch.primary',
+      order: series ? 20 : 10,
+      view: { default: series ? 'plot' : 'table', x: series?.x, y: series?.y, chart: series ? 'line' : undefined },
+    };
+  }
+  if (metric) {
+    const domain = namespace.split('.')[0] || 'custom';
+    return {
+      domain,
+      name: metric.key || artifact.name,
+      role: metric.kind === 'series' ? 'metric_series' : 'metric_table',
+      title: metric.key || artifact.name,
+      group: namespace || `${domain}.metrics`,
+      order: 50,
+      view: { default: metric.kind === 'series' ? 'plot' : 'table', x: metric.x, y: metric.y, mode: metric.mode },
+    };
+  }
+  if (kind.includes('report') || kind.includes('risk') || kind.includes('position') || kind.includes('trade')) {
+    return {
+      domain: kind.includes('risk') ? 'risk' : 'diagnostic',
+      name: artifact.name,
+      role: kind.includes('report') ? 'report' : 'table',
+      title: artifact.name,
+      group: kind.includes('risk') ? 'risk.primary' : 'diagnostic.primary',
+      order: 80,
+      view: { default: kind.includes('report') ? 'report' : 'table' },
+    };
+  }
+  return null;
+}
+
+function groupRunResultsByDomain(items) {
+  const domains = new Map();
+  for (const item of items || []) {
+    if (!domains.has(item.domain)) domains.set(item.domain, new Map());
+    const domain = domains.get(item.domain);
+    const key = item.group || `${item.domain}.default`;
+    domain.set(key, [...(domain.get(key) || []), item]);
+  }
+  return Array.from(domains.entries())
+    .map(([domain, groups]) => ({
+      domain,
+      itemCount: Array.from(groups.values()).reduce((total, groupItems) => total + groupItems.length, 0),
+      groups: Array.from(groups.entries()).map(([key, groupItems]) => ({
+        key,
+        title: resultGroupTitle(key, groupItems),
+        items: [...groupItems].sort((left, right) => left.order - right.order || left.title.localeCompare(right.title)),
+      })).sort((left, right) => left.title.localeCompare(right.title)),
+    }))
+    .sort((left, right) => resultDomainOrder(left.domain) - resultDomainOrder(right.domain) || resultDomainLabel(left.domain).localeCompare(resultDomainLabel(right.domain)));
+}
+
+function resultGroupTitle(key, items) {
+  const explicit = items.find((item) => item.result.group_title)?.result.group_title;
+  if (explicit) return explicit;
+  const suffix = String(key || '').split('.').filter(Boolean).slice(1).join(' / ');
+  return suffix || resultDomainLabel(items[0]?.domain);
+}
+
+function resultDomainOrder(domain) {
+  return {
+    performance: 0,
+    factor: 10,
+    factor_batch: 20,
+    risk: 30,
+    cost: 40,
+    diagnostic: 50,
+    custom: 90,
+  }[domain] ?? 80;
+}
+
+function resultDomainLabel(domain) {
+  return {
+    performance: 'Performance',
+    factor: 'Factor',
+    factor_batch: 'Factor Batch',
+    risk: 'Risk',
+    cost: 'Cost',
+    diagnostic: 'Diagnostics',
+    custom: 'Custom',
+  }[domain] || titleCase(domain);
+}
+
+function resultRoleLabel(role) {
+  return {
+    primary_curve: 'Primary Curve',
+    drawdown: 'Drawdown',
+    summary_table: 'Summary Table',
+    ic_curve: 'IC Curve',
+    quantile_returns: 'Grouped Returns',
+    comparison_table: 'Comparison Table',
+    comparison_curve: 'Comparison Curve',
+    metric_series: 'Metric Series',
+    metric_table: 'Metric Table',
+    report: 'Report',
+    table: 'Table',
+  }[role] || titleCase(role);
+}
+
+function titleCase(value) {
+  return String(value || '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function runSeriesArtifacts(run) {
-  const preferred = ['equity_curve', 'returns', 'returns_series', 'drawdown_series', 'factor_ic_series', 'turnover'];
+  const preferred = ['equity_curve', 'returns', 'returns_series', 'pnl_series', 'absolute_return_series', 'drawdown_series', 'factor_ic_series', 'turnover'];
   return (run.artifacts || [])
     .map((artifact) => {
       const metadata = artifact.metadata_json || {};
       const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
       const rows = Array.isArray(artifact.preview_json?.rows) ? artifact.preview_json.rows : [];
       if (!series || !rows.length) return null;
-      const yKeys = Array.isArray(series.y) ? series.y : [series.y].filter(Boolean);
+      const yKeys = Array.isArray(series.y) ? series.y : [series.y || 'series_values'].filter(Boolean);
       const numericYKeys = yKeys.filter((key) => rows.some((row) => Number.isFinite(toNumber(row?.[key]))));
       if (!numericYKeys.length) return null;
       return {
@@ -6526,7 +7507,9 @@ function runSeriesArtifacts(run) {
         artifactName: artifact.name,
         x: series.x || null,
         y: numericYKeys,
+        mode: series.mode || null,
         namespace: series.namespace || null,
+        result: artifactResultMetadata(artifact),
         rows,
       };
     })
@@ -6539,38 +7522,47 @@ function runSeriesArtifacts(run) {
 }
 
 function runEquityChartData(items) {
-  const equityItem = findSeriesItem(items, ['equity_curve', 'nav', 'net_value', 'cumulative_return', 'returns_series', 'returns'], ['nav', 'net_value', 'equity', 'value', 'cumulative_return', 'cum_return', 'total_return', 'return', 'ret']);
+  const equityKeys = ['series_values', 'nav', 'net_value', 'equity', 'value', 'cumulative_return', 'cum_return', 'total_return', 'return', 'ret', 'pnl', 'profit', 'delta', 'change', 'amount'];
+  const equityItem = findResultSeriesItem(items, 'performance', 'primary_curve', equityKeys) || findSeriesItem(
+    items,
+    ['equity_curve', 'nav', 'net_value', 'cumulative_return', 'returns_series', 'returns', 'pnl_series', 'absolute_return_series', 'pnl', 'profit_series', 'delta_series'],
+    equityKeys
+  );
   if (!equityItem) return null;
-  const equityKey = chooseSeriesKey(equityItem, ['nav', 'net_value', 'equity', 'value', 'cumulative_return', 'cum_return', 'total_return', 'return', 'ret']);
+  const equityKey = chooseSeriesKey(equityItem, equityKeys);
   if (!equityKey) return null;
   const xKey = equityItem.x;
-  const isReturnSeries = isPeriodicReturnSeries(equityItem, equityKey);
+  const valueMode = seriesValueMode(equityItem, equityKey);
   const equityPoints = [];
   let compounded = 1;
+  let cumulative = 0;
   for (const [index, row] of equityItem.rows.entries()) {
     const raw = toNumber(row?.[equityKey]);
     if (!Number.isFinite(raw)) continue;
     const x = chartXValue(row, xKey, index);
-    if (isReturnSeries) {
+    if (valueMode === 'period_return') {
       compounded *= 1 + raw;
       equityPoints.push({ x, value: compounded - 1 });
+    } else if (valueMode === 'absolute_change') {
+      cumulative += raw;
+      equityPoints.push({ x, value: cumulative });
     } else {
       equityPoints.push({ x, value: raw });
     }
   }
   if (!equityPoints.length) return null;
 
-  const drawdownItem = findSeriesItemStrict(items, ['drawdown_series', 'drawdown', 'dd'], ['drawdown', 'max_drawdown', 'dd']);
-  const drawdownKey = drawdownItem ? chooseSeriesKeyStrict(drawdownItem, ['drawdown', 'max_drawdown', 'dd']) : null;
+  const drawdownItem = findDrawdownSeriesItem(items);
+  const drawdownKey = drawdownItem ? chooseSeriesKey(drawdownItem, ['drawdown', 'max_drawdown', 'dd', 'series_values']) : null;
   let drawdownPoints = [];
   if (drawdownItem && drawdownKey) {
     drawdownPoints = drawdownItem.rows.map((row, index) => ({
       x: chartXValue(row, drawdownItem.x, index),
-      value: normalizeDrawdown(toNumber(row?.[drawdownKey])),
+      value: normalizeDrawdown(toNumber(row?.[drawdownKey]), valueMode),
     })).filter((point) => Number.isFinite(point.value));
   }
   if (!drawdownPoints.length) {
-    drawdownPoints = computeDrawdownPoints(equityPoints, isReturnSeries);
+    drawdownPoints = computeDrawdownPoints(equityPoints, valueMode);
   }
 
   const xValues = [];
@@ -6585,9 +7577,20 @@ function runEquityChartData(items) {
     xValues,
     equityData: xValues.map((x) => [x, equityByX.get(x) ?? null]),
     drawdownData: xValues.map((x) => [x, drawdownByX.get(x) ?? null]),
-    lineName: isReturnSeries || /return/i.test(equityKey) ? 'Cumulative Return' : 'Net Value',
-    valueAsPercent: isReturnSeries || /return/i.test(equityKey),
+    lineName: chartLineName(valueMode, equityKey),
+    valueAsPercent: valueMode === 'period_return',
+    drawdownAsPercent: valueMode !== 'absolute_change',
+    valueMode,
   };
+}
+
+function findResultSeriesItem(items, domain, role, keys) {
+  return (items || []).find((item) => {
+    const result = item.result || {};
+    if (String(result.domain || '').toLowerCase() !== domain) return false;
+    if (String(result.role || '').toLowerCase() !== role) return false;
+    return chooseSeriesKey(item, keys);
+  }) || null;
 }
 
 function findSeriesItem(items, names, keys) {
@@ -6602,6 +7605,18 @@ function findSeriesItemStrict(items, names, keys) {
   const normalizedKeys = keys.map((key) => key.toLowerCase());
   return (items || []).find((item) => normalizedNames.some((name) => String(item.name || '').toLowerCase().includes(name)) && chooseSeriesKeyStrict(item, normalizedKeys))
     || (items || []).find((item) => chooseSeriesKeyStrict(item, normalizedKeys));
+}
+
+function findDrawdownSeriesItem(items) {
+  const resultItem = findResultSeriesItem(items, 'performance', 'drawdown', ['drawdown', 'max_drawdown', 'dd', 'series_values']);
+  if (resultItem) return resultItem;
+  return (items || []).find((item) => {
+    const name = String(item.name || '').toLowerCase();
+    const namespace = String(item.namespace || '').toLowerCase();
+    const mode = String(item.mode || '').toLowerCase();
+    if (!(name.includes('drawdown') || name === 'dd' || namespace.includes('drawdown') || mode === 'drawdown')) return false;
+    return chooseSeriesKey(item, ['drawdown', 'max_drawdown', 'dd', 'series_values']);
+  }) || null;
 }
 
 function chooseSeriesKey(item, preferredKeys) {
@@ -6622,6 +7637,16 @@ function chooseSeriesKeyStrict(item, preferredKeys) {
     || null;
 }
 
+function seriesValueMode(item, key) {
+  const explicitMode = String(item?.mode || '').toLowerCase();
+  if (['return', 'returns', 'period_return', 'periodic_return'].includes(explicitMode)) return 'period_return';
+  if (['pnl', 'profit', 'absolute', 'absolute_return', 'absolute_change'].includes(explicitMode)) return 'absolute_change';
+  if (['nav', 'equity', 'net_value', 'level'].includes(explicitMode)) return 'level';
+  if (isAbsoluteChangeSeries(item, key)) return 'absolute_change';
+  if (isPeriodicReturnSeries(item, key)) return 'period_return';
+  return 'level';
+}
+
 function isPeriodicReturnSeries(item, key) {
   const keyName = String(key || '').toLowerCase();
   const seriesName = String(item?.name || '').toLowerCase();
@@ -6631,20 +7656,42 @@ function isPeriodicReturnSeries(item, key) {
   return seriesName.includes('return') && values.length && Math.max(...values) < 1;
 }
 
+function isAbsoluteChangeSeries(item, key) {
+  const keyName = String(key || '').toLowerCase();
+  const seriesName = String(item?.name || '').toLowerCase();
+  const namespace = String(item?.namespace || '').toLowerCase();
+  if (/equity|nav|net_value|drawdown|cumulative|cum_|total/.test(seriesName) || /cumulative|cum_|total|nav|net_value|equity/.test(keyName)) return false;
+  if (/pnl|profit|absolute|amount|delta|change/.test(seriesName) || /pnl|profit|amount|delta|change/.test(keyName) || namespace.includes('pnl')) return true;
+  if (/return/.test(seriesName) && /absolute/.test(seriesName)) return true;
+  return false;
+}
+
+function chartLineName(valueMode, key) {
+  if (valueMode === 'period_return') return 'Cumulative Return';
+  if (valueMode === 'absolute_change') return /pnl|profit/i.test(String(key || '')) ? 'Cumulative PnL' : 'Cumulative Change';
+  return 'Net Value';
+}
+
 function chartXValue(row, xKey, index) {
   const value = xKey ? row?.[xKey] : undefined;
   return value === null || value === undefined || value === '' ? String(index + 1) : String(value);
 }
 
-function normalizeDrawdown(value) {
+function normalizeDrawdown(value, valueMode = 'level') {
   if (!Number.isFinite(value)) return NaN;
+  if (valueMode === 'absolute_change') return value > 0 ? -value : value;
   return value > 1 ? -Math.abs(value) / 100 : value > 0 ? -value : value;
 }
 
-function computeDrawdownPoints(equityPoints, valueAsPercent) {
+function computeDrawdownPoints(equityPoints, valueMode) {
   let runningPeak = -Infinity;
   return equityPoints.map((point) => {
-    const nav = valueAsPercent ? 1 + point.value : point.value;
+    if (valueMode === 'absolute_change') {
+      if (!Number.isFinite(point.value)) return { x: point.x, value: null };
+      runningPeak = Math.max(runningPeak, point.value);
+      return { x: point.x, value: point.value - runningPeak };
+    }
+    const nav = valueMode === 'period_return' ? 1 + point.value : point.value;
     if (!Number.isFinite(nav)) return { x: point.x, value: null };
     runningPeak = Math.max(runningPeak, nav);
     return { x: point.x, value: runningPeak > 0 ? nav / runningPeak - 1 : 0 };
@@ -6669,7 +7716,7 @@ function runEquityChartOption(chart) {
       formatter: (params) => {
         const rows = params.map((item) => {
           const value = item.value?.[1];
-          const formatted = Number.isFinite(value) ? (item.seriesName === 'Drawdown' || chart.valueAsPercent ? percentLabel(value) : formatMetric(value)) : '--';
+          const formatted = Number.isFinite(value) ? ((item.seriesName === 'Drawdown' ? chart.drawdownAsPercent : chart.valueAsPercent) ? percentLabel(value) : formatMetric(value)) : '--';
           return `${item.marker}${item.seriesName}: ${formatted}`;
         });
         return [params[0]?.axisValueLabel, ...rows].filter(Boolean).join('<br/>');
@@ -6699,7 +7746,7 @@ function runEquityChartOption(chart) {
         axisLine: { show: false },
         axisTick: { show: false },
         splitLine: { show: false },
-        axisLabel: { color: '#374151', formatter: percentLabel },
+        axisLabel: { color: '#374151', formatter: chart.drawdownAsPercent ? percentLabel : undefined },
       },
     ],
     series: [
@@ -7162,18 +8209,60 @@ function buildPageContext(data, active, selections, runDetail) {
   return { project, research, branch, run, extra };
 }
 
+function decodeRouteSegment(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function parseAppRoute(pathname = '/') {
+  const [section, id] = String(pathname || '/').split('/').filter(Boolean).map(decodeRouteSegment);
+  if (!section) return { active: 'dashboard' };
+  if (section === 'projects') return { active: 'project', projectId: id || null };
+  if (section === 'researches') return { active: 'research', researchId: id || null };
+  if (section === 'branches') return { active: 'branch', branchId: id || null };
+  if (section === 'runs') return { active: 'run', runId: id || null };
+  if (section === 'sweeps') return { active: 'sweep', sweepId: id || null };
+  if (section === 'compare') return { active: 'compare', compareSetId: id || null };
+  if (section === 'search') return { active: 'search', searchViewId: id || null };
+  return { active: 'dashboard' };
+}
+
+function pathWithOptionalId(base, id) {
+  return id ? `${base}/${encodeURIComponent(id)}` : base;
+}
+
+function pathForAppState(active, selections) {
+  if (active === 'project') return pathWithOptionalId('/projects', selections.projectId);
+  if (active === 'research') return pathWithOptionalId('/researches', selections.researchId);
+  if (active === 'branch') return pathWithOptionalId('/branches', selections.branchId);
+  if (active === 'run') return pathWithOptionalId('/runs', selections.runId);
+  if (active === 'sweep') return pathWithOptionalId('/sweeps', selections.sweepId);
+  if (active === 'compare') return pathWithOptionalId('/compare', selections.compareSetId);
+  if (active === 'search') return pathWithOptionalId('/search', selections.searchViewId);
+  return '/';
+}
+
 function App() {
-  const [active, setActive] = useState('dashboard');
+  const initialRouteRef = useRef(null);
+  if (!initialRouteRef.current) {
+    initialRouteRef.current = parseAppRoute(typeof window === 'undefined' ? '/' : window.location.pathname);
+  }
+  const skipNextHistoryWriteRef = useRef(false);
+  const initialRoute = initialRouteRef.current;
+  const [active, setActive] = useState(initialRoute.active);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedResearchId, setSelectedResearchId] = useState(null);
-  const [selectedBranchId, setSelectedBranchId] = useState(null);
-  const [selectedRunId, setSelectedRunId] = useState(null);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [selectedSweepId, setSelectedSweepId] = useState(null);
-  const [selectedCompareSetId, setSelectedCompareSetId] = useState(null);
-  const [selectedSearchViewId, setSelectedSearchViewId] = useState(null);
+  const [selectedResearchId, setSelectedResearchId] = useState(initialRoute.researchId || null);
+  const [selectedBranchId, setSelectedBranchId] = useState(initialRoute.branchId || null);
+  const [selectedRunId, setSelectedRunId] = useState(initialRoute.runId || null);
+  const [selectedProjectId, setSelectedProjectId] = useState(initialRoute.projectId || null);
+  const [selectedSweepId, setSelectedSweepId] = useState(initialRoute.sweepId || null);
+  const [selectedCompareSetId, setSelectedCompareSetId] = useState(initialRoute.compareSetId || null);
+  const [selectedSearchViewId, setSelectedSearchViewId] = useState(initialRoute.searchViewId || null);
   const [runDetail, setRunDetail] = useState(null);
   const [liveStatus, setLiveStatus] = useState('connecting');
   const [quickSearch, setQuickSearch] = useState(null);
@@ -7199,6 +8288,43 @@ function App() {
   };
 
   useEffect(() => { refresh(); }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseAppRoute(window.location.pathname);
+      skipNextHistoryWriteRef.current = true;
+      setActive(route.active);
+      setSelectedProjectId(route.projectId || null);
+      setSelectedResearchId(route.researchId || null);
+      setSelectedBranchId(route.branchId || null);
+      setSelectedRunId(route.runId || null);
+      setSelectedSweepId(route.sweepId || null);
+      setSelectedCompareSetId(route.compareSetId || null);
+      setSelectedSearchViewId(route.searchViewId || null);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    const nextPath = pathForAppState(active, {
+      projectId: selectedProjectId,
+      researchId: selectedResearchId,
+      branchId: selectedBranchId,
+      runId: selectedRunId,
+      sweepId: selectedSweepId,
+      compareSetId: selectedCompareSetId,
+      searchViewId: selectedSearchViewId,
+    });
+    if (skipNextHistoryWriteRef.current) {
+      skipNextHistoryWriteRef.current = false;
+      return;
+    }
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, '', nextPath);
+    }
+  }, [active, selectedBranchId, selectedCompareSetId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
+
   useEffect(() => {
     const timer = window.setInterval(() => {
       refresh();
@@ -7279,6 +8405,7 @@ function App() {
   const selectSearchView = (id) => { setSelectedSearchViewId(id); setActive('search'); };
   const runGlobalSearch = (query) => {
     if (query) setQuickSearch({ query, nonce: Date.now() });
+    setSelectedSearchViewId(null);
     setActive('search');
   };
   const onCreated = async (kind, entity) => {

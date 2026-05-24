@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const apiProxyTarget = process.env.VITE_BLACKBOX_API_PROXY || process.env.VITE_BLACKBOX_API_BASE || 'http://127.0.0.1:8000';
+
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://127.0.0.1:8000',
-      '/healthz': 'http://127.0.0.1:8000',
+      '/api': { target: apiProxyTarget, changeOrigin: true, ws: true },
+      '/healthz': { target: apiProxyTarget, changeOrigin: true },
     },
   },
   build: {

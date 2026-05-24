@@ -92,3 +92,82 @@ table .table-head th {
 table td button {
   text-align: left;
 }
+
+.markdown-document h1,
+.markdown-document h2,
+.markdown-document h3,
+.markdown-document h4 {
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.markdown-document h1 {
+  font-size: 1.25rem;
+}
+
+.markdown-document h2 {
+  font-size: 1.1rem;
+}
+
+.markdown-document h3,
+.markdown-document h4 {
+  font-size: 1rem;
+}
+
+.markdown-document p,
+.markdown-document ul,
+.markdown-document ol,
+.markdown-document blockquote,
+.markdown-document table,
+.markdown-document pre {
+  margin: 0.75rem 0;
+}
+
+.markdown-document ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.markdown-document ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.markdown-document table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.markdown-document th,
+.markdown-document td {
+  border: 1px solid #dfe3df;
+  padding: 0.5rem 0.625rem;
+  vertical-align: top;
+}
+
+.markdown-document th {
+  background: #f3f4f1;
+  font-weight: 700;
+}
+
+.markdown-document code {
+  border-radius: 0.25rem;
+  background: #f3f4f1;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.85em;
+}
+
+.markdown-document pre {
+  overflow: auto;
+  border: 1px solid #dfe3df;
+  border-radius: 0.375rem;
+  background: #f3f4f1;
+  padding: 0.75rem;
+}
+
+.markdown-document pre code {
+  background: transparent;
+  padding: 0;
+}
