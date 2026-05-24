@@ -322,7 +322,10 @@ class SeriesCreate(BaseModel):
     data: list[dict[str, Any]]
     x: str | None = None
     y: str | list[str] | None = None
+    mode: str | None = None
     namespace: str | None = None
+    metric: dict[str, Any] | None = None
+    result: dict[str, Any] | None = None
     kind: str = "table_csv"
     filename: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)

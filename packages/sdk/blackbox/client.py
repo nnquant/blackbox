@@ -437,7 +437,10 @@ class BlackboxClient:
         data: list[dict[str, Any]],
         x: str | None = None,
         y: str | list[str] | None = None,
+        mode: str | None = None,
         namespace: str | None = None,
+        metric: dict[str, Any] | None = None,
+        result: dict[str, Any] | None = None,
         kind: str = "table_csv",
         filename: str | None = None,
         metadata: dict[str, Any] | None = None,
@@ -448,11 +451,16 @@ class BlackboxClient:
             "data": data,
             "x": x,
             "y": y,
+            "mode": mode,
             "namespace": namespace,
             "kind": kind,
             "filename": filename,
             "metadata": metadata or {},
         }
+        if metric is not None:
+            series_payload["metric"] = metric
+        if result is not None:
+            series_payload["result"] = result
         request_kwargs = {"json": series_payload}
         if idempotency_key:
             request_kwargs["headers"] = {"Idempotency-Key": idempotency_key}

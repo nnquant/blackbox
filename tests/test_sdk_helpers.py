@@ -112,12 +112,16 @@ class FakeRunWithClient(FakeRun):
 def test_quant_sdk_helpers_emit_expected_namespaces_and_artifact_kinds(monkeypatch) -> None:
     from blackbox import (
         log_backtest_summary,
+        log_absolute_return_series,
         log_cost_breakdown,
         log_drawdown_series,
         log_factor_coverage,
         log_factor_ic_series,
         log_factor_summary,
         log_factor_turnover,
+        log_metric_series,
+        log_metric_table,
+        log_pnl_series,
         log_positions,
         log_quantile_returns,
         log_returns_series,
@@ -139,26 +143,93 @@ def test_quant_sdk_helpers_emit_expected_namespaces_and_artifact_kinds(monkeypat
 
     ic = log_factor_ic_series([{"date": "2026-01-01", "ic": 0.02}])
     quantile = log_quantile_returns([{"quantile": 1, "return": 0.01}])
-    returns = log_returns_series([{"date": "2026-01-01", "return": 0.01}])
+    returns = log_returns_series([{"date": "2026-01-01", "series_values": 0.01}])
+    pnl = log_pnl_series([{"date": "2026-01-01", "series_values": 9.0}])
+    absolute_returns = log_absolute_return_series([{"date": "2026-01-01", "series_values": 9.0}])
     drawdown = log_drawdown_series([{"date": "2026-01-01", "drawdown": -0.02}])
     positions = log_positions([{"date": "2026-01-01", "symbol": "000001", "weight": 0.1}])
     trades = log_trades([{"date": "2026-01-01", "symbol": "000001", "qty": 100}])
     risk = log_risk_exposure([{"factor": "size", "exposure": 0.2}])
+    metric_series = log_metric_series("factor.ic", "ic_by_date", [{"date": "2026-01-01", "ic": 0.02}], x="date", y="ic")
+    metric_table = log_metric_table("factor.summary", "factor_scores", [{"factor": "alpha", "ic": 0.02}])
 
     assert ic["kind"] == "table_csv"
-    assert ic["metadata"]["series"] == {"name": "factor_ic_series", "x": "date", "y": "ic", "namespace": "factor.ic"}
+    assert ic["metadata"]["series"] == {"name": "factor_ic_series", "x": "date", "y": "ic", "mode": None, "namespace": "factor.ic"}
     assert quantile["name"] == "factor_quantile_returns"
     assert quantile["kind"] == "table_parquet"
     assert quantile["filename"] == "factor_quantile_returns.parquet"
     assert returns["kind"] == "returns_series_parquet"
     assert returns["filename"] == "returns_series.parquet"
+    assert returns["metadata"]["series"] == {"name": "returns_series", "x": "date", "y": "series_values", "mode": "return", "namespace": "strategy.returns"}
+    assert pnl["metadata"]["series"] == {"name": "pnl_series", "x": "date", "y": "series_values", "mode": "pnl", "namespace": "strategy.pnl"}
+    assert pnl["filename"] == "pnl_series.parquet"
+    assert absolute_returns["metadata"]["series"] == {"name": "absolute_return_series", "x": "date", "y": "series_values", "mode": "pnl", "namespace": "strategy.absolute_return"}
     assert drawdown["metadata"]["series"]["namespace"] == "strategy.drawdown"
     assert positions["kind"] == "position_log_parquet"
     assert positions["filename"] == "positions.parquet"
     assert trades["kind"] == "trade_log_parquet"
     assert risk["kind"] == "risk_report_json"
     assert risk["filename"] == "risk_exposure.json"
+    assert metric_series["metadata"]["metric"] == {"namespace": "factor.ic", "key": "ic_by_date", "kind": "series", "x": "date", "y": "ic", "mode": None}
+    assert metric_series["metadata"]["series"]["namespace"] == "factor.ic"
+    assert metric_table["metadata"]["metric"] == {"namespace": "factor.summary", "key": "factor_scores", "kind": "table"}
+    assert metric_table["kind"] == "table_csv"
     assert positions["content"].startswith(b"PAR1")
+
+
+def test_run_result_helpers_attach_typed_result_metadata(monkeypatch) -> None:
+    from blackbox import log_factor_batch_result, log_factor_result, log_result_series, log_result_table, result_metadata
+
+    logging_module = importlib.import_module("blackbox.logging")
+    fake_run = FakeRun()
+    monkeypatch.setattr(logging_module, "current_run", lambda: fake_run)
+
+    assert result_metadata("factor", "primary_ic", "ic_curve", title="Cumulative IC") == {
+        "domain": "factor",
+        "name": "primary_ic",
+        "role": "ic_curve",
+        "title": "Cumulative IC",
+        "group": "factor.primary_ic",
+    }
+
+    series = log_result_series(
+        "custom_curve",
+        [{"date": "2026-01-01", "value": 1.0}],
+        domain="diagnostic",
+        role="comparison_curve",
+        result_name="latency_curve",
+        title="Latency Curve",
+        group="diagnostic.latency",
+        order=7,
+        view={"default": "plot", "x": "date", "y": "value"},
+        x="date",
+        y="value",
+    )
+    table = log_result_table(
+        "factor_scores",
+        [{"factor": "alpha", "score": 1.2}],
+        domain="factor_batch",
+        role="comparison_table",
+        metric={"namespace": "factor.batch", "key": "factor_scores", "kind": "table"},
+    )
+    factor = log_factor_result(
+        metrics={"ic_mean": 0.03},
+        ic_series=[{"date": "2026-01-01", "cumulative_ic": 0.03}],
+        factor_name="alpha_reversal",
+    )
+    batch = log_factor_batch_result(
+        comparison_series=[{"date": "2026-01-01", "alpha_a": 1.01, "alpha_b": 1.02}],
+        y=["alpha_a", "alpha_b"],
+    )
+
+    assert series["metadata"]["result"]["domain"] == "diagnostic"
+    assert series["metadata"]["result"]["role"] == "comparison_curve"
+    assert series["metadata"]["result"]["order"] == 7
+    assert table["metadata"]["result"]["domain"] == "factor_batch"
+    assert table["metadata"]["metric"]["key"] == "factor_scores"
+    assert factor["metrics"][0]["namespace"] == "factor.summary"
+    assert factor["artifacts"][0]["metadata"]["result"]["group"] == "factor.alpha_reversal"
+    assert batch["artifacts"][0]["metadata"]["result"]["role"] == "comparison_curve"
 
 
 def test_core_sdk_helpers_update_run_and_summary(monkeypatch) -> None:
@@ -197,15 +268,25 @@ def test_client_logging_payloads_accept_caller_ids_and_author_type() -> None:
     event = client.log_event("run_1", "stage_completed", stage="train", payload={"rows": 10}, client_event_id="evt_once")
     metric = client.log_metric("run_1", "strategy.summary", {"sharpe": 1.23}, client_event_id="met_once")
     note = client.log_note("run_1", "decision", "Promote candidate", structured={"promote": True}, author_type="human", client_event_id="note_once")
+    series = client.log_series(
+        "run_1",
+        "factor_ic_series",
+        [{"date": "2026-01-01", "cumulative_ic": 0.03}],
+        x="date",
+        y="cumulative_ic",
+        result={"domain": "factor", "name": "primary_ic", "role": "ic_curve"},
+    )
 
     assert event["client_event_id"] == "evt_once"
     assert metric["client_event_id"] == "met_once"
     assert note["author_type"] == "human"
     assert note["client_event_id"] == "note_once"
+    assert series["result"] == {"domain": "factor", "name": "primary_ic", "role": "ic_curve"}
     assert requests[0]["path"] == "/api/v1/runs/run_1/events"
     assert requests[1]["json"]["client_event_id"] == "met_once"
     assert requests[2]["json"]["structured"] == {"promote": True}
     assert requests[2]["json"]["client_event_id"] == "note_once"
+    assert requests[3]["json"]["result"]["role"] == "ic_curve"
 
 
 def test_client_buffered_logging_flushes_in_order(monkeypatch) -> None:
@@ -255,6 +336,7 @@ def test_client_buffered_logging_flushes_in_order(monkeypatch) -> None:
                 "data": [{"date": "2026-01-01", "return": 0.01}],
                 "x": "date",
                 "y": "return",
+                "mode": None,
                 "namespace": None,
                 "kind": "table_csv",
                 "filename": None,

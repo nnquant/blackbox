@@ -140,6 +140,13 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
                 "x": "date",
                 "y": "nav",
                 "namespace": "strategy.equity",
+                "result": {
+                    "domain": "performance",
+                    "name": "primary_performance",
+                    "role": "primary_curve",
+                    "group": "performance.primary",
+                    "order": 10,
+                },
             },
         )
         assert direct_series_response.status_code == 200, direct_series_response.text
@@ -158,7 +165,14 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert direct_series_retry.status_code == 200, direct_series_retry.text
         assert direct_series_retry.json()["data"]["id"] == direct_series["id"]
         assert direct_series_retry.json()["data"]["name"] == "equity_curve"
-        assert direct_series["metadata_json"]["series"] == {"name": "equity_curve", "x": "date", "y": "nav", "namespace": "strategy.equity"}
+        assert direct_series["metadata_json"]["series"] == {"name": "equity_curve", "x": "date", "y": "nav", "mode": None, "namespace": "strategy.equity"}
+        assert direct_series["metadata_json"]["result"] == {
+            "domain": "performance",
+            "name": "primary_performance",
+            "role": "primary_curve",
+            "group": "performance.primary",
+            "order": 10,
+        }
         assert direct_series["preview_json"]["columns"] == ["date", "nav"]
         assert direct_series["preview_json"]["row_count"] == 25
         assert len(direct_series["preview_json"]["rows"]) == 20
@@ -738,7 +752,7 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         offline_report_artifact = next(item for item in synced_detail["artifacts"] if item["name"] == "offline_report")
         assert offline_report_artifact["preview_json"]["title"] == "Offline Report"
         returns_artifact = next(item for item in synced_detail["artifacts"] if item["name"] == "returns")
-        assert returns_artifact["metadata_json"]["series"] == {"name": "returns", "x": "date", "y": "ret", "namespace": None}
+        assert returns_artifact["metadata_json"]["series"] == {"name": "returns", "x": "date", "y": "ret", "mode": None, "namespace": None}
         series_compare = post(
             client,
             "/api/v1/compare/runs",

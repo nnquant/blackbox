@@ -19,6 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from blackbox_common.enums import EventType, RunStatus
 from blackbox_common.errors import ApiError, ErrorCode
@@ -98,6 +99,29 @@ from .workers import get_worker
 
 
 IDEMPOTENCY_METADATA_KEY = "_blackbox_idempotency_key"
+
+
+class SpaStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope: dict[str, Any]) -> Response:
+        request_path = str(scope.get("path") or "")
+        path_text = path.lstrip("/")
+        if (
+            request_path == "/api"
+            or request_path.startswith("/api/")
+            or request_path == "/healthz"
+            or request_path.startswith("/healthz/")
+            or path_text == "api"
+            or path_text.startswith("api/")
+            or path_text == "healthz"
+            or path_text.startswith("healthz/")
+        ):
+            raise StarletteHTTPException(status_code=404)
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code == 404 and scope.get("method") in {"GET", "HEAD"}:
+                return await super().get_response("index.html", scope)
+            raise
 
 
 @asynccontextmanager
@@ -751,10 +775,16 @@ def create_app() -> FastAPI:
         filename = payload.filename or default_artifact_filename(payload.name, payload.kind)
         stored = get_storage(get_settings()).put_bytes(run_id=run_id, artifact_id=None, filename=filename, content=content)
         mime_type = stored.mime_type or default_artifact_mime_type(stored.filename, payload.kind)
-        metadata = with_idempotency_metadata({
+        series_y = payload.y or "series_values"
+        metadata_payload = {
             **payload.metadata,
-            "series": {"name": payload.name, "x": payload.x, "y": payload.y, "namespace": payload.namespace},
-        }, idempotency_key)
+            "series": {"name": payload.name, "x": payload.x, "y": series_y, "mode": payload.mode, "namespace": payload.namespace},
+        }
+        if payload.metric is not None:
+            metadata_payload["metric"] = payload.metric
+        if payload.result is not None:
+            metadata_payload["result"] = payload.result
+        metadata = with_idempotency_metadata(metadata_payload, idempotency_key)
         artifact = Artifact(
             run_id=run_id,
             kind=payload.kind,
@@ -1311,7 +1341,7 @@ def create_app() -> FastAPI:
         run_ids = list(dict.fromkeys(run.id for run in resolved_runs))
         runs = [require_run(db, run_id) for run_id in run_ids]
         metrics = payload.get("metrics") or default_quick_compare_metrics()
-        series = payload.get("series") or ["equity_curve", "returns_series"]
+        series = payload.get("series") or ["equity_curve", "returns_series", "pnl_series", "absolute_return_series"]
         return ok(
             {
                 "targets": [
@@ -1411,7 +1441,7 @@ def create_app() -> FastAPI:
 
     webui_dist = Path(__file__).resolve().parents[3] / "webui" / "dist"
     if webui_dist.exists():
-        app.mount("/", StaticFiles(directory=webui_dist, html=True), name="webui")
+        app.mount("/", SpaStaticFiles(directory=webui_dist, html=True), name="webui")
 
     return app
 
@@ -2240,7 +2270,8 @@ def build_series_refs(db: Session, run_ids: list[str], requested_series: list[st
                 "artifact_name": artifact.name,
                 "kind": artifact.kind,
                 "x": series_meta.get("x"),
-                "y": series_meta.get("y"),
+                "y": series_meta.get("y") or "series_values",
+                "mode": series_meta.get("mode"),
                 "namespace": namespace,
                 "columns": artifact.preview_json.get("columns", []),
                 "rows": full_rows_from_artifact(artifact),
@@ -2280,6 +2311,11 @@ def series_matches_request(series_name: str, namespace: Any, requested: set[str]
         "dd": "drawdown_series",
         "returns": "returns_series",
         "return": "returns_series",
+        "pnl": "pnl_series",
+        "profit": "pnl_series",
+        "absolute_return": "absolute_return_series",
+        "absolute_returns": "absolute_return_series",
+        "absolute_change": "absolute_return_series",
     }
     return any(aliases.get(item) == series_name for item in requested)
 

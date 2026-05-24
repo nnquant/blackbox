@@ -228,7 +228,19 @@ def build_parser() -> argparse.ArgumentParser:
     run_series.add_argument("--data-file")
     run_series.add_argument("--x")
     run_series.add_argument("--y")
+    run_series.add_argument("--mode")
     run_series.add_argument("--namespace")
+    run_series.add_argument("--metric-key")
+    run_series.add_argument("--metric-namespace")
+    run_series.add_argument("--metric-kind", choices=["series", "table"], default="series")
+    run_series.add_argument("--result")
+    run_series.add_argument("--result-domain")
+    run_series.add_argument("--result-name")
+    run_series.add_argument("--result-role")
+    run_series.add_argument("--result-title")
+    run_series.add_argument("--result-group")
+    run_series.add_argument("--result-order", type=int)
+    run_series.add_argument("--result-view")
     run_series.add_argument("--kind", default="table_csv")
     run_series.add_argument("--filename")
     run_series.add_argument("--metadata", default="{}")
@@ -591,21 +603,28 @@ def dispatch(args: argparse.Namespace) -> Any:
     if args.group == "run" and args.action == "log-series":
         data = parse_json(Path(args.data_file).read_text(encoding="utf-8")) if args.data_file else parse_json(args.data)
         headers = {"Idempotency-Key": args.idempotency_key} if args.idempotency_key else {}
+        series_payload = {
+            "name": args.name,
+            "data": data,
+            "x": args.x,
+            "y": parse_csv_arg(args.y),
+            "mode": args.mode,
+            "namespace": args.namespace,
+            "kind": args.kind,
+            "filename": args.filename,
+            "metadata": parse_json(args.metadata),
+        }
+        if args.metric_key:
+            series_payload["metric"] = compact_payload({"namespace": args.metric_namespace or args.namespace, "key": args.metric_key, "kind": args.metric_kind, "x": args.x, "y": parse_csv_arg(args.y), "mode": args.mode})
+        result_payload = build_result_payload(args)
+        if result_payload:
+            series_payload["result"] = result_payload
         return request(
             args,
             "POST",
             f"/api/v1/runs/{args.run_id}/series",
             headers=headers,
-            json={
-                "name": args.name,
-                "data": data,
-                "x": args.x,
-                "y": parse_csv_arg(args.y),
-                "namespace": args.namespace,
-                "kind": args.kind,
-                "filename": args.filename,
-                "metadata": parse_json(args.metadata),
-            },
+            json=series_payload,
         )
     if args.group == "run" and args.action == "finish":
         return request(args, "POST", f"/api/v1/runs/{args.run_id}/finish")
@@ -1099,6 +1118,25 @@ def parse_json_object_arg(value: str, label: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise CliError("VALIDATION_ERROR", f"{label} must be a JSON object")
     return parsed
+
+
+def build_result_payload(args: argparse.Namespace) -> dict[str, Any]:
+    payload = parse_json_object_arg(args.result, "result") if getattr(args, "result", None) else {}
+    view = parse_json_object_arg(args.result_view, "result view") if getattr(args, "result_view", None) else None
+    payload.update(
+        compact_payload(
+            {
+                "domain": getattr(args, "result_domain", None),
+                "name": getattr(args, "result_name", None),
+                "role": getattr(args, "result_role", None),
+                "title": getattr(args, "result_title", None),
+                "group": getattr(args, "result_group", None),
+                "order": getattr(args, "result_order", None),
+                "view": view,
+            }
+        )
+    )
+    return payload
 
 
 def parse_structured_object_file(path_value: str, label: str) -> dict[str, Any]:

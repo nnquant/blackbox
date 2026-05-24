@@ -486,6 +486,8 @@ def test_run_log_series_dispatches_series_request(monkeypatch) -> None:
             "date",
             "--y",
             "nav,benchmark",
+            "--mode",
+            "nav",
             "--namespace",
             "strategy.equity",
             "--idempotency-key",
@@ -504,6 +506,7 @@ def test_run_log_series_dispatches_series_request(monkeypatch) -> None:
                 "data": [{"date": "2026-01-01", "nav": 1.01}],
                 "x": "date",
                 "y": ["nav", "benchmark"],
+                "mode": "nav",
                 "namespace": "strategy.equity",
                 "kind": "table_csv",
                 "filename": None,
@@ -511,6 +514,62 @@ def test_run_log_series_dispatches_series_request(monkeypatch) -> None:
             },
         }
     ]
+
+
+def test_run_log_series_accepts_result_metadata(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        return {"id": "art_1"}
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "log-series",
+            "--run-id",
+            "run_1",
+            "--name",
+            "factor_ic_series",
+            "--data",
+            '[{"date":"2026-01-01","cumulative_ic":0.03}]',
+            "--x",
+            "date",
+            "--y",
+            "cumulative_ic",
+            "--namespace",
+            "factor.ic",
+            "--result-domain",
+            "factor",
+            "--result-name",
+            "primary_ic",
+            "--result-role",
+            "ic_curve",
+            "--result-title",
+            "Cumulative IC",
+            "--result-group",
+            "factor.primary",
+            "--result-order",
+            "10",
+            "--result-view",
+            '{"default":"plot","x":"date","y":"cumulative_ic"}',
+        ]
+    )
+
+    assert cli_main.dispatch(args) == {"id": "art_1"}
+    assert calls[0]["json"]["result"] == {
+        "domain": "factor",
+        "name": "primary_ic",
+        "role": "ic_curve",
+        "title": "Cumulative IC",
+        "group": "factor.primary",
+        "order": 10,
+        "view": {"default": "plot", "x": "date", "y": "cumulative_ic"},
+    }
 
 
 def test_artifact_get_and_note_list_dispatch_requests(monkeypatch) -> None:

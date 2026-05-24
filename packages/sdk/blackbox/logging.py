@@ -224,9 +224,23 @@ def log_bytes(
     return run.log_bytes(name, data, kind, filename, metadata, idempotency_key=idempotency_key)
 
 
-def log_table(name: str, data: Any, kind: str = "table_parquet", filename: str | None = None) -> dict[str, Any]:
+def log_table(
+    name: str,
+    data: Any,
+    kind: str = "table_parquet",
+    filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
     content = serialize_table(data, kind)
-    return log_bytes(name, content, kind=kind, filename=filename or default_artifact_filename(name, kind))
+    return log_bytes(
+        name,
+        content,
+        kind=kind,
+        filename=filename or default_artifact_filename(name, kind),
+        metadata=metadata,
+        idempotency_key=idempotency_key,
+    )
 
 
 def log_series(
@@ -234,9 +248,13 @@ def log_series(
     data: Any,
     x: str | None = None,
     y: str | list[str] | None = None,
+    mode: str | None = None,
     namespace: str | None = None,
     kind: str = "table_csv",
     filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    metric: dict[str, Any] | None = None,
+    result: dict[str, Any] | None = None,
     idempotency_key: str | None = None,
 ) -> dict[str, Any]:
     rows = normalize_rows(data)
@@ -248,14 +266,78 @@ def log_series(
             rows,
             x=x,
             y=y,
+            mode=mode,
             namespace=namespace,
+            metric=metric,
+            result=result,
             kind=kind,
             filename=filename or default_artifact_filename(name, kind),
+            metadata=metadata,
             idempotency_key=idempotency_key,
         )
-    metadata = {"series": {"name": name, "x": x, "y": y, "namespace": namespace}}
+    metadata_payload = {
+        **(metadata or {}),
+        "series": {"name": name, "x": x, "y": y or "series_values", "mode": mode, "namespace": namespace},
+    }
+    if metric is not None:
+        metadata_payload["metric"] = metric
+    if result is not None:
+        metadata_payload["result"] = result
     content = serialize_table(rows, kind)
-    return run.log_bytes(name, content, kind=kind, filename=filename or default_artifact_filename(name, kind), metadata=metadata)
+    return run.log_bytes(name, content, kind=kind, filename=filename or default_artifact_filename(name, kind), metadata=metadata_payload, idempotency_key=idempotency_key)
+
+
+def log_metric_series(
+    namespace: str,
+    key: str,
+    data: Any,
+    x: str | None = None,
+    y: str | list[str] | None = None,
+    mode: str | None = None,
+    kind: str = "table_csv",
+    filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    result: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    metric = {"namespace": namespace, "key": key, "kind": "series", "x": x, "y": y or "series_values", "mode": mode}
+    return log_series(
+        key,
+        data,
+        x=x,
+        y=y,
+        mode=mode,
+        namespace=namespace,
+        kind=kind,
+        filename=filename,
+        metadata=metadata,
+        metric=metric,
+        result=result,
+        idempotency_key=idempotency_key,
+    )
+
+
+def log_metric_table(
+    namespace: str,
+    key: str,
+    data: Any,
+    kind: str = "table_csv",
+    filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    result: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    metadata_payload = {**(metadata or {}), "metric": {"namespace": namespace, "key": key, "kind": "table"}}
+    if result is not None:
+        metadata_payload["result"] = result
+    return log_table(
+        key,
+        data,
+        kind=kind,
+        filename=filename,
+        metadata=metadata_payload,
+        idempotency_key=idempotency_key,
+    )
 
 
 def register_external_artifact(
@@ -314,16 +396,322 @@ def create_sweep(
     return client.create_sweep(branch_id, name, search_space=search_space, objective=objective, status=status)
 
 
+def result_metadata(
+    domain: str,
+    name: str,
+    role: str,
+    title: str | None = None,
+    group: str | None = None,
+    order: int | None = None,
+    view: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return compact_dict(
+        {
+            "domain": domain,
+            "name": name,
+            "role": role,
+            "title": title,
+            "group": group or f"{domain}.{name}",
+            "order": order,
+            "view": view,
+        }
+    )
+
+
+def log_result_series(
+    artifact_name: str,
+    data: Any,
+    *,
+    domain: str,
+    role: str,
+    result_name: str | None = None,
+    title: str | None = None,
+    group: str | None = None,
+    order: int | None = None,
+    view: dict[str, Any] | None = None,
+    x: str | None = None,
+    y: str | list[str] | None = None,
+    mode: str | None = None,
+    namespace: str | None = None,
+    metric: dict[str, Any] | None = None,
+    kind: str = "table_csv",
+    filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    return log_series(
+        artifact_name,
+        data,
+        x=x,
+        y=y,
+        mode=mode,
+        namespace=namespace,
+        kind=kind,
+        filename=filename,
+        metadata=metadata,
+        metric=metric,
+        result=result_metadata(domain, result_name or artifact_name, role, title=title, group=group, order=order, view=view),
+        idempotency_key=idempotency_key,
+    )
+
+
+def log_result_table(
+    artifact_name: str,
+    data: Any,
+    *,
+    domain: str,
+    role: str,
+    result_name: str | None = None,
+    title: str | None = None,
+    group: str | None = None,
+    order: int | None = None,
+    view: dict[str, Any] | None = None,
+    metric: dict[str, Any] | None = None,
+    kind: str = "table_csv",
+    filename: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    metadata_payload = {**(metadata or {}), "result": result_metadata(domain, result_name or artifact_name, role, title=title, group=group, order=order, view=view)}
+    if metric is not None:
+        metadata_payload["metric"] = metric
+    return log_table(
+        artifact_name,
+        data,
+        kind=kind,
+        filename=filename,
+        metadata=metadata_payload,
+        idempotency_key=idempotency_key,
+    )
+
+
+def log_performance_result(
+    curve: Any | None = None,
+    *,
+    metrics: dict[str, Any] | None = None,
+    mode: str = "nav",
+    x: str = "date",
+    y: str | list[str] = "series_values",
+    drawdown: Any | None = None,
+    drawdown_y: str | list[str] = "drawdown",
+    idempotency_prefix: str | None = None,
+) -> dict[str, Any]:
+    metric_rows = log_backtest_summary(metrics) if metrics else []
+    artifacts: list[dict[str, Any]] = []
+    normalized_mode = canonical_performance_mode(mode)
+    curve_name = performance_curve_artifact_name(normalized_mode)
+    namespace = {"nav": "strategy.equity", "return": "strategy.returns", "pnl": "strategy.pnl"}.get(normalized_mode, "strategy.performance")
+    if curve is not None:
+        artifacts.append(
+            log_result_series(
+                curve_name,
+                curve,
+                domain="performance",
+                role="primary_curve",
+                result_name="primary_performance",
+                title="Performance Curve",
+                group="performance.primary",
+                order=10,
+                view={"default": "performance_chart", "x": x, "y": y, "mode": normalized_mode, "chart": "line_drawdown"},
+                x=x,
+                y=y,
+                mode=normalized_mode,
+                namespace=namespace,
+                kind="returns_series_parquet",
+                filename=f"{curve_name}.parquet",
+                idempotency_key=f"{idempotency_prefix}-performance-curve" if idempotency_prefix else None,
+            )
+        )
+    if drawdown is not None:
+        artifacts.append(
+            log_result_series(
+                "drawdown_series",
+                drawdown,
+                domain="performance",
+                role="drawdown",
+                result_name="primary_drawdown",
+                title="Drawdown",
+                group="performance.primary",
+                order=20,
+                view={"default": "drawdown", "x": x, "y": drawdown_y, "mode": "drawdown", "chart": "area"},
+                x=x,
+                y=drawdown_y,
+                mode="drawdown",
+                namespace="strategy.drawdown",
+                kind="returns_series_parquet",
+                filename="drawdown_series.parquet",
+                idempotency_key=f"{idempotency_prefix}-drawdown" if idempotency_prefix else None,
+            )
+        )
+    return {"metrics": metric_rows, "artifacts": artifacts}
+
+
+def log_factor_result(
+    *,
+    metrics: dict[str, Any] | None = None,
+    ic_series: Any | None = None,
+    quantile_returns: Any | None = None,
+    factor_name: str = "primary",
+    x: str = "date",
+    ic_y: str | list[str] = "cumulative_ic",
+    idempotency_prefix: str | None = None,
+) -> dict[str, Any]:
+    metric_rows = log_factor_summary(metrics) if metrics else []
+    artifacts: list[dict[str, Any]] = []
+    group = f"factor.{factor_name}"
+    if ic_series is not None:
+        artifacts.append(
+            log_result_series(
+                "factor_ic_series",
+                ic_series,
+                domain="factor",
+                role="ic_curve",
+                result_name=f"{factor_name}_ic",
+                title="Cumulative IC",
+                group=group,
+                order=10,
+                view={"default": "plot", "x": x, "y": ic_y, "chart": "line"},
+                x=x,
+                y=ic_y,
+                namespace="factor.ic",
+                metric={"namespace": "factor.ic", "key": "cumulative_ic", "kind": "series", "x": x, "y": ic_y},
+                kind="table_csv",
+                filename="factor_ic_series.csv",
+                idempotency_key=f"{idempotency_prefix}-factor-ic" if idempotency_prefix else None,
+            )
+        )
+    if quantile_returns is not None:
+        artifacts.append(
+            log_result_table(
+                "factor_quantile_returns",
+                quantile_returns,
+                domain="factor",
+                role="quantile_returns",
+                result_name=f"{factor_name}_quantile_returns",
+                title="Grouped Returns",
+                group=group,
+                order=20,
+                view={"default": "table", "chart": "bar"},
+                metric={"namespace": "factor.quantile", "key": "grouped_returns", "kind": "table"},
+                kind="table_parquet",
+                filename="factor_quantile_returns.parquet",
+                idempotency_key=f"{idempotency_prefix}-factor-quantile" if idempotency_prefix else None,
+            )
+        )
+    return {"metrics": metric_rows, "artifacts": artifacts}
+
+
+def log_factor_batch_result(
+    *,
+    metrics: dict[str, Any] | None = None,
+    comparison_table: Any | None = None,
+    comparison_series: Any | None = None,
+    batch_name: str = "primary",
+    x: str = "date",
+    y: str | list[str] | None = None,
+    idempotency_prefix: str | None = None,
+) -> dict[str, Any]:
+    metric_rows = log(values=metrics, namespace="factor.batch.summary", point={"kind": "event", "name": "factor_batch_done"}) if metrics else []
+    artifacts: list[dict[str, Any]] = []
+    group = f"factor_batch.{batch_name}"
+    if comparison_table is not None:
+        artifacts.append(
+            log_result_table(
+                "factor_comparison",
+                comparison_table,
+                domain="factor_batch",
+                role="comparison_table",
+                result_name=f"{batch_name}_comparison_table",
+                title="Factor Comparison",
+                group=group,
+                order=10,
+                view={"default": "table"},
+                metric={"namespace": "factor.batch", "key": "factor_comparison", "kind": "table"},
+                kind="table_csv",
+                filename="factor_comparison.csv",
+                idempotency_key=f"{idempotency_prefix}-factor-comparison" if idempotency_prefix else None,
+            )
+        )
+    if comparison_series is not None:
+        artifacts.append(
+            log_result_series(
+                "factor_return_comparison",
+                comparison_series,
+                domain="factor_batch",
+                role="comparison_curve",
+                result_name=f"{batch_name}_comparison_curve",
+                title="Factor Return Comparison",
+                group=group,
+                order=20,
+                view={"default": "plot", "x": x, "y": y, "chart": "line"},
+                x=x,
+                y=y,
+                namespace="factor.batch.returns",
+                metric={"namespace": "factor.batch", "key": "return_comparison", "kind": "series", "x": x, "y": y},
+                kind="table_csv",
+                filename="factor_return_comparison.csv",
+                idempotency_key=f"{idempotency_prefix}-factor-comparison-series" if idempotency_prefix else None,
+            )
+        )
+    return {"metrics": metric_rows, "artifacts": artifacts}
+
+
+def performance_curve_artifact_name(mode: str) -> str:
+    mode = canonical_performance_mode(mode)
+    if mode == "return":
+        return "returns_series"
+    if mode == "pnl":
+        return "pnl_series"
+    return "equity_curve"
+
+
+def canonical_performance_mode(mode: str) -> str:
+    normalized = str(mode or "").lower()
+    if normalized in {"return", "returns", "period_return", "periodic_return"}:
+        return "return"
+    if normalized in {"pnl", "profit", "absolute", "absolute_return", "absolute_change"}:
+        return "pnl"
+    return "nav"
+
+
 def log_factor_summary(values: dict[str, Any]) -> list[dict[str, Any]]:
     return log(values, namespace="factor.summary", point={"kind": "event", "name": "factor_eval_done"})
 
 
 def log_factor_ic_series(data: Any, x: str = "date", y: str | list[str] = "ic") -> dict[str, Any]:
-    return log_series("factor_ic_series", data, x=x, y=y, namespace="factor.ic", kind="table_csv")
+    return log_series(
+        "factor_ic_series",
+        data,
+        x=x,
+        y=y,
+        namespace="factor.ic",
+        kind="table_csv",
+        result=result_metadata(
+            "factor",
+            "primary_ic",
+            "ic_curve",
+            title="Factor IC",
+            group="factor.primary",
+            order=10,
+            view={"default": "plot", "x": x, "y": y, "chart": "line"},
+        ),
+    )
 
 
 def log_quantile_returns(data: Any) -> dict[str, Any]:
-    return log_table("factor_quantile_returns", data, kind="table_parquet", filename="factor_quantile_returns.parquet")
+    return log_result_table(
+        "factor_quantile_returns",
+        data,
+        domain="factor",
+        role="quantile_returns",
+        result_name="primary_quantile_returns",
+        title="Grouped Returns",
+        group="factor.primary",
+        order=20,
+        view={"default": "table", "chart": "bar"},
+        kind="table_parquet",
+        filename="factor_quantile_returns.parquet",
+    )
 
 
 def log_factor_turnover(data: Any) -> dict[str, Any] | list[dict[str, Any]]:
@@ -342,15 +730,69 @@ def log_backtest_summary(values: dict[str, Any]) -> list[dict[str, Any]]:
     return log(values, namespace="strategy.summary", point={"kind": "event", "name": "post_cost_backtest_done"})
 
 
-def log_returns_series(data: Any, x: str = "date", y: str | list[str] = "return") -> dict[str, Any]:
+def log_returns_series(data: Any, x: str = "date", y: str | list[str] = "series_values") -> dict[str, Any]:
     return log_series(
         "returns_series",
         data,
         x=x,
         y=y,
+        mode="return",
         namespace="strategy.returns",
         kind="returns_series_parquet",
         filename="returns_series.parquet",
+        result=result_metadata(
+            "performance",
+            "primary_performance",
+            "primary_curve",
+            title="Performance Curve",
+            group="performance.primary",
+            order=10,
+            view={"default": "performance_chart", "x": x, "y": y, "mode": "return", "chart": "line_drawdown"},
+        ),
+    )
+
+
+def log_pnl_series(data: Any, x: str = "date", y: str | list[str] = "series_values") -> dict[str, Any]:
+    return log_series(
+        "pnl_series",
+        data,
+        x=x,
+        y=y,
+        mode="pnl",
+        namespace="strategy.pnl",
+        kind="returns_series_parquet",
+        filename="pnl_series.parquet",
+        result=result_metadata(
+            "performance",
+            "primary_performance",
+            "primary_curve",
+            title="Performance Curve",
+            group="performance.primary",
+            order=10,
+            view={"default": "performance_chart", "x": x, "y": y, "mode": "pnl", "chart": "line_drawdown"},
+        ),
+    )
+
+
+def log_absolute_return_series(data: Any, x: str = "date", y: str | list[str] = "series_values") -> dict[str, Any]:
+    return log_series(
+        "absolute_return_series",
+        data,
+        x=x,
+        y=y,
+        mode="pnl",
+        namespace="strategy.absolute_return",
+        kind="returns_series_parquet",
+        filename="absolute_return_series.parquet",
+        result=result_metadata(
+            "performance",
+            "primary_performance",
+            "primary_curve",
+            title="Performance Curve",
+            group="performance.primary",
+            order=10,
+            view={"default": "performance_chart", "x": x, "y": y, "mode": "pnl", "chart": "line_drawdown"},
+        ),
     )
 
 
@@ -360,9 +802,19 @@ def log_drawdown_series(data: Any, x: str = "date", y: str | list[str] = "drawdo
         data,
         x=x,
         y=y,
+        mode="drawdown",
         namespace="strategy.drawdown",
         kind="returns_series_parquet",
         filename="drawdown_series.parquet",
+        result=result_metadata(
+            "performance",
+            "primary_drawdown",
+            "drawdown",
+            title="Drawdown",
+            group="performance.primary",
+            order=20,
+            view={"default": "drawdown", "x": x, "y": y, "mode": "drawdown", "chart": "area"},
+        ),
     )
 
 
@@ -469,6 +921,10 @@ def serialize_json(data: Any) -> bytes:
 
 def is_scalar_dict(data: dict[str, Any]) -> bool:
     return all(not isinstance(value, (dict, list, tuple, set)) and not hasattr(value, "to_dict") for value in data.values())
+
+
+def compact_dict(data: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in data.items() if value is not None}
 
 
 def serialize_list_csv(rows: list[Any]) -> bytes:
