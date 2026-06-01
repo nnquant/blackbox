@@ -1470,11 +1470,12 @@ function ProjectResearchHeatPanel({ researches, branches, runs, selectResearch, 
               <HeatStat label="fail rate" value={`${Math.round(row.failureRate * 100)}%`} tone={row.failureRate > 0.25 ? 'negative' : 'neutral'} />
               <HeatStat label="branches" value={row.branchCount} tone="info" />
             </div>
-            <div className="mt-3 rounded-md bg-white/50 p-3">
+            <div className="mt-3 min-w-0 overflow-hidden rounded-md bg-white/50 p-3">
               <div className="text-xs font-semibold uppercase text-muted">Champion</div>
               {row.champion ? (
-                <button className="mt-1 text-left text-sm font-semibold text-ink hover:text-info" onClick={() => selectRun(row.champion.id)}>
-                  {row.champion.name} · Sharpe {formatMetric(metricValue(row.champion, 'strategy.summary', 'sharpe'))}
+                <button className="mt-1 block w-full min-w-0 text-left text-sm font-semibold text-ink hover:text-info" onClick={() => selectRun(row.champion.id)}>
+                  <span className="block break-words [overflow-wrap:anywhere]">{row.champion.name}</span>
+                  <span className="mt-1 block">Sharpe {formatMetric(metricValue(row.champion, 'strategy.summary', 'sharpe'))}</span>
                 </button>
               ) : <div className="mt-1 text-sm text-muted">No completed runs.</div>}
             </div>
@@ -1589,7 +1590,20 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
     <Panel className="overflow-hidden">
       <PanelHeader title={title} icon={Trophy} />
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1280px] border-collapse">
+        <table className="w-full min-w-[1560px] table-fixed border-collapse">
+          <colgroup>
+            <col className="w-[300px]" />
+            <col className="w-[280px]" />
+            <col className="w-[96px]" />
+            <col className="w-[96px]" />
+            <col className="w-[76px]" />
+            <col className="w-[76px]" />
+            <col className="w-[76px]" />
+            <col className="w-[82px]" />
+            <col className="w-[360px]" />
+            <col className="w-[100px]" />
+            <col className="w-[118px]" />
+          </colgroup>
           <thead className="table-head">
             <tr>
               <th className="px-4 py-3">Run</th>
@@ -1609,10 +1623,13 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
             {runs.length ? runs.map((run) => (
               <tr className="transition hover:bg-white/45" key={run.id}>
                 <td className="table-cell">
-                  <button className="font-semibold text-ink hover:underline" onClick={() => onSelectRun(run.id)}>{run.name}</button>
+                  <button className="font-semibold text-ink hover:underline break-words [overflow-wrap:anywhere]" onClick={() => onSelectRun(run.id)}>{run.name}</button>
                 </td>
                 <td className="table-cell text-muted">
-                  {run.research_key || '--'} / <button className="font-semibold text-ink hover:underline" onClick={() => onSelectBranch(run.branch_id)}>{run.branch_key || run.branch_id}</button>
+                  <div className="break-words [overflow-wrap:anywhere]">{run.research_key || '--'}</div>
+                  <button className="mt-1 block font-semibold text-ink hover:underline break-words [overflow-wrap:anywhere]" onClick={() => onSelectBranch(run.branch_id)}>
+                    {run.branch_key || run.branch_id}
+                  </button>
                 </td>
                 <td className="table-cell"><StatusBadge status={run.status} /></td>
                 <td className="table-cell text-muted">{runCreator(run)}</td>
@@ -1620,7 +1637,7 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
                 <td className="table-cell text-right text-muted">{formatMetric(metricValue(run, 'strategy.summary', 'max_drawdown'))}</td>
                 <td className="table-cell text-right text-muted">{formatMetric(metricValue(run, 'strategy.summary', 'ic_mean'))}</td>
                 <td className="table-cell text-right text-muted">{runRuntime(run)}</td>
-                <td className="table-cell text-muted">{configSummary(run.config_json)}</td>
+                <td className="table-cell text-muted"><div className="break-words [overflow-wrap:anywhere]">{configSummary(run.config_json)}</div></td>
                 <td className="table-cell"><ArtifactSummary run={run} /></td>
                 <td className="table-cell text-right text-muted">{formatDate(run.updated_at)}</td>
               </tr>
@@ -5468,12 +5485,19 @@ function seriesChartOption(name, byRun, runById) {
       };
     });
   }).filter((item) => item.data.length);
+  const allPoints = seriesItems.flatMap((item) => item.data || []);
+  const xAxisType = shouldUseTimeAxis(allPoints) ? 'time' : 'category';
+  const categoryValues = xAxisType === 'category' ? sortedUniqueChartXValues(allPoints.map((point) => point?.[0])) : undefined;
   return {
     animation: false,
     tooltip: { trigger: 'axis' },
     legend: { top: 0, type: 'scroll' },
     grid: { top: 42, left: 48, right: 24, bottom: 36 },
-    xAxis: { type: 'category', boundaryGap: false },
+    xAxis: {
+      type: xAxisType,
+      boundaryGap: false,
+      ...(categoryValues ? { data: categoryValues } : {}),
+    },
     yAxis: { type: 'value', scale: true },
     series: seriesItems.length ? seriesItems : [{ name, type: 'line', showSymbol: false, data: [] }],
   };
@@ -5483,10 +5507,9 @@ function seriesPreviewData(seriesName, item, yKey, xKey) {
   const valueMode = seriesValueMode({ ...item, name: seriesName }, yKey);
   let compounded = 1;
   let cumulative = 0;
-  return (item.rows || []).map((row, index) => {
+  const points = sortedChartRows(item.rows || [], xKey).map(({ row, x }) => {
     const raw = toNumber(row?.[yKey]);
     if (!Number.isFinite(raw)) return null;
-    const x = xKey ? row[xKey] : index + 1;
     if (valueMode === 'period_return') {
       compounded *= 1 + raw;
       return [x, compounded - 1];
@@ -5497,6 +5520,7 @@ function seriesPreviewData(seriesName, item, yKey, xKey) {
     }
     return [x, raw];
   }).filter(Boolean);
+  return normalizeChartPoints(points);
 }
 
 function sortComparedRuns(runs, metrics, sortMetric, sortDirection) {
@@ -7536,10 +7560,9 @@ function runEquityChartData(items) {
   const equityPoints = [];
   let compounded = 1;
   let cumulative = 0;
-  for (const [index, row] of equityItem.rows.entries()) {
+  for (const { row, x } of sortedChartRows(equityItem.rows || [], xKey)) {
     const raw = toNumber(row?.[equityKey]);
     if (!Number.isFinite(raw)) continue;
-    const x = chartXValue(row, xKey, index);
     if (valueMode === 'period_return') {
       compounded *= 1 + raw;
       equityPoints.push({ x, value: compounded - 1 });
@@ -7556,8 +7579,8 @@ function runEquityChartData(items) {
   const drawdownKey = drawdownItem ? chooseSeriesKey(drawdownItem, ['drawdown', 'max_drawdown', 'dd', 'series_values']) : null;
   let drawdownPoints = [];
   if (drawdownItem && drawdownKey) {
-    drawdownPoints = drawdownItem.rows.map((row, index) => ({
-      x: chartXValue(row, drawdownItem.x, index),
+    drawdownPoints = sortedChartRows(drawdownItem.rows || [], drawdownItem.x).map(({ row, x }) => ({
+      x,
       value: normalizeDrawdown(toNumber(row?.[drawdownKey]), valueMode),
     })).filter((point) => Number.isFinite(point.value));
   }
@@ -7571,10 +7594,13 @@ function runEquityChartData(items) {
   };
   equityPoints.forEach((point) => addX(point.x));
   drawdownPoints.forEach((point) => addX(point.x));
+  xValues.sort(compareChartXValues);
   const equityByX = new Map(equityPoints.map((point) => [point.x, point.value]));
   const drawdownByX = new Map(drawdownPoints.map((point) => [point.x, point.value]));
+  const xAxisType = shouldUseTimeAxis(xValues.map((x) => [x, 0])) ? 'time' : 'category';
   return {
     xValues,
+    xAxisType,
     equityData: xValues.map((x) => [x, equityByX.get(x) ?? null]),
     drawdownData: xValues.map((x) => [x, drawdownByX.get(x) ?? null]),
     lineName: chartLineName(valueMode, equityKey),
@@ -7674,7 +7700,76 @@ function chartLineName(valueMode, key) {
 
 function chartXValue(row, xKey, index) {
   const value = xKey ? row?.[xKey] : undefined;
-  return value === null || value === undefined || value === '' ? String(index + 1) : String(value);
+  if (value === null || value === undefined || value === '') return String(index + 1);
+  return normalizeChartXValue(value);
+}
+
+function sortedChartRows(rows, xKey) {
+  return (rows || [])
+    .map((row, index) => ({ row, index, x: chartXValue(row, xKey, index) }))
+    .sort((left, right) => compareChartXValues(left.x, right.x) || left.index - right.index);
+}
+
+function normalizeChartXValue(value) {
+  const raw = String(value).trim();
+  const date = parseChartDate(raw);
+  return date ? date.iso : raw;
+}
+
+function parseChartDate(value) {
+  const raw = String(value || '').trim();
+  let match = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T].*)?$/);
+  if (!match) match = raw.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null;
+  const timestamp = Date.UTC(year, month - 1, day);
+  const date = new Date(timestamp);
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return { iso: `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`, timestamp };
+}
+
+function chartXSortValue(value) {
+  const date = parseChartDate(value);
+  if (date) return { type: 'date', value: date.timestamp };
+  const number = toNumber(value);
+  if (Number.isFinite(number)) return { type: 'number', value: number };
+  return { type: 'text', value: String(value || '') };
+}
+
+function compareChartXValues(left, right) {
+  const a = chartXSortValue(left);
+  const b = chartXSortValue(right);
+  if (a.type === b.type) {
+    if (a.type === 'text') return a.value.localeCompare(b.value, undefined, { numeric: true, sensitivity: 'base' });
+    return a.value - b.value;
+  }
+  const rank = { date: 0, number: 1, text: 2 };
+  return rank[a.type] - rank[b.type];
+}
+
+function normalizeChartPoints(points) {
+  const byX = new Map();
+  for (const point of points || []) {
+    const x = normalizeChartXValue(point?.[0]);
+    const y = toNumber(point?.[1]);
+    if (!x || !Number.isFinite(y)) continue;
+    byX.set(x, y);
+  }
+  return Array.from(byX.entries())
+    .sort(([left], [right]) => compareChartXValues(left, right))
+    .map(([x, y]) => [x, y]);
+}
+
+function sortedUniqueChartXValues(values) {
+  return Array.from(new Set((values || []).map(normalizeChartXValue).filter(Boolean))).sort(compareChartXValues);
+}
+
+function shouldUseTimeAxis(points) {
+  const values = (points || []).map((point) => Array.isArray(point) ? point[0] : point).filter((value) => value !== null && value !== undefined && value !== '');
+  return values.length > 0 && values.every((value) => Boolean(parseChartDate(value)));
 }
 
 function normalizeDrawdown(value, valueMode = 'level') {
@@ -7724,8 +7819,9 @@ function runEquityChartOption(chart) {
     },
     grid: { top: 12, left: 56, right: 58, bottom: 36 },
     xAxis: {
-      type: 'category',
+      type: chart.xAxisType || 'category',
       boundaryGap: false,
+      ...(chart.xAxisType === 'time' ? {} : { data: chart.xValues || [] }),
       axisLine: { lineStyle: { color: '#d7dce2' } },
       axisTick: { show: false },
       axisLabel: { color: '#5f6b7a', hideOverlap: true },
