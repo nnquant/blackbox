@@ -16,6 +16,7 @@ import {
   ExternalLink,
   FileText,
   GitBranch,
+  Image as ImageIcon,
   Layers3,
   LineChart,
   ListTree,
@@ -3325,8 +3326,8 @@ function RunResultGroup({ group, onOpenArtifact, onOpenDataMetric }) {
                 <td className="table-cell max-w-[420px] text-muted"><ArtifactPreviewSummary preview={item.artifact.preview_json || {}} /></td>
                 <td className="table-cell">
                   <div className="flex justify-end gap-2">
-                    <button className="icon-button" type="button" onClick={() => onOpenDataMetric(resultMetricModalItem(item))} aria-label={`View result ${item.title}`} title="View data">
-                      <TableProperties className="h-4 w-4" />
+                    <button className="icon-button" type="button" onClick={() => onOpenDataMetric(resultMetricModalItem(item))} aria-label={`View result ${item.title}`} title={resultViewAction(item).title}>
+                      {React.createElement(resultViewAction(item).icon, { className: 'h-4 w-4' })}
                     </button>
                     <button className="icon-button" type="button" onClick={() => onOpenArtifact(item.artifact)} aria-label={`View artifact ${item.artifact.name}`} title="View artifact">
                       <FileText className="h-4 w-4" />
@@ -3345,6 +3346,12 @@ function RunResultGroup({ group, onOpenArtifact, onOpenDataMetric }) {
   );
 }
 
+function resultViewAction(item) {
+  if (isImageArtifact(item.artifact, item.artifact.preview_json || {})) return { icon: ImageIcon, title: 'View image' };
+  if (isSeriesResultItem(item, item.artifact)) return { icon: LineChart, title: 'View series data' };
+  return { icon: TableProperties, title: 'View table data' };
+}
+
 function resultMetricModalItem(item) {
   const metadata = item.artifact.metadata_json || {};
   const metric = metadata.metric && typeof metadata.metric === 'object' ? metadata.metric : null;
@@ -3356,6 +3363,9 @@ function resultMetricModalItem(item) {
     artifact: item.artifact,
     metricBinding: metric,
     seriesBinding: series,
+    result: item.result,
+    resultRole: item.role,
+    resultDomain: item.domain,
   };
 }
 
@@ -3363,6 +3373,27 @@ function isResultSeriesChartable(item) {
   const metadata = item.artifact.metadata_json || {};
   const series = metadata.series && typeof metadata.series === 'object' ? metadata.series : null;
   const rows = Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : [];
+  if (!series || !rows.length) return false;
+  const yKeys = Array.isArray(series.y) ? series.y : [series.y || 'series_values'].filter(Boolean);
+  return yKeys.some((key) => rows.some((row) => Number.isFinite(toNumber(row?.[key]))));
+}
+
+function isSeriesResultItem(item, artifact = item?.artifact) {
+  const role = String(item?.role || item?.resultRole || item?.result?.role || '').toLowerCase();
+  const metricKind = String(item?.metricBinding?.kind || item?.result?.metric?.kind || '').toLowerCase();
+  if (role.includes('table') || role === 'quantile_returns' || role === 'report') return false;
+  if (role.includes('series')
+    || role.includes('curve')
+    || role === 'drawdown'
+    || role === 'primary_curve'
+    || role === 'ic_curve'
+    || role === 'comparison_curve') return true;
+  if (metricKind === 'series') return true;
+  return Boolean(item?.seriesBinding) && hasNumericSeriesRows(item.seriesBinding, artifact);
+}
+
+function hasNumericSeriesRows(series, artifact) {
+  const rows = Array.isArray(artifact?.preview_json?.rows) ? artifact.preview_json.rows : [];
   if (!series || !rows.length) return false;
   const yKeys = Array.isArray(series.y) ? series.y : [series.y || 'series_values'].filter(Boolean);
   return yKeys.some((key) => rows.some((row) => Number.isFinite(toNumber(row?.[key]))));
@@ -5914,24 +5945,29 @@ function metricSearchText(metric) {
 }
 
 function MetricDataModal({ item, onClose }) {
-  const [activeView, setActiveView] = useState('table');
   const [detail, setDetail] = useState(item.artifact);
   const [rows, setRows] = useState(() => Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : []);
   const [markdownText, setMarkdownText] = useState('');
   const [error, setError] = useState(null);
+  const [activeView, setActiveView] = useState(() => artifactDataViews(item.artifact, item)[0] || 'table');
   useEffect(() => {
     let cancelled = false;
     setDetail(item.artifact);
     setRows(Array.isArray(item.artifact.preview_json?.rows) ? item.artifact.preview_json.rows : []);
     setMarkdownText('');
     setError(null);
+    setActiveView(artifactDataViews(item.artifact, item)[0] || 'table');
     apiGet(`/api/v1/artifacts/${item.artifact.id}`)
       .then(async (payload) => {
         if (cancelled) return;
         setDetail(payload);
+        const views = artifactDataViews(payload, item);
+        setActiveView((current) => (views.includes(current) ? current : views[0] || 'table'));
         if (isMarkdownArtifact(payload)) {
           const text = await loadArtifactText(payload);
           if (!cancelled) setMarkdownText(text || markdownTextFromPreview(payload.preview_json));
+        } else if (isImageArtifact(payload, payload.preview_json || {})) {
+          if (!cancelled) setRows([]);
         } else {
           const parsedRows = await loadArtifactRows(payload);
           if (!cancelled) setRows(parsedRows.length ? parsedRows : (Array.isArray(payload.preview_json?.rows) ? payload.preview_json.rows : []));
@@ -5950,35 +5986,88 @@ function MetricDataModal({ item, onClose }) {
     };
   }, [item.artifact.id, onClose]);
   const columns = metricDataColumns(rows, detail.preview_json || {});
-  const isMarkdown = isMarkdownArtifact(detail);
+  const availableViews = artifactDataViews(detail, item);
+  const showTabs = availableViews.length > 1;
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-5xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold text-ink">{item.namespace}.{item.key}</h2>
-            <div className="mt-1 truncate text-xs text-muted">{detail.name} · {detail.kind} · {rows.length || 0} rows</div>
+            <div className="mt-1 truncate text-xs text-muted">{artifactDataSubtitle(detail, rows)}</div>
           </div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close metric details">
             <XCircle className="h-4 w-4" />
           </button>
         </div>
-        {isMarkdown ? null : (
-          <div className="flex gap-2 border-b border-line p-3">
-            {['table', 'plot'].map((view) => (
-              <button className={`secondary-button ${activeView === view ? 'border-lineStrong bg-white text-ink shadow-insetLine' : 'text-muted'}`} key={view} type="button" onClick={() => setActiveView(view)}>
-                {view === 'table' ? 'Table' : 'Plot'}
+        {showTabs ? (
+          <div className="flex gap-1 border-b border-line px-4 py-3">
+            {availableViews.map((view) => (
+              <button
+                className={`rounded-md px-3 py-2 text-sm font-semibold transition ${activeView === view ? 'bg-[#e8ebe7] text-ink' : 'text-muted hover:bg-[#f3f4f1] hover:text-ink'}`}
+                key={view}
+                type="button"
+                onClick={() => setActiveView(view)}
+              >
+                {artifactDataViewLabel(view)}
               </button>
             ))}
           </div>
-        )}
+        ) : null}
         <div className="max-h-[calc(100vh-18rem)] overflow-y-auto p-4">
           <InlineError message={error} />
-          {isMarkdown ? <MarkdownDocument text={markdownText || markdownTextFromPreview(detail.preview_json)} /> : (
-            activeView === 'table' ? <MetricDataTable columns={columns} rows={rows} /> : <MetricDataPlot item={item} rows={rows} columns={columns} />
-          )}
+          {renderArtifactDataView(activeView, { item, detail, rows, columns, markdownText })}
         </div>
       </div>
+    </div>
+  );
+}
+
+function renderArtifactDataView(view, { item, detail, rows, columns, markdownText }) {
+  if (view === 'image') return <ImageArtifactView artifact={detail} />;
+  if (view === 'markdown') return <MarkdownDocument text={markdownText || markdownTextFromPreview(detail.preview_json)} />;
+  if (view === 'plot') return <MetricDataPlot item={item} rows={rows} columns={columns} />;
+  return <MetricDataTable columns={columns} rows={rows} />;
+}
+
+function artifactDataViews(artifact, item = {}) {
+  const preview = artifact?.preview_json || {};
+  if (isImageArtifact(artifact, preview)) return ['image'];
+  if (isMarkdownArtifact(artifact)) return ['markdown'];
+  if (isSeriesResultItem(item, artifact)) return ['table', 'plot'];
+  return ['table'];
+}
+
+function artifactDataViewLabel(view) {
+  return {
+    image: 'Image',
+    markdown: 'Report',
+    plot: 'Plot',
+    table: 'Table',
+  }[view] || view;
+}
+
+function artifactDataSubtitle(artifact, rows) {
+  const preview = artifact?.preview_json || {};
+  const parts = [artifact?.name, artifact?.kind];
+  if (isImageArtifact(artifact, preview)) {
+    parts.push(['image', preview.width && preview.height ? `${preview.width}x${preview.height}` : null].filter(Boolean).join(' · '));
+  } else if (isMarkdownArtifact(artifact)) {
+    parts.push('report');
+  } else {
+    const rowCount = Number(preview.row_count);
+    parts.push(Number.isFinite(rowCount) ? `${rowCount} rows` : `${rows.length || 0} rows`);
+  }
+  return parts.filter(Boolean).join(' · ');
+}
+
+function ImageArtifactView({ artifact }) {
+  if (!artifact?.id) {
+    return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">No image available.</div>;
+  }
+  return (
+    <div className="overflow-hidden rounded-md border border-line bg-white/55">
+      <img className="max-h-[calc(100vh-18rem)] w-full object-contain" src={artifactContentUrl(artifact.id)} alt={artifact.name || 'artifact image'} />
     </div>
   );
 }
@@ -6092,13 +6181,30 @@ function parseCsvLine(line) {
 
 function metricDataColumns(rows, preview) {
   const previewColumns = Array.isArray(preview.columns) ? preview.columns : [];
-  if (previewColumns.length) return previewColumns;
+  if (previewColumns.length) return prioritizeTemporalColumns(previewColumns);
   const columns = new Set();
   for (const row of rows || []) {
     Object.keys(row || {}).forEach((key) => columns.add(key));
     if (columns.size >= 24) break;
   }
-  return Array.from(columns);
+  return prioritizeTemporalColumns(Array.from(columns));
+}
+
+function prioritizeTemporalColumns(columns) {
+  return (columns || [])
+    .map((column, index) => ({ column, index, rank: temporalColumnRank(column) }))
+    .sort((left, right) => {
+      if (left.rank !== right.rank) return left.rank - right.rank;
+      return left.index - right.index;
+    })
+    .map((entry) => entry.column);
+}
+
+function temporalColumnRank(column) {
+  const order = ['DATE', 'DATETIME', 'TRADE_DATE', 'END_DATE', 'TIME'];
+  const normalized = String(column || '').trim().toUpperCase();
+  const index = order.indexOf(normalized);
+  return index === -1 ? order.length : index;
 }
 
 function MetricDataTable({ columns, rows }) {
@@ -6361,7 +6467,7 @@ function ArtifactDetailModal({ artifact, onClose }) {
 function ArtifactPreview({ detail }) {
   const preview = detail.preview_json || {};
   const rows = Array.isArray(preview.rows) ? preview.rows : [];
-  const columns = Array.isArray(preview.columns) ? preview.columns : [];
+  const columns = Array.isArray(preview.columns) ? prioritizeTemporalColumns(preview.columns) : [];
   if (isImageArtifact(detail, preview)) {
     return (
       <div className="overflow-hidden rounded-md border border-line bg-white/50">
