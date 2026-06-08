@@ -578,7 +578,7 @@ function DashboardActivityHeatmap({ data }) {
     };
   }, []);
   const visibleWeeks = Math.max(53, Math.floor(Math.max(containerWidth - 88, 0) / 15));
-  const { weeks, total, max, monthLabels, yearLabels } = dashboardHeatmapData(data, visibleWeeks);
+  const { weeks, max, monthLabels, yearLabels } = dashboardHeatmapData(data, visibleWeeks);
   const heatmapColumns = `44px repeat(${weeks.length}, 12px)`;
   return (
     <Panel className="overflow-hidden">
@@ -606,7 +606,7 @@ function DashboardActivityHeatmap({ data }) {
                       className="h-3 w-3 rounded-[3px]"
                       key={cell.key}
                       style={{ backgroundColor: heatmapRed(cell.count, max) }}
-                      title={`${cell.dateLabel}: ${cell.count} activities`}
+                      title={`${cell.dateLabel}: ${cell.count} runs`}
                     />
                   );
                 })}
@@ -8344,7 +8344,7 @@ function dashboardHeatmapData(data, weekCount = 53) {
   firstDay.setDate(end.getDate() - ((end.getDay() + 6) % 7) - (weekCount - 1) * 7);
   const start = firstDay;
   const counts = new Map();
-  dashboardActivityDates(data).forEach((date) => {
+  dashboardRunDates(data).forEach((date) => {
     const key = dateKey(startOfLocalDay(date));
     counts.set(key, (counts.get(key) || 0) + 1);
   });
@@ -8393,12 +8393,11 @@ function dashboardHeatmapData(data, weekCount = 53) {
   };
 }
 
-function dashboardActivityDates(data) {
-  return [
-    ...(data?.projects || []).map((item) => item.updated_at || item.created_at),
-    ...(data?.researches || []).map((item) => item.updated_at || item.created_at),
-    ...(data?.runs || []).map((item) => item.updated_at || item.ended_at || item.started_at || item.created_at),
-  ].map(parseDateValue).filter((date) => date && Number.isFinite(date.getTime()));
+function dashboardRunDates(data) {
+  return (data?.runs || [])
+    .map((run) => run.started_at || run.created_at || run.ended_at || run.updated_at)
+    .map(parseDateValue)
+    .filter((date) => date && Number.isFinite(date.getTime()));
 }
 
 function dashboardTimelineGroups(data) {
