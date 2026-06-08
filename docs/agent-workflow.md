@@ -11,6 +11,8 @@ This guide is the operational contract for AI agents and batch jobs that write t
 - Token environment: `BLACKBOX_TOKEN` or `BLACKBOX_API_TOKEN`
 - Default local data directory: `~/.blackbox`
 - Offline spool layout: `~/.blackbox/queue`, `~/.blackbox/artifacts`, `~/.blackbox/manifests`
+- Agent upload preflight: pass `--strict-contract --dry-run` on `bbox run log-series` / `bbox run log-metric` before real uploads, or set `BLACKBOX_AGENT_STRICT_UPLOAD=1` for the process. Use `--skip-upload-validation` only for an explicit legacy/manual override.
+- Upload diagnostics: parse `error.details.issues` on CLI/API failure, `data.validation.issues` on dry-run, or `UploadValidationError.report["issues"]` in SDK. Issues include stable `code`, `field`, `fix`, and optional `example`; apply the fix before retrying unchanged `VALIDATION_ERROR` payloads.
 
 For agent automation, prefer JSON output and narrow payloads:
 
@@ -67,9 +69,9 @@ bbox run start `
 ```powershell
 bbox run log-event --run-id run_new --event-type stage_started --stage backtest --payload '{"step":"backtest"}' --client-event-id agent-task-123-evt-backtest-start --json
 
-bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"sharpe":1.34,"max_drawdown":0.08,"turnover":0.42}' --client-event-id agent-task-123-met-summary --json
+bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"annual_return":18.5,"max_drawdown":-8.0,"sharpe":1.34,"turnover":0.42}' --client-event-id agent-task-123-met-summary --strict-contract --json
 
-bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y nav --kind table_csv --idempotency-key agent-task-123-series-equity --json
+bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y series_values --mode nav --kind table_csv --result-domain performance --result-name primary_performance --result-role primary_curve --idempotency-key agent-task-123-series-equity --strict-contract --json
 
 bbox dataset register `
   --run-id run_new `
@@ -89,8 +91,13 @@ bbox artifact upload --run-id run_new --name post_cost_report --kind report_html
 5. Finish or fail the run.
 
 ```powershell
-bbox run finish --run-id run_new --json
+bbox run validate --run-id run_new --expected-start 2023-01-03 --expected-end 2026-05-07 --expected-rows 820 --primary-series equity_curve --fail-on-warning --json
+bbox run finish --run-id run_new --fail-on-warning --json
 ```
+
+Run Detail shows a Result Summary panel above the tabs. Use it as the first check for primary curve, date range, result domains, key metric coverage, artifact counts, update time, and quality status. Expand Result diagnostics when present; each issue includes a suggested fix command.
+
+Result templates are registry-driven in WebUI. Built-in domains cover `performance`, `factor`, `factor_batch`, `risk`, `cost`, and `diagnostic`. To extend rendering without changing application code, set `window.BLACKBOX_RESULT_TEMPLATES` before app boot or store JSON in localStorage key `blackbox.resultTemplates`; use the same shape as the built-in domain registry, for example `{"event_study":{"blocks":[{"title":"Event Returns","roles":["event_curve"],"chart":true}]}}`.
 
 ```powershell
 bbox run fail --run-id run_new --error '{"code":"BACKTEST_ERROR","message":"input data missing"}' --json

@@ -69,6 +69,13 @@ from blackbox_common.schemas import (
     WorkspaceRead,
     WorkspaceUpdate,
 )
+from blackbox_common.validation import (
+    format_upload_report_for_agent,
+    upload_report_failed,
+    validate_metric_upload,
+    validate_run_detail,
+    validate_series_upload,
+)
 
 from . import db as db_module
 from .db import get_db
@@ -623,6 +630,29 @@ def create_app() -> FastAPI:
         run = require_run(db, run_id)
         return ok(run_detail(db, run))
 
+    @app.get("/api/v1/runs/{run_id}/validate")
+    def validate_run(
+        run_id: str,
+        expected_start: str | None = Query(None),
+        expected_end: str | None = Query(None),
+        expected_rows: int | None = Query(None),
+        primary_series_name: str | None = Query(None),
+        db: Session = Depends(get_db),
+    ) -> dict[str, Any]:
+        detail = run_detail(db, require_run(db, run_id))
+        return ok(
+            {
+                "run_id": run_id,
+                **validate_run_detail(
+                    detail,
+                    expected_start=expected_start,
+                    expected_end=expected_end,
+                    expected_rows=expected_rows,
+                    primary_series_name=primary_series_name,
+                ),
+            }
+        )
+
     @app.patch("/api/v1/runs/{run_id}")
     def update_run(run_id: str, payload: RunUpdate, db: Session = Depends(get_db)) -> dict[str, Any]:
         run = require_run(db, run_id)
@@ -721,6 +751,7 @@ def create_app() -> FastAPI:
     def add_metrics(run_id: str, payload: MetricCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
         run = require_run(db, run_id)
         validate_metric_payload_size(payload)
+        enforce_api_upload_preflight(validate_metric_upload(payload.namespace, payload.values))
         existing = get_existing_metrics(db, run_id, payload.client_event_id)
         if existing:
             return ok([MetricRead.model_validate(item).model_dump(mode="json") for item in existing])
@@ -768,6 +799,7 @@ def create_app() -> FastAPI:
         idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
     ) -> dict[str, Any]:
         require_run(db, run_id)
+        enforce_api_upload_preflight(validate_series_upload(payload.model_dump(mode="json")))
         existing = get_existing_artifact(db, run_id, idempotency_key)
         if existing:
             return ok(ArtifactRead.model_validate(existing).model_dump(mode="json"))
@@ -831,12 +863,19 @@ def create_app() -> FastAPI:
         return ok([NoteRead.model_validate(item).model_dump(mode="json") for item in items])
 
     @app.post("/api/v1/runs/{run_id}/finish")
-    def finish_run(run_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
+    def finish_run(
+        run_id: str,
+        skip_quality_gate: bool = Query(False),
+        fail_on_warning: bool = Query(False),
+        db: Session = Depends(get_db),
+    ) -> dict[str, Any]:
         run = require_run(db, run_id)
         if run.status == RunStatus.completed.value:
             return ok(RunRead.model_validate(run).model_dump(mode="json"))
         if run.status in {RunStatus.failed.value, RunStatus.cancelled.value}:
             raise ApiError(ErrorCode.state_error, f"run {run_id} is already terminal")
+        if not skip_quality_gate:
+            enforce_run_quality_gate(db, run, status=RunStatus.completed.value, fail_on_warning=fail_on_warning)
         run.status = RunStatus.completed.value
         run.ended_at = utcnow()
         run.updated_at = utcnow()
@@ -1321,6 +1360,9 @@ def create_app() -> FastAPI:
         if not run_ids:
             raise ApiError(ErrorCode.validation_error, "run_ids is required")
         runs = [require_run(db, run_id) for run_id in run_ids]
+        if not payload.get("skip_quality_gate"):
+            for run in runs:
+                enforce_run_quality_gate(db, run, fail_on_warning=bool(payload.get("fail_on_warning")))
         return ok(
             {
                 "runs": run_summaries(db, runs),
@@ -1895,6 +1937,16 @@ def validate_metric_payload_size(payload: MetricCreate) -> None:
         )
 
 
+def enforce_api_upload_preflight(report: dict[str, Any]) -> None:
+    if upload_report_failed(report):
+        raise ApiError(
+            ErrorCode.validation_error,
+            format_upload_report_for_agent(report),
+            hint=report.get("hint"),
+            details=report,
+        )
+
+
 def update_summary(summary: dict[str, Any], namespace: str, key: str, value: Any) -> None:
     section = summary.setdefault(namespace, {})
     section[key] = value
@@ -2128,6 +2180,26 @@ def run_detail(db: Session, run: Run) -> dict[str, Any]:
         "notes": [NoteRead.model_validate(item).model_dump(mode="json") for item in db.scalars(select(RunNote).where(RunNote.run_id == run.id).order_by(RunNote.created_at))],
         "snapshots": snapshot_detail(db, run.id),
     }
+
+
+def run_quality_gate_report(db: Session, run: Run, status: str | None = None) -> dict[str, Any]:
+    detail = run_detail(db, run)
+    if status is not None:
+        detail = {**detail, "status": status}
+    return validate_run_detail(detail)
+
+
+def enforce_run_quality_gate(db: Session, run: Run, *, status: str | None = None, fail_on_warning: bool = False) -> dict[str, Any]:
+    report = run_quality_gate_report(db, run, status=status)
+    gate_failed = report["severity"] == "error" or (fail_on_warning and report["severity"] == "warning")
+    if gate_failed:
+        raise ApiError(
+            ErrorCode.validation_error,
+            "run result quality gate failed",
+            "Fix result diagnostics before finishing or comparing, or use an explicit quality-gate override.",
+            details={"run_id": run.id, **report},
+        )
+    return report
 
 
 def snapshot_detail(db: Session, run_id: str) -> dict[str, Any]:

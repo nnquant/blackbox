@@ -17,6 +17,8 @@ from typing import Any
 
 import httpx
 
+from blackbox_common.validation import format_upload_report_for_agent, upload_report_failed, validate_metric_upload, validate_series_upload
+
 from .offline import OfflineSpool
 
 
@@ -110,6 +112,29 @@ class BlackboxClient:
     def get_run(self, run_id: str) -> dict[str, Any]:
         return self.request("GET", f"/api/v1/runs/{run_id}")
 
+    def validate_run(
+        self,
+        run_id: str,
+        *,
+        expected_start: str | None = None,
+        expected_end: str | None = None,
+        expected_rows: int | None = None,
+        primary_series_name: str | None = None,
+    ) -> dict[str, Any]:
+        params = compact_payload(
+            {
+                "expected_start": expected_start,
+                "expected_end": expected_end,
+                "expected_rows": expected_rows,
+                "primary_series_name": primary_series_name,
+            }
+        )
+        return self.request(
+            "GET",
+            f"/api/v1/runs/{run_id}/validate",
+            **({"params": params} if params else {}),
+        )
+
     def search_runs(self, **filters: Any) -> list[dict[str, Any]]:
         return self.request("POST", "/api/v1/search/runs", json=compact_payload(filters))
 
@@ -122,16 +147,20 @@ class BlackboxClient:
         metrics: list[str] | None = None,
         series: list[str] | None = None,
         with_config_diff: bool = True,
+        fail_on_warning: bool | None = None,
+        skip_quality_gate: bool | None = None,
     ) -> dict[str, Any]:
         return self.request(
             "POST",
             "/api/v1/compare/runs",
-            json={
+            json=compact_payload({
                 "run_ids": run_ids,
                 "metrics": metrics or [],
                 "series": series or [],
                 "with_config_diff": with_config_diff,
-            },
+                "fail_on_warning": fail_on_warning,
+                "skip_quality_gate": skip_quality_gate,
+            }),
         )
 
     def create_compare_set(self, project_id: str, name: str, run_ids: list[str], layout: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -385,6 +414,9 @@ class BlackboxClient:
         values: dict[str, Any],
         point: dict[str, Any] | None = None,
         client_event_id: str | None = None,
+        strict_contract: bool | None = None,
+        skip_upload_validation: bool = False,
+        dry_run: bool = False,
     ) -> list[dict[str, Any]]:
         metric_payload = {
             "namespace": namespace,
@@ -392,6 +424,11 @@ class BlackboxClient:
             "point": point or {"kind": "summary"},
             "client_event_id": client_event_id or make_client_event_id("met"),
         }
+        report = validate_metric_upload(namespace, values, strict=agent_strict_upload(strict_contract))
+        if not skip_upload_validation:
+            enforce_upload_preflight(report, fail_on_warning=agent_strict_upload(strict_contract))
+        if dry_run:
+            return [{"dry_run": True, "kind": "metric", "namespace": namespace, "validation": report}]
         if self.spool:
             return self.spool.add_metric(run_id, metric_payload)
         if self.should_buffer_logs():
@@ -445,6 +482,9 @@ class BlackboxClient:
         filename: str | None = None,
         metadata: dict[str, Any] | None = None,
         idempotency_key: str | None = None,
+        strict_contract: bool | None = None,
+        skip_upload_validation: bool = False,
+        dry_run: bool = False,
     ) -> dict[str, Any]:
         series_payload = {
             "name": name,
@@ -461,6 +501,11 @@ class BlackboxClient:
             series_payload["metric"] = metric
         if result is not None:
             series_payload["result"] = result
+        report = validate_series_upload(series_payload, strict=agent_strict_upload(strict_contract))
+        if not skip_upload_validation:
+            enforce_upload_preflight(report, fail_on_warning=agent_strict_upload(strict_contract))
+        if dry_run:
+            return {"dry_run": True, "kind": "series", "name": name, "rows": len(data), "validation": report}
         request_kwargs = {"json": series_payload}
         if idempotency_key:
             request_kwargs["headers"] = {"Idempotency-Key": idempotency_key}
@@ -662,13 +707,25 @@ class BlackboxClient:
             json={"run_id": run_id, "coord": coord or {}, "rank": rank},
         )
 
-    def finish(self, run_id: str, status: str = "completed") -> dict[str, Any]:
+    def finish(
+        self,
+        run_id: str,
+        status: str = "completed",
+        *,
+        fail_on_warning: bool | None = None,
+        skip_quality_gate: bool | None = None,
+    ) -> dict[str, Any]:
         if status != "completed":
             raise ValueError("finish only supports status='completed'; use fail() or cancel() for terminal errors")
         if self.spool:
             return self.spool.finish(run_id)
         self.flush()
-        return self.request("POST", f"/api/v1/runs/{run_id}/finish")
+        params = compact_payload({"fail_on_warning": fail_on_warning, "skip_quality_gate": skip_quality_gate})
+        return self.request(
+            "POST",
+            f"/api/v1/runs/{run_id}/finish",
+            **({"params": params} if params else {}),
+        )
 
     def fail(self, run_id: str, error: dict[str, Any] | None = None) -> dict[str, Any]:
         if self.spool:
@@ -870,9 +927,14 @@ def current_run() -> RunContext:
     return run
 
 
-def finish(status: str = "completed") -> dict[str, Any]:
+def finish(
+    status: str = "completed",
+    *,
+    fail_on_warning: bool | None = None,
+    skip_quality_gate: bool | None = None,
+) -> dict[str, Any]:
     run = current_run()
-    return run.client.finish(run.id, status=status)
+    return run.client.finish(run.id, status=status, fail_on_warning=fail_on_warning, skip_quality_gate=skip_quality_gate)
 
 
 def fail(error: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -910,6 +972,24 @@ def parse_int_env(name: str, default: int) -> int:
 
 def compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in payload.items() if value is not None}
+
+
+def agent_strict_upload(value: bool | None = None) -> bool:
+    if value is not None:
+        return value
+    return os.getenv("BLACKBOX_AGENT_STRICT_UPLOAD", "0").lower() in {"1", "true", "yes"}
+
+
+class UploadValidationError(ValueError):
+    def __init__(self, report: dict[str, Any]):
+        super().__init__(format_upload_report_for_agent(report))
+        self.report = report
+        self.issues = report.get("issues") or []
+
+
+def enforce_upload_preflight(report: dict[str, Any], *, fail_on_warning: bool = False) -> None:
+    if upload_report_failed(report, fail_on_warning=fail_on_warning):
+        raise UploadValidationError(report)
 
 
 def list_or_empty(value: Any) -> list[str]:

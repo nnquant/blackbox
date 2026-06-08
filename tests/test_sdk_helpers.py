@@ -368,6 +368,120 @@ def test_client_finish_flushes_buffer_before_terminal_request() -> None:
     ]
 
 
+def test_client_finish_quality_gate_params() -> None:
+    from blackbox import BlackboxClient
+
+    client = BlackboxClient(endpoint="http://example.invalid")
+    requests: list[dict[str, Any]] = []
+
+    def fake_request(method: str, path: str, **kwargs: Any) -> Any:
+        requests.append({"method": method, "path": path, **kwargs})
+        return {"id": "run_1", "path": path}
+
+    client.request = fake_request  # type: ignore[method-assign]
+
+    client.finish("run_1", fail_on_warning=True, skip_quality_gate=True)
+
+    assert requests == [
+        {
+            "method": "POST",
+            "path": "/api/v1/runs/run_1/finish",
+            "params": {"fail_on_warning": True, "skip_quality_gate": True},
+        }
+    ]
+
+
+def test_client_strict_upload_preflight_blocks_legacy_performance_series(monkeypatch) -> None:
+    from blackbox import BlackboxClient
+
+    monkeypatch.setenv("BLACKBOX_AGENT_STRICT_UPLOAD", "1")
+    client = BlackboxClient(endpoint="http://example.invalid")
+
+    def fake_request(method: str, path: str, **kwargs: Any) -> Any:
+        raise AssertionError("request should not be sent after failed preflight")
+
+    client.request = fake_request  # type: ignore[method-assign]
+
+    try:
+        client.log_series(
+            "run_1",
+            "equity_curve",
+            [{"date": "2026-01-01", "nav": 1.0}],
+            x="date",
+            y="nav",
+            mode="nav",
+            namespace="strategy.equity",
+        )
+    except ValueError as exc:
+        assert "Performance curve does not use series_values" in str(exc)
+        assert getattr(exc, "report")["issues"][0]["code"] == "PERFORMANCE_VALUE_COLUMN_NOT_SERIES_VALUES"
+        assert "fix" in getattr(exc, "issues")[0]
+    else:
+        raise AssertionError("strict upload preflight should reject legacy performance contracts")
+
+
+def test_client_strict_metric_preflight_blocks_decimal_percent_units() -> None:
+    from blackbox import BlackboxClient
+
+    client = BlackboxClient(endpoint="http://example.invalid")
+
+    try:
+        client.log_metric("run_1", "strategy.summary", {"annual_return": 0.18}, strict_contract=True)
+    except ValueError as exc:
+        assert "annual_return may use decimal units" in str(exc)
+        assert getattr(exc, "report")["issues"][0]["code"] == "SUMMARY_PERCENT_DECIMAL_UNIT"
+    else:
+        raise AssertionError("strict upload preflight should reject decimal percentage units")
+
+
+def test_client_log_series_dry_run_returns_validation_without_request() -> None:
+    from blackbox import BlackboxClient
+
+    client = BlackboxClient(endpoint="http://example.invalid")
+
+    def fake_request(method: str, path: str, **kwargs: Any) -> Any:
+        raise AssertionError("dry-run should not send request")
+
+    client.request = fake_request  # type: ignore[method-assign]
+
+    result = client.log_series(
+        "run_1",
+        "equity_curve",
+        [{"date": "2026-01-01", "series_values": 1.0}, {"date": "2026-01-02", "series_values": 1.01}],
+        x="date",
+        y="series_values",
+        mode="nav",
+        result={"domain": "performance", "name": "primary_performance", "role": "primary_curve"},
+        strict_contract=True,
+        dry_run=True,
+    )
+
+    assert result["dry_run"] is True
+    assert result["validation"]["severity"] == "ok"
+
+
+def test_client_log_metric_dry_run_returns_validation_without_request() -> None:
+    from blackbox import BlackboxClient
+
+    client = BlackboxClient(endpoint="http://example.invalid")
+
+    def fake_request(method: str, path: str, **kwargs: Any) -> Any:
+        raise AssertionError("dry-run should not send request")
+
+    client.request = fake_request  # type: ignore[method-assign]
+
+    result = client.log_metric(
+        "run_1",
+        "strategy.summary",
+        {"annual_return": 18.0, "max_drawdown": -9.0},
+        strict_contract=True,
+        dry_run=True,
+    )
+
+    assert result[0]["dry_run"] is True
+    assert result[0]["validation"]["severity"] == "ok"
+
+
 def test_client_buffered_flush_preserves_unflushed_tail_on_error() -> None:
     from blackbox import BlackboxClient
 
@@ -528,6 +642,7 @@ def test_client_read_paths_match_api_contract() -> None:
 
     client.dashboard()
     client.get_run("run_1")
+    client.validate_run("run_1")
     client.search_runs(project_key="alpha", status=None, metrics=[{"metric": "strategy.summary.sharpe", "op": ">=", "value": 1.2}])
     client.search_researches(project_key="alpha", text="neutralization")
     client.compare_runs(["run_1", "run_2"], metrics=["strategy.summary.sharpe"], series=["returns"], with_config_diff=False)
@@ -539,6 +654,7 @@ def test_client_read_paths_match_api_contract() -> None:
     assert requests == [
         {"method": "GET", "path": "/api/v1/dashboard"},
         {"method": "GET", "path": "/api/v1/runs/run_1"},
+        {"method": "GET", "path": "/api/v1/runs/run_1/validate"},
         {
             "method": "POST",
             "path": "/api/v1/search/runs",
@@ -554,6 +670,39 @@ def test_client_read_paths_match_api_contract() -> None:
         {"method": "GET", "path": "/api/v1/lineage/branches/br_1"},
         {"method": "GET", "path": "/api/v1/sweeps/swp_1"},
         {"method": "GET", "path": "/api/v1/sweeps/swp_1/summary"},
+    ]
+
+
+def test_client_validate_run_sends_expected_series_params() -> None:
+    from blackbox import BlackboxClient
+
+    client = BlackboxClient(endpoint="http://example.invalid")
+    requests: list[dict[str, Any]] = []
+
+    def fake_request(method: str, path: str, **kwargs: Any) -> Any:
+        requests.append({"method": method, "path": path, **kwargs})
+        return {"severity": "ok"}
+
+    client.request = fake_request  # type: ignore[method-assign]
+
+    assert client.validate_run(
+        "run_1",
+        expected_start="2023-01-03",
+        expected_end="2026-05-07",
+        expected_rows=820,
+        primary_series_name="equity_curve",
+    ) == {"severity": "ok"}
+    assert requests == [
+        {
+            "method": "GET",
+            "path": "/api/v1/runs/run_1/validate",
+            "params": {
+                "expected_start": "2023-01-03",
+                "expected_end": "2026-05-07",
+                "expected_rows": 820,
+                "primary_series_name": "equity_curve",
+            },
+        }
     ]
 
 
@@ -606,7 +755,7 @@ def test_client_saved_view_paths_match_api_contract() -> None:
 
 
 def test_top_level_read_helpers_use_default_client(monkeypatch) -> None:
-    from blackbox import compare_runs, get_sweep_summary, search_runs
+    from blackbox import compare_runs, get_sweep_summary, search_runs, validate_run
 
     logging_module = importlib.import_module("blackbox.logging")
     created_clients: list[dict[str, Any]] = []
@@ -634,16 +783,22 @@ def test_top_level_read_helpers_use_default_client(monkeypatch) -> None:
             calls.append({"action": "get_sweep_summary", "sweep_id": sweep_id})
             return {"sweep_id": sweep_id}
 
+        def validate_run(self, run_id: str, **kwargs: Any) -> dict[str, Any]:
+            calls.append({"action": "validate_run", "run_id": run_id, **kwargs})
+            return {"run_id": run_id, "severity": "ok"}
+
     monkeypatch.setattr(logging_module, "BlackboxClient", FakeQueryClient)
 
     assert search_runs(endpoint="http://blackbox.local", token="secret", project_key="alpha") == [{"id": "run_1"}]
     assert compare_runs(["run_1"], metrics=["strategy.summary.sharpe"], with_config_diff=False) == {"runs": ["run_1"]}
     assert get_sweep_summary("swp_1") == {"sweep_id": "swp_1"}
+    assert validate_run("run_1") == {"run_id": "run_1", "severity": "ok"}
     assert created_clients[0] == {"endpoint": "http://blackbox.local", "token": "secret", "offline": None, "spool_dir": None}
     assert calls == [
         {"action": "search_runs", "filters": {"project_key": "alpha"}},
         {"action": "compare_runs", "run_ids": ["run_1"], "metrics": ["strategy.summary.sharpe"], "series": None, "with_config_diff": False},
         {"action": "get_sweep_summary", "sweep_id": "swp_1"},
+        {"action": "validate_run", "run_id": "run_1", "expected_start": None, "expected_end": None, "expected_rows": None, "primary_series_name": None},
     ]
 
 

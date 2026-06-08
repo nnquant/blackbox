@@ -1,7 +1,6 @@
 from .enums import ArtifactKind, BranchStatus, EventType, NoteKind, PointKind, RunStatus
 from .errors import ApiError, ErrorCode
 from .ids import new_id
-from .schemas import ApiResponse
 
 __all__ = [
     "ApiError",
@@ -14,5 +13,27 @@ __all__ = [
     "PointKind",
     "RunStatus",
     "new_id",
+    "validate_metric_upload",
+    "validate_run_detail",
+    "validate_series_upload",
 ]
 
+
+def __getattr__(name: str):
+    if name == "ApiResponse":
+        from .schemas import ApiResponse
+
+        return ApiResponse
+    if name == "validate_run_detail":
+        from .validation import validate_run_detail
+
+        return validate_run_detail
+    if name == "validate_series_upload":
+        from .validation import validate_series_upload
+
+        return validate_series_upload
+    if name == "validate_metric_upload":
+        from .validation import validate_metric_upload
+
+        return validate_metric_upload
+    raise AttributeError(name)

@@ -67,11 +67,11 @@ bbox run start `
 ```powershell
 bbox run log-event --run-id run_new --event-type stage_started --stage backtest --payload '{"step":"backtest"}' --client-event-id agent-task-123-evt-backtest-start --json
 
-bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"annual_return":18.5,"annual_volatility":12.4,"max_drawdown":-9.0,"sharpe":1.34,"sortino":1.88,"calmar":2.06,"turnover":0.42}' --client-event-id agent-task-123-met-summary --json
+bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"annual_return":18.5,"annual_volatility":12.4,"max_drawdown":-9.0,"sharpe":1.34,"sortino":1.88,"calmar":2.06,"turnover":0.42}' --client-event-id agent-task-123-met-summary --strict-contract --json
 
-bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y nav --kind table_csv --idempotency-key agent-task-123-series-equity --json
+bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y series_values --mode nav --kind table_csv --result-domain performance --result-name primary_performance --result-role primary_curve --idempotency-key agent-task-123-series-equity --strict-contract --json
 
-bbox run log-series --run-id run_new --name drawdown_series --data-file .\drawdown.json --x date --y drawdown --kind table_csv --idempotency-key agent-task-123-series-drawdown --json
+bbox run log-series --run-id run_new --name drawdown_series --data-file .\drawdown.json --x date --y drawdown --mode drawdown --kind table_csv --result-domain performance --result-name primary_drawdown --result-role drawdown --idempotency-key agent-task-123-series-drawdown --strict-contract --json
 
 bbox dataset register `
   --run-id run_new `
@@ -91,7 +91,8 @@ bbox artifact upload --run-id run_new --name post_cost_report --kind report_html
 5. Finish or fail the run.
 
 ```powershell
-bbox run finish --run-id run_new --json
+bbox run validate --run-id run_new --expected-start 2023-01-03 --expected-end 2026-05-07 --expected-rows 820 --primary-series equity_curve --fail-on-warning --json
+bbox run finish --run-id run_new --fail-on-warning --json
 ```
 
 ```powershell
@@ -504,7 +505,11 @@ bbox run log-series `
   --y series_values `
   --mode nav `
   --kind table_csv `
+  --result-domain performance `
+  --result-name primary_performance `
+  --result-role primary_curve `
   --idempotency-key agent-task-123-series-equity `
+  --strict-contract `
   --json
 
 bbox run log-series `
@@ -515,7 +520,11 @@ bbox run log-series `
   --y series_values `
   --mode pnl `
   --kind table_csv `
+  --result-domain performance `
+  --result-name primary_performance `
+  --result-role primary_curve `
   --idempotency-key agent-task-123-series-pnl `
+  --strict-contract `
   --json
 
 bbox run log-series `
@@ -526,7 +535,11 @@ bbox run log-series `
   --y drawdown `
   --mode drawdown `
   --kind table_csv `
+  --result-domain performance `
+  --result-name primary_drawdown `
+  --result-role drawdown `
   --idempotency-key agent-task-123-series-drawdown `
+  --strict-contract `
   --json
 ```
 
@@ -535,20 +548,15 @@ SDK:
 ```python
 import blackbox as bb
 
-bb.log_series(
-    "equity_curve",
-    [
+bb.log_performance_result(
+    curve=[
         {"date": "2026-01-01", "series_values": 1.0000},
         {"date": "2026-01-02", "series_values": 1.0125},
         {"date": "2026-01-05", "series_values": 1.0060},
         {"date": "2026-01-06", "series_values": 1.0310},
     ],
-    x="date",
-    y="series_values",
     mode="nav",
-    namespace="strategy.equity",
-    kind="table_csv",
-    idempotency_key="agent-task-123-series-equity",
+    idempotency_prefix="agent-task-123",
 )
 
 bb.log_pnl_series(
@@ -560,20 +568,13 @@ bb.log_pnl_series(
     ],
 )
 
-bb.log_series(
-    "drawdown_series",
+bb.log_drawdown_series(
     [
         {"date": "2026-01-01", "drawdown": 0.0},
         {"date": "2026-01-02", "drawdown": 0.0},
         {"date": "2026-01-05", "drawdown": -0.0064},
         {"date": "2026-01-06", "drawdown": 0.0},
-    ],
-    x="date",
-    y="drawdown",
-    mode="drawdown",
-    namespace="strategy.drawdown",
-    kind="table_csv",
-    idempotency_key="agent-task-123-series-drawdown",
+    ]
 )
 ```
 
@@ -594,7 +595,57 @@ Rules:
 
 ### Required upload-side validation
 
-After uploading metrics and series, agents must validate the run before `bbox run finish`.
+Agents must use local upload preflight first, then validate the run before `bbox run finish`.
+
+Upload preflight:
+
+- CLI: pass `--strict-contract --dry-run` on `bbox run log-series` and `bbox run log-metric` before the real upload, or set `BLACKBOX_AGENT_STRICT_UPLOAD=1` for the process.
+- SDK: set `BLACKBOX_AGENT_STRICT_UPLOAD=1`, or pass `strict_contract=True` where the helper exposes it.
+- `--skip-upload-validation` is a manual override for legacy data inspection only; document why it was used.
+
+Strict upload preflight fails before writing when:
+
+- A performance curve upload does not use `series_values`.
+- A performance curve omits `mode` or uses a mode outside `nav`, `return`, `pnl`.
+- A performance curve omits typed `metadata.result`.
+- A declared `x` or `y` column is missing from uploaded rows.
+- `strategy.summary` percentage metrics look like decimals, for example `annual_return=0.18` instead of `18.0`.
+
+Upload diagnostic response contract:
+
+- CLI/API failures use the standard envelope and put machine-readable diagnostics under `error.details.issues`.
+- CLI/SDK dry-runs return diagnostics under `data.validation.issues`.
+- SDK strict failures raise `blackbox.UploadValidationError`, which is still a `ValueError`; parse `exc.report["issues"]`.
+- Each issue has stable `code`, `severity`, `title`, `detail`, and usually `field`, `fix`, and `example`.
+- Agents should branch on `code`, apply `fix`, regenerate the payload, and retry with the same idempotency key. Do not retry unchanged requests on `VALIDATION_ERROR`.
+
+Example failed CLI/API issue:
+
+```json
+{
+  "code": "SERIES_Y_COLUMN_NOT_FOUND",
+  "severity": "error",
+  "title": "Series y column is missing",
+  "field": "y",
+  "detail": "Column(s) series_values are not present in uploaded rows.",
+  "fix": "Set y to existing numeric column(s), or add series_values to each row.",
+  "example": "[{\"date\":\"2026-01-01\",\"series_values\":1.0}]"
+}
+```
+
+Common fix branches for agents:
+
+- `SERIES_Y_COLUMN_NOT_FOUND`: add or rename the numeric value field to `series_values`, then pass `--y series_values`.
+- `PERFORMANCE_MODE_INVALID`: choose `mode=nav`, `mode=return`, or `mode=pnl` according to the source series semantics.
+- `SERIES_RESULT_METADATA_MISSING`: add `--result-domain performance --result-name primary_performance --result-role primary_curve` for primary curves.
+- `SUMMARY_PERCENT_DECIMAL_UNIT`: convert percentage-style summary metrics from decimals to percentage points.
+- `DRAWDOWN_UNIT_SUSPICIOUS`: use decimal drawdown for nav/return runs, or `mode=pnl` only for absolute drawdown values.
+
+After uploading metrics and series, run-level validation is still required before finish. Use `bbox run validate --expected-start ... --expected-end ... --expected-rows ... --primary-series ... --fail-on-warning` when the research spec has a known date range and row count.
+
+WebUI Run Detail now shows a Result Summary panel at the top of a run. Check it before reading charts: it shows the primary curve, date range, result domains, key metric coverage, artifact counts, update time, and quality status. If the diagnostics card appears, expand it and follow the suggested fix command.
+
+Result view templates are registry-driven. Built-in domains cover `performance`, `factor`, `factor_batch`, `risk`, `cost`, and `diagnostic`; teams can extend WebUI rendering with `window.BLACKBOX_RESULT_TEMPLATES` or localStorage key `blackbox.resultTemplates` using the same domain/block shape as the built-in registry.
 
 Minimum checks:
 

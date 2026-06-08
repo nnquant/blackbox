@@ -6,7 +6,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .client import BlackboxClient, current_run
+from blackbox_common.validation import validate_series_upload
+
+from .client import BlackboxClient, agent_strict_upload, current_run, enforce_upload_preflight
 
 
 def default_client(
@@ -26,6 +28,25 @@ def get_run(run_id: str, endpoint: str | None = None, token: str | None = None) 
     return default_client(endpoint=endpoint, token=token).get_run(run_id)
 
 
+def validate_run(
+    run_id: str,
+    *,
+    expected_start: str | None = None,
+    expected_end: str | None = None,
+    expected_rows: int | None = None,
+    primary_series_name: str | None = None,
+    endpoint: str | None = None,
+    token: str | None = None,
+) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).validate_run(
+        run_id,
+        expected_start=expected_start,
+        expected_end=expected_end,
+        expected_rows=expected_rows,
+        primary_series_name=primary_series_name,
+    )
+
+
 def search_runs(endpoint: str | None = None, token: str | None = None, **filters: Any) -> list[dict[str, Any]]:
     return default_client(endpoint=endpoint, token=token).search_runs(**filters)
 
@@ -39,10 +60,17 @@ def compare_runs(
     metrics: list[str] | None = None,
     series: list[str] | None = None,
     with_config_diff: bool = True,
+    fail_on_warning: bool | None = None,
+    skip_quality_gate: bool | None = None,
     endpoint: str | None = None,
     token: str | None = None,
 ) -> dict[str, Any]:
-    return default_client(endpoint=endpoint, token=token).compare_runs(run_ids, metrics=metrics, series=series, with_config_diff=with_config_diff)
+    kwargs = {"metrics": metrics, "series": series, "with_config_diff": with_config_diff}
+    if fail_on_warning is not None:
+        kwargs["fail_on_warning"] = fail_on_warning
+    if skip_quality_gate is not None:
+        kwargs["skip_quality_gate"] = skip_quality_gate
+    return default_client(endpoint=endpoint, token=token).compare_runs(run_ids, **kwargs)
 
 
 def create_compare_set(
@@ -256,6 +284,9 @@ def log_series(
     metric: dict[str, Any] | None = None,
     result: dict[str, Any] | None = None,
     idempotency_key: str | None = None,
+    strict_contract: bool | None = None,
+    skip_upload_validation: bool = False,
+    dry_run: bool = False,
 ) -> dict[str, Any]:
     rows = normalize_rows(data)
     run = current_run()
@@ -274,6 +305,9 @@ def log_series(
             filename=filename or default_artifact_filename(name, kind),
             metadata=metadata,
             idempotency_key=idempotency_key,
+            strict_contract=strict_contract,
+            skip_upload_validation=skip_upload_validation,
+            dry_run=dry_run,
         )
     metadata_payload = {
         **(metadata or {}),
@@ -283,6 +317,16 @@ def log_series(
         metadata_payload["metric"] = metric
     if result is not None:
         metadata_payload["result"] = result
+    payload = {"name": name, "data": rows, "x": x, "y": y, "mode": mode, "namespace": namespace, "kind": kind, "filename": filename, "metadata": metadata or {}}
+    if metric is not None:
+        payload["metric"] = metric
+    if result is not None:
+        payload["result"] = result
+    report = validate_series_upload(payload, strict=agent_strict_upload(strict_contract))
+    if not skip_upload_validation:
+        enforce_upload_preflight(report, fail_on_warning=agent_strict_upload(strict_contract))
+    if dry_run:
+        return {"dry_run": True, "kind": "series", "name": name, "rows": len(rows), "validation": report}
     content = serialize_table(rows, kind)
     return run.log_bytes(name, content, kind=kind, filename=filename or default_artifact_filename(name, kind), metadata=metadata_payload, idempotency_key=idempotency_key)
 
@@ -299,6 +343,9 @@ def log_metric_series(
     metadata: dict[str, Any] | None = None,
     result: dict[str, Any] | None = None,
     idempotency_key: str | None = None,
+    strict_contract: bool | None = None,
+    skip_upload_validation: bool = False,
+    dry_run: bool = False,
 ) -> dict[str, Any]:
     metric = {"namespace": namespace, "key": key, "kind": "series", "x": x, "y": y or "series_values", "mode": mode}
     return log_series(
@@ -314,6 +361,9 @@ def log_metric_series(
         metric=metric,
         result=result,
         idempotency_key=idempotency_key,
+        strict_contract=strict_contract,
+        skip_upload_validation=skip_upload_validation,
+        dry_run=dry_run,
     )
 
 

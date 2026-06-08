@@ -11,6 +11,14 @@ from typing import Any
 
 import httpx
 
+from blackbox_common.validation import (
+    format_upload_report_for_agent,
+    upload_report_failed,
+    validate_metric_upload,
+    validate_run_detail,
+    validate_series_upload,
+)
+
 from .sync import sync_spool
 
 
@@ -20,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         data = dispatch(args)
         write_success(args, data)
-        return 0
+        return command_exit_code(args, data)
     except CliError as exc:
         print(json.dumps({"ok": False, "data": None, "error": exc.payload}, ensure_ascii=False), file=sys.stderr)
         return exc.exit_code
@@ -30,10 +38,10 @@ def main(argv: list[str] | None = None) -> int:
 
 
 class CliError(Exception):
-    def __init__(self, code: str, message: str, exit_code: int = 2, hint: str | None = None):
+    def __init__(self, code: str, message: str, exit_code: int = 2, hint: str | None = None, details: Any = None):
         super().__init__(message)
         self.exit_code = exit_code
-        self.payload = {"code": code, "message": message, "hint": hint}
+        self.payload = {"code": code, "message": message, "hint": hint, "details": details}
 
 
 GLOBAL_FLAG_OPTIONS = {"--json", "--quiet", "--compact"}
@@ -188,6 +196,14 @@ def build_parser() -> argparse.ArgumentParser:
     run_start.add_argument("--idempotency-key")
     run_get = run_sub.add_parser("get")
     run_get.add_argument("--run-id", required=True)
+    run_validate = run_sub.add_parser("validate")
+    run_validate.add_argument("--run-id", required=True)
+    run_validate.add_argument("--expected-start", help="Expected first x/date value for the primary performance curve.")
+    run_validate.add_argument("--expected-end", help="Expected last x/date value for the primary performance curve.")
+    run_validate.add_argument("--expected-rows", type=int, help="Expected full row count for the primary performance curve.")
+    run_validate.add_argument("--primary-series", help="Expected primary performance series name, e.g. equity_curve or pnl_series.")
+    run_validate.add_argument("--fail-on-warning", action="store_true", help="Return a non-zero exit code when validation warnings are present.")
+    run_validate.add_argument("--no-fail", action="store_true", help="Always return exit code 0 after printing diagnostics.")
     run_update = run_sub.add_parser("update")
     run_update.add_argument("--run-id", required=True)
     run_update.add_argument("--name")
@@ -221,6 +237,9 @@ def build_parser() -> argparse.ArgumentParser:
     run_metric.add_argument("--values", required=True)
     run_metric.add_argument("--point", default='{"kind":"summary"}')
     run_metric.add_argument("--client-event-id")
+    run_metric.add_argument("--strict-contract", action="store_true", help="Fail upload preflight on contract warnings. Also enabled by BLACKBOX_AGENT_STRICT_UPLOAD=1.")
+    run_metric.add_argument("--skip-upload-validation", action="store_true", help="Bypass local upload preflight checks.")
+    run_metric.add_argument("--dry-run", action="store_true", help="Validate the upload payload locally without writing it.")
     run_series = run_sub.add_parser("log-series")
     run_series.add_argument("--run-id", required=True)
     run_series.add_argument("--name", required=True)
@@ -245,9 +264,14 @@ def build_parser() -> argparse.ArgumentParser:
     run_series.add_argument("--filename")
     run_series.add_argument("--metadata", default="{}")
     run_series.add_argument("--idempotency-key")
+    run_series.add_argument("--strict-contract", action="store_true", help="Fail upload preflight on contract warnings. Also enabled by BLACKBOX_AGENT_STRICT_UPLOAD=1.")
+    run_series.add_argument("--skip-upload-validation", action="store_true", help="Bypass local upload preflight checks.")
+    run_series.add_argument("--dry-run", action="store_true", help="Validate the upload payload locally without writing it.")
     run_finish = run_sub.add_parser("finish")
     run_finish.add_argument("--run-id", required=True)
     run_finish.add_argument("--status", default="completed", choices=["completed"])
+    run_finish.add_argument("--fail-on-warning", action="store_true", help="Fail the finish quality gate when validation warnings are present.")
+    run_finish.add_argument("--skip-quality-gate", action="store_true", help="Finish without running the result quality gate.")
     run_fail = run_sub.add_parser("fail")
     run_fail.add_argument("--run-id", required=True)
     run_fail.add_argument("--error", default="{}")
@@ -380,6 +404,8 @@ def build_parser() -> argparse.ArgumentParser:
     compare_runs.add_argument("--series", default="")
     compare_runs.add_argument("--with-config-diff", action="store_true", default=True)
     compare_runs.add_argument("--no-config-diff", action="store_false", dest="with_config_diff")
+    compare_runs.add_argument("--fail-on-warning", action="store_true", help="Fail compare when any selected run has quality warnings.")
+    compare_runs.add_argument("--skip-quality-gate", action="store_true", help="Compare runs without applying the result quality gate.")
 
     lineage = sub.add_parser("lineage")
     lineage_sub = lineage.add_subparsers(dest="action", required=True)
@@ -575,6 +601,16 @@ def dispatch(args: argparse.Namespace) -> Any:
         )
     if args.group == "run" and args.action == "get":
         return request(args, "GET", f"/api/v1/runs/{args.run_id}")
+    if args.group == "run" and args.action == "validate":
+        detail = request(args, "GET", f"/api/v1/runs/{args.run_id}")
+        report = validate_run_detail(
+            detail,
+            expected_start=args.expected_start,
+            expected_end=args.expected_end,
+            expected_rows=args.expected_rows,
+            primary_series_name=args.primary_series,
+        )
+        return {"run_id": args.run_id, **report}
     if args.group == "run" and args.action == "update":
         config = parse_structured_file(args.config_file, "config file") if args.config_file else (parse_json(args.config) if args.config is not None else None)
         return request(args, "PATCH", f"/api/v1/runs/{args.run_id}", json=compact_payload({"name": args.name, "title": args.title, "source_run_id": args.source_run_id, "config": config, "context": parse_json(args.context) if args.context is not None else None, "tags": parse_json(args.tags) if args.tags is not None else None}))
@@ -599,7 +635,13 @@ def dispatch(args: argparse.Namespace) -> Any:
     if args.group == "run" and args.action == "log-event":
         return request(args, "POST", f"/api/v1/runs/{args.run_id}/events", json=compact_payload({"event_type": args.event_type, "stage": args.stage, "payload": parse_json(args.payload), "client_event_id": args.client_event_id}))
     if args.group == "run" and args.action == "log-metric":
-        return request(args, "POST", f"/api/v1/runs/{args.run_id}/metrics", json=compact_payload({"namespace": args.namespace, "values": parse_json(args.values), "point": parse_json(args.point), "client_event_id": args.client_event_id}))
+        values = parse_json(args.values)
+        report = validate_metric_upload(args.namespace, values, strict=upload_validation_strict(args))
+        if not args.skip_upload_validation:
+            enforce_upload_preflight(report, fail_on_warning=upload_validation_strict(args))
+        if args.dry_run:
+            return {"dry_run": True, "kind": "metric", "namespace": args.namespace, "validation": report}
+        return request(args, "POST", f"/api/v1/runs/{args.run_id}/metrics", json=compact_payload({"namespace": args.namespace, "values": values, "point": parse_json(args.point), "client_event_id": args.client_event_id}))
     if args.group == "run" and args.action == "log-series":
         data = parse_json(Path(args.data_file).read_text(encoding="utf-8")) if args.data_file else parse_json(args.data)
         headers = {"Idempotency-Key": args.idempotency_key} if args.idempotency_key else {}
@@ -619,6 +661,11 @@ def dispatch(args: argparse.Namespace) -> Any:
         result_payload = build_result_payload(args)
         if result_payload:
             series_payload["result"] = result_payload
+        report = validate_series_upload(series_payload, strict=upload_validation_strict(args))
+        if not args.skip_upload_validation:
+            enforce_upload_preflight(report, fail_on_warning=upload_validation_strict(args))
+        if args.dry_run:
+            return {"dry_run": True, "kind": "series", "name": args.name, "validation": report, "rows": len(data) if isinstance(data, list) else None}
         return request(
             args,
             "POST",
@@ -627,7 +674,13 @@ def dispatch(args: argparse.Namespace) -> Any:
             json=series_payload,
         )
     if args.group == "run" and args.action == "finish":
-        return request(args, "POST", f"/api/v1/runs/{args.run_id}/finish")
+        params = compact_payload({"fail_on_warning": args.fail_on_warning or None, "skip_quality_gate": args.skip_quality_gate or None})
+        return request(
+            args,
+            "POST",
+            f"/api/v1/runs/{args.run_id}/finish",
+            **({"params": params} if params else {}),
+        )
     if args.group == "run" and args.action == "fail":
         return request(args, "POST", f"/api/v1/runs/{args.run_id}/fail", json=parse_json(args.error))
     if args.group == "run" and args.action == "cancel":
@@ -773,6 +826,7 @@ def dispatch(args: argparse.Namespace) -> Any:
                 "metrics": split_csv(args.metrics),
                 "series": split_csv(args.series),
                 "with_config_diff": args.with_config_diff,
+                **compact_payload({"fail_on_warning": args.fail_on_warning or None, "skip_quality_gate": args.skip_quality_gate or None}),
             },
         )
     if args.group == "lineage" and args.action == "research":
@@ -942,7 +996,7 @@ def request(args: argparse.Namespace, method: str, path: str, **kwargs: Any) -> 
         error = payload.get("error") or {}
         code = error.get("code", "SERVER_ERROR")
         exit_code = {"VALIDATION_ERROR": 2, "NOT_FOUND": 3, "CONFLICT": 4, "STATE_ERROR": 4, "AUTH_ERROR": 5}.get(code, 10)
-        raise CliError(code, error.get("message", "request failed"), exit_code, error.get("hint"))
+        raise CliError(code, error.get("message", "request failed"), exit_code, error.get("hint"), error.get("details"))
     return payload["data"]
 
 
@@ -990,6 +1044,34 @@ def write_success(args: argparse.Namespace, data: Any) -> None:
         print(format_yaml(payload))
         return
     print(json.dumps(payload, ensure_ascii=False, indent=None if args.compact else 2))
+
+
+def command_exit_code(args: argparse.Namespace, data: Any) -> int:
+    if getattr(args, "group", None) == "run" and getattr(args, "action", None) == "validate" and isinstance(data, dict):
+        if getattr(args, "no_fail", False):
+            return 0
+        if int(data.get("error_count") or 0) > 0:
+            return 4
+        if getattr(args, "fail_on_warning", False) and int(data.get("warning_count") or 0) > 0:
+            return 4
+    return 0
+
+
+def upload_validation_strict(args: argparse.Namespace) -> bool:
+    if getattr(args, "strict_contract", False):
+        return True
+    return os.getenv("BLACKBOX_AGENT_STRICT_UPLOAD", "0").lower() in {"1", "true", "yes"}
+
+
+def enforce_upload_preflight(report: dict[str, Any], *, fail_on_warning: bool = False) -> None:
+    if upload_report_failed(report, fail_on_warning=fail_on_warning):
+        raise CliError(
+            "VALIDATION_ERROR",
+            format_upload_report_for_agent(report),
+            exit_code=4,
+            hint=report.get("hint") or "Fix the upload contract or pass --skip-upload-validation for an explicit manual override.",
+            details=report,
+        )
 
 
 def apply_select(data: Any, select: str | None) -> Any:

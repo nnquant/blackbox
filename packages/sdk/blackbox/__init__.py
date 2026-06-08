@@ -1,6 +1,7 @@
 from .client import (
     BlackboxClient,
     RunContext,
+    UploadValidationError,
     cancel,
     capture_git,
     capture_packages as capture_requirements,
@@ -67,11 +68,13 @@ from .logging import (
     search_runs,
     set_summary,
     set_tags,
+    validate_run,
 )
 
 __all__ = [
     "BlackboxClient",
     "RunContext",
+    "UploadValidationError",
     "attach_sweep",
     "branch_lineage",
     "compare_runs",
@@ -136,4 +139,5 @@ __all__ = [
     "search_runs",
     "set_summary",
     "set_tags",
+    "validate_run",
 ]

@@ -77,6 +77,22 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         )
         assert run["created_by_type"] == "agent"
         assert run["created_by_id"] == "agent-alpha"
+        incomplete_run = post(
+            client,
+            "/api/v1/runs",
+            {
+                "project_key": project["key"],
+                "research_key": research["key"],
+                "branch_key": branch["key"],
+                "name": "missing-results",
+            },
+        )
+        blocked_finish = client.post(f"/api/v1/runs/{incomplete_run['id']}/finish")
+        assert blocked_finish.status_code == 422
+        blocked_finish_body = blocked_finish.json()
+        assert blocked_finish_body["ok"] is False
+        assert blocked_finish_body["error"]["code"] == "VALIDATION_ERROR"
+        assert blocked_finish_body["error"]["details"]["severity"] == "error"
         keyed_run = client.post(
             "/api/v1/runs",
             headers={"Idempotency-Key": "run-once"},
@@ -385,6 +401,11 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert len(detail["notes"]) == 2
         assert len(detail["snapshots"]["code"]) == 1
         assert len(detail["snapshots"]["env"]) == 1
+        validation = get(client, f"/api/v1/runs/{run['id']}/validate")
+        assert validation["run_id"] == run["id"]
+        assert validation["severity"] == "warning"
+        assert validation["error_count"] == 0
+        assert validation["warning_count"] >= 1
 
         compare = post(
             client,
@@ -512,6 +533,18 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
                 "namespace": "strategy.summary",
                 "values": {"sharpe": 1.05, "max_drawdown": 0.11},
                 "point": {"kind": "event", "name": "post_cost_backtest_done"},
+            },
+        )
+        post(
+            client,
+            f"/api/v1/runs/{sweep_run_2_source['id']}/series",
+            {
+                "name": "equity_curve",
+                "data": [{"date": "2026-01-01", "nav": 1.0}, {"date": "2026-01-02", "nav": 1.02}],
+                "x": "date",
+                "y": "nav",
+                "namespace": "strategy.equity",
+                "result": {"domain": "performance", "name": "primary_performance", "role": "primary_curve"},
             },
         )
         post(client, f"/api/v1/runs/{sweep_run_2_source['id']}/finish", None)
@@ -777,6 +810,52 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         offline_sweep_summary = get(client, f"/api/v1/sweeps/{offline_remote_sweep['id']}/summary")
         assert offline_sweep_summary["objective"] == {"metric": "strategy.summary.sharpe", "direction": "max"}
         assert offline_sweep_summary["rows"][0]["run_id"] == remote_run["id"]
+
+
+def test_api_upload_validation_error_details(tmp_path: Path, monkeypatch) -> None:
+    db_path = tmp_path / "blackbox.db"
+    artifact_root = tmp_path / "artifacts"
+    monkeypatch.setenv("BLACKBOX_DATABASE_URL", f"sqlite:///{db_path}")
+    monkeypatch.setenv("BLACKBOX_ARTIFACT_ROOT", str(artifact_root))
+
+    from blackbox_server.main import create_app
+
+    with TestClient(create_app()) as client:
+        project = post(client, "/api/v1/projects", {"key": "upload-diagnostics", "title": "Upload Diagnostics"})
+        research = post(client, "/api/v1/researches", {"project_key": project["key"], "key": "contract", "title": "Contract"})
+        branch = post(client, "/api/v1/branches", {"research_id": research["id"], "key": "agent", "title": "Agent"})
+        run = post(client, "/api/v1/runs", {"branch_id": branch["id"], "name": "bad-upload"})
+
+        invalid_metric_response = client.post(
+            f"/api/v1/runs/{run['id']}/metrics",
+            json={"namespace": "strategy.summary", "values": {}},
+        )
+        assert invalid_metric_response.status_code == 422
+        invalid_metric_body = invalid_metric_response.json()
+        assert invalid_metric_body["error"]["code"] == "VALIDATION_ERROR"
+        metric_issue = invalid_metric_body["error"]["details"]["issues"][0]
+        assert metric_issue["code"] == "METRIC_VALUES_EMPTY"
+        assert metric_issue["field"] == "values"
+        assert "non-empty JSON object" in metric_issue["fix"]
+
+        invalid_series_response = client.post(
+            f"/api/v1/runs/{run['id']}/series",
+            json={
+                "name": "returns_series",
+                "data": [{"date": "2026-01-01", "ret": 0.01}],
+                "x": "date",
+                "y": "series_values",
+                "mode": "return",
+            },
+        )
+        assert invalid_series_response.status_code == 422
+        invalid_series_body = invalid_series_response.json()
+        assert invalid_series_body["error"]["code"] == "VALIDATION_ERROR"
+        assert "SERIES_Y_COLUMN_NOT_FOUND" in invalid_series_body["error"]["message"]
+        invalid_series_issue = invalid_series_body["error"]["details"]["issues"][0]
+        assert invalid_series_issue["code"] == "SERIES_Y_COLUMN_NOT_FOUND"
+        assert invalid_series_issue["field"] == "y"
+        assert "series_values" in invalid_series_issue["fix"]
 
 
 def test_parquet_preview_uses_optional_pyarrow(monkeypatch) -> None:

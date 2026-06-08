@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 const API_BASE = import.meta.env.VITE_BLACKBOX_API_BASE || '';
 const STATIC_TOKEN = import.meta.env.VITE_BLACKBOX_TOKEN || '';
 const TOKEN_STORAGE_KEY = 'blackbox.apiToken';
@@ -74,11 +76,29 @@ function authHeaders() {
 }
 
 async function unwrap(response) {
-  const payload = await response.json();
+  const text = await response.text();
+  let payload = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      const error = new Error(t('API returned a non-JSON response. Start the FastAPI server or set VITE_BLACKBOX_API_BASE.'));
+      error.code = 'INVALID_JSON_RESPONSE';
+      error.status = response.status;
+      throw error;
+    }
+  }
+  if (!payload) {
+    const error = new Error(t('API returned an empty response. Start the FastAPI server or set VITE_BLACKBOX_API_BASE.'));
+    error.code = 'EMPTY_RESPONSE';
+    error.status = response.status;
+    throw error;
+  }
   if (!response.ok || !payload.ok) {
-    const message = payload?.error?.message || response.statusText;
+    const message = payload?.error?.message || t('API request failed');
     const error = new Error(message);
     error.code = payload?.error?.code;
+    error.status = response.status;
     throw error;
   }
   return payload.data;

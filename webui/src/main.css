@@ -57,7 +57,7 @@
   }
 
   .table-head {
-    @apply border-b border-line bg-[#f3f4f1] text-left text-[11px] font-semibold uppercase tracking-normal text-muted;
+    @apply border-b border-line bg-[#f3f4f1] text-left text-xs font-semibold uppercase tracking-normal text-muted;
   }
 
   .table-cell {
@@ -87,6 +87,15 @@ table td,
 table .table-cell,
 table .table-head th {
   text-align: left !important;
+}
+
+table th,
+table .table-head th,
+table th button,
+table .table-head th button {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: nowrap;
 }
 
 table td button {

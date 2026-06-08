@@ -481,7 +481,7 @@ def test_run_log_series_dispatches_series_request(monkeypatch) -> None:
             "--name",
             "equity_curve",
             "--data",
-            '[{"date":"2026-01-01","nav":1.01}]',
+            '[{"date":"2026-01-01","nav":1.01,"benchmark":1.0}]',
             "--x",
             "date",
             "--y",
@@ -503,7 +503,7 @@ def test_run_log_series_dispatches_series_request(monkeypatch) -> None:
             "headers": {"Idempotency-Key": "series-once"},
             "json": {
                 "name": "equity_curve",
-                "data": [{"date": "2026-01-01", "nav": 1.01}],
+                "data": [{"date": "2026-01-01", "nav": 1.01, "benchmark": 1.0}],
                 "x": "date",
                 "y": ["nav", "benchmark"],
                 "mode": "nav",
@@ -572,6 +572,177 @@ def test_run_log_series_accepts_result_metadata(monkeypatch) -> None:
     }
 
 
+def test_run_log_series_strict_contract_blocks_legacy_performance_upload(monkeypatch, capsys) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("request should not be sent after failed preflight")
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+
+    exit_code = cli_main.main(
+        [
+            "run",
+            "log-series",
+            "--run-id",
+            "run_1",
+            "--name",
+            "equity_curve",
+            "--data",
+            '[{"date":"2026-01-01","nav":1.01}]',
+            "--x",
+            "date",
+            "--y",
+            "nav",
+            "--mode",
+            "nav",
+            "--namespace",
+            "strategy.equity",
+            "--strict-contract",
+        ]
+    )
+
+    assert exit_code == 4
+    err = capsys.readouterr().err
+    assert '"code": "VALIDATION_ERROR"' in err
+    assert "PERFORMANCE_VALUE_COLUMN_NOT_SERIES_VALUES" in err
+    assert "Performance curve does not use series_values" in err
+    assert "Fix:" in err
+    assert '"fix": "Use series_values as the preferred value column for performance curves."' in err
+
+
+def test_run_log_series_skip_upload_validation_allows_manual_override(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        return {"id": "art_1"}
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "log-series",
+            "--run-id",
+            "run_1",
+            "--name",
+            "returns_series",
+            "--data",
+            '[{"date":"2026-01-01","ret":0.01}]',
+            "--x",
+            "date",
+            "--y",
+            "series_values",
+            "--mode",
+            "return",
+            "--strict-contract",
+            "--skip-upload-validation",
+        ]
+    )
+
+    assert cli_main.dispatch(args) == {"id": "art_1"}
+    assert calls[0]["json"]["y"] == "series_values"
+
+
+def test_run_log_series_dry_run_validates_without_request(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("dry-run should not send request")
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "log-series",
+            "--run-id",
+            "run_1",
+            "--name",
+            "equity_curve",
+            "--data",
+            '[{"date":"2026-01-01","series_values":1.0},{"date":"2026-01-02","series_values":1.01}]',
+            "--x",
+            "date",
+            "--y",
+            "series_values",
+            "--mode",
+            "nav",
+            "--result-domain",
+            "performance",
+            "--result-name",
+            "primary_performance",
+            "--result-role",
+            "primary_curve",
+            "--strict-contract",
+            "--dry-run",
+        ]
+    )
+
+    result = cli_main.dispatch(args)
+
+    assert result["dry_run"] is True
+    assert result["kind"] == "series"
+    assert result["validation"]["severity"] == "ok"
+
+
+def test_run_log_metric_strict_contract_blocks_decimal_percent_units(monkeypatch, capsys) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    monkeypatch.setattr(cli_main, "request", lambda *args, **kwargs: {"ok": True})
+
+    exit_code = cli_main.main(
+        [
+            "run",
+            "log-metric",
+            "--run-id",
+            "run_1",
+            "--namespace",
+            "strategy.summary",
+            "--values",
+            '{"annual_return":0.18}',
+            "--strict-contract",
+        ]
+    )
+
+    assert exit_code == 4
+    err = capsys.readouterr().err
+    assert "annual_return may use decimal units" in err
+    assert "SUMMARY_PERCENT_DECIMAL_UNIT" in err
+    assert "percentage points" in err
+
+
+def test_run_log_metric_dry_run_validates_without_request(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("dry-run should not send request")
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "log-metric",
+            "--run-id",
+            "run_1",
+            "--namespace",
+            "strategy.summary",
+            "--values",
+            '{"annual_return":18.0,"max_drawdown":-9.0,"sharpe":1.2}',
+            "--strict-contract",
+            "--dry-run",
+        ]
+    )
+
+    result = cli_main.dispatch(args)
+
+    assert result["dry_run"] is True
+    assert result["kind"] == "metric"
+    assert result["validation"]["severity"] == "ok"
+
+
 def test_artifact_get_and_note_list_dispatch_requests(monkeypatch) -> None:
     cli_main = importlib.import_module("blackbox_cli.main")
 
@@ -595,6 +766,102 @@ def test_artifact_get_and_note_list_dispatch_requests(monkeypatch) -> None:
         {"method": "GET", "path": "/api/v1/artifacts/art_1"},
         {"method": "GET", "path": "/api/v1/runs/run_1/notes"},
     ]
+
+
+def test_run_validate_dispatches_run_detail_validation(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args, kwargs
+        calls.append({"method": method, "path": path})
+        return {
+            "id": "run_1",
+            "status": "completed",
+            "summary_json": {"strategy.summary": {"sharpe": 1.2}},
+            "artifacts": [],
+        }
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(["run", "validate", "--run-id", "run_1"])
+
+    report = cli_main.dispatch(args)
+
+    assert calls == [{"method": "GET", "path": "/api/v1/runs/run_1"}]
+    assert report["run_id"] == "run_1"
+    assert report["severity"] == "error"
+    assert report["error_count"] == 2
+
+
+def test_run_validate_main_exits_nonzero_on_error(monkeypatch, capsys) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args, method, path, kwargs
+        return {
+            "id": "run_1",
+            "status": "completed",
+            "summary_json": {"strategy.summary": {"sharpe": 1.2}},
+            "artifacts": [],
+        }
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+
+    assert cli_main.main(["run", "validate", "--run-id", "run_1", "--compact"]) == 4
+    assert '"severity": "error"' in capsys.readouterr().out
+
+
+def test_run_validate_checks_expected_primary_series_range(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args, method, path, kwargs
+        return {
+            "id": "run_1",
+            "status": "completed",
+            "artifacts": [
+                {
+                    "id": "art_1",
+                    "name": "equity_curve",
+                    "kind": "table_csv",
+                    "metadata_json": {
+                        "series": {"name": "equity_curve", "x": "date", "y": ["series_values"], "mode": "nav"},
+                        "result": {"domain": "performance", "role": "primary_curve", "name": "primary_performance"},
+                    },
+                    "preview_json": {
+                        "row_count": 2,
+                        "rows": [
+                            {"date": "2026-01-01", "series_values": 1.0},
+                            {"date": "2026-01-02", "series_values": 1.1},
+                        ],
+                    },
+                }
+            ],
+        }
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "validate",
+            "--run-id",
+            "run_1",
+            "--expected-start",
+            "2026-01-01",
+            "--expected-end",
+            "2026-01-03",
+            "--expected-rows",
+            "2",
+            "--primary-series",
+            "equity_curve",
+        ]
+    )
+
+    report = cli_main.dispatch(args)
+
+    assert report["severity"] == "error"
+    assert any(issue["title"] == "Primary curve end does not match expected date" for issue in report["issues"])
 
 
 def test_artifact_download_writes_content(monkeypatch, tmp_path) -> None:
@@ -883,6 +1150,32 @@ def test_resource_get_commands_dispatch_requests(monkeypatch) -> None:
         {"method": "GET", "path": "/api/v1/researches/rsr_1"},
         {"method": "GET", "path": "/api/v1/branches/br_1"},
         {"method": "POST", "path": "/api/v1/runs/run_1/finish"},
+    ]
+
+
+def test_run_finish_quality_gate_flags_dispatch_params(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        return {"ok": True}
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+
+    args = cli_main.build_parser().parse_args(
+        ["run", "finish", "--run-id", "run_1", "--fail-on-warning", "--skip-quality-gate"]
+    )
+
+    assert cli_main.dispatch(args) == {"ok": True}
+    assert calls == [
+        {
+            "method": "POST",
+            "path": "/api/v1/runs/run_1/finish",
+            "params": {"fail_on_warning": True, "skip_quality_gate": True},
+        }
     ]
 
 
@@ -1240,6 +1533,38 @@ def test_compare_runs_dispatches_series_request(monkeypatch) -> None:
                 "metrics": ["strategy.summary.sharpe", "strategy.summary.max_drawdown"],
                 "series": ["equity_curve", "drawdown_series"],
                 "with_config_diff": True,
+            },
+        }
+    ]
+
+
+def test_compare_runs_quality_gate_flags_dispatch_payload(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        return {"ok": True}
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        ["compare", "runs", "--run-ids", "run_1", "--fail-on-warning", "--skip-quality-gate"]
+    )
+
+    assert cli_main.dispatch(args) == {"ok": True}
+    assert calls == [
+        {
+            "method": "POST",
+            "path": "/api/v1/compare/runs",
+            "json": {
+                "run_ids": ["run_1"],
+                "metrics": [],
+                "series": [],
+                "with_config_diff": True,
+                "fail_on_warning": True,
+                "skip_quality_gate": True,
             },
         }
     ]
