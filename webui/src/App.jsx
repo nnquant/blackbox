@@ -8343,11 +8343,7 @@ function dashboardHeatmapData(data, weekCount = 53) {
   const firstDay = new Date(end);
   firstDay.setDate(end.getDate() - ((end.getDay() + 6) % 7) - (weekCount - 1) * 7);
   const start = firstDay;
-  const counts = new Map();
-  dashboardRunDates(data).forEach((date) => {
-    const key = dateKey(startOfLocalDay(date));
-    counts.set(key, (counts.get(key) || 0) + 1);
-  });
+  const counts = dashboardRunDailyCounts(data);
   const weeks = Array.from({ length: weekCount }, (_, weekIndex) => ({
     days: Array.from({ length: 7 }, (_, dayIndex) => {
       const date = new Date(firstDay);
@@ -8398,6 +8394,25 @@ function dashboardRunDates(data) {
     .map((run) => run.ended_at || run.started_at || run.created_at || run.updated_at)
     .map(parseDateValue)
     .filter((date) => date && Number.isFinite(date.getTime()));
+}
+
+function dashboardRunDailyCounts(data) {
+  const rows = data?.run_activity_daily || [];
+  const counts = new Map();
+  if (rows.length) {
+    rows.forEach((row) => {
+      const date = parseDateValue(row.date);
+      const count = Number(row.run_count ?? row.count ?? 0);
+      if (!date || !Number.isFinite(date.getTime()) || !Number.isFinite(count) || count <= 0) return;
+      counts.set(dateKey(startOfLocalDay(date)), (counts.get(dateKey(startOfLocalDay(date))) || 0) + count);
+    });
+    return counts;
+  }
+  dashboardRunDates(data).forEach((date) => {
+    const key = dateKey(startOfLocalDay(date));
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  return counts;
 }
 
 function dashboardTimelineGroups(data) {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import os
 import sys
 from pathlib import Path
@@ -651,6 +652,14 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert search_view_results[0]["branch_key"] == "baseline-v1"
         assert search_view_results[0]["artifact_count"] == 9
         assert search_view_results[0]["has_report_artifact"] is True
+        from blackbox_server.db import SessionLocal
+        from blackbox_server.models import Run as RunModel
+
+        with SessionLocal() as db:
+            db.get(RunModel, run["id"]).ended_at = datetime(2026, 6, 1, 15, 0, tzinfo=timezone.utc)
+            db.get(RunModel, sweep_run_2_source["id"]).ended_at = datetime(2026, 6, 2, 15, 0, tzinfo=timezone.utc)
+            db.commit()
+
         dashboard = get(client, "/api/v1/dashboard")
         assert dashboard["summary"]["workspaces"] == 2
         assert dashboard["summary"]["projects"] == 1
@@ -681,6 +690,12 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert dashboard["runs"][0]["research_key"] == "csi500-reversal"
         assert any(item["id"] == run["id"] and item["has_report_artifact"] is True for item in dashboard["runs"])
         assert any(item["kind"] == "decision" and item["summary"] == "keep as baseline" and item["run_name"] == run["name"] for item in dashboard["notes"])
+        dashboard_activity = {item["date"]: item["run_count"] for item in dashboard["run_activity_daily"]}
+        assert dashboard_activity["2026-06-01"] == 1
+        assert dashboard_activity["2026-06-02"] == 1
+        assert sum(dashboard_activity.values()) == 6
+        runs_activity = get(client, "/api/v1/runs/activity/daily")
+        assert runs_activity == dashboard["run_activity_daily"]
         project_detail = get(client, f"/api/v1/projects/{project['id']}")
         assert project_detail["workspace_key"] == "research-lab"
         assert project_detail["research_count"] == 1

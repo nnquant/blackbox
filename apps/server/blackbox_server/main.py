@@ -337,6 +337,7 @@ def create_app() -> FastAPI:
                     for item in branches
                 ],
                 "runs": [run_summary_for_dashboard(run, branch_by_id, research_by_id, project_by_id, artifact_summary_by_run) for run in runs],
+                "run_activity_daily": run_activity_daily(db),
                 "artifacts": [ArtifactRead.model_validate(item).model_dump(mode="json") for item in artifacts],
                 "notes": [note_summary_for_dashboard(item, run_by_id, branch_by_id, research_by_id) for item in notes],
                 "sweeps": [
@@ -356,6 +357,10 @@ def create_app() -> FastAPI:
                 ],
             }
         )
+
+    @app.get("/api/v1/runs/activity/daily")
+    def runs_activity_daily(db: Session = Depends(get_db)) -> dict[str, Any]:
+        return ok(run_activity_daily(db))
 
     @app.post("/api/v1/workspaces")
     def create_workspace(payload: WorkspaceCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
@@ -1540,6 +1545,20 @@ def run_summary_for_dashboard(
         "project_title": project.title if project else None,
         **artifact_summary,
     }
+
+
+def run_activity_daily(db: Session) -> list[dict[str, Any]]:
+    activity_date = func.date(func.coalesce(Run.ended_at, Run.started_at, Run.created_at, Run.updated_at))
+    rows = db.execute(
+        select(activity_date.label("date"), func.count(Run.id).label("run_count"))
+        .group_by(activity_date)
+        .order_by(activity_date)
+    ).all()
+    return [
+        {"date": str(row.date), "run_count": int(row.run_count or 0)}
+        for row in rows
+        if row.date is not None
+    ]
 
 
 def run_summaries(db: Session, runs: list[Run]) -> list[dict[str, Any]]:
