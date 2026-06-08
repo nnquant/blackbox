@@ -8395,7 +8395,7 @@ function dashboardHeatmapData(data, weekCount = 53) {
 
 function dashboardRunDates(data) {
   return (data?.runs || [])
-    .map((run) => run.started_at || run.created_at || run.ended_at || run.updated_at)
+    .map((run) => run.ended_at || run.started_at || run.created_at || run.updated_at)
     .map(parseDateValue)
     .filter((date) => date && Number.isFinite(date.getTime()));
 }

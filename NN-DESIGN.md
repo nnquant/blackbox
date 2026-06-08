@@ -23,14 +23,14 @@ designSystem:
       line: "#e1e2dd"
       lineStrong: "#cfd1cc"
       charcoal: "#1c1f22"
-      positive: "#16a34a"
-      positiveSoft: "#dcfce7"
-      negative: "#ef233c"
-      negativeSoft: "#fee2e2"
-      warning: "#f97316"
-      warningSoft: "#fef3c7"
-      info: "#0f70ff"
-      infoSoft: "#dbeafe"
+      positive: "#15803d"
+      positiveSoft: "#e7f3ea"
+      negative: "#dc2626"
+      negativeSoft: "#f8e4e4"
+      warning: "#d97706"
+      warningSoft: "#f6ecd4"
+      info: "#2563eb"
+      infoSoft: "#e1e8f4"
       tableHeader: "#f3f4f1"
     typography:
       fontFamily:
@@ -162,17 +162,17 @@ Use the Tailwind tokens from `webui/tailwind.config.js`:
 
 Semantic colors:
 
-- `positive #16a34a`: success, positive deltas, completed status text.
-- `negative #ef233c`: errors, failed status text, severe diagnostics.
-- `warning #f97316`: warnings and degraded quality.
-- `info #0f70ff`: selected informational state.
+- `positive #15803d`: success, positive deltas, completed status text.
+- `negative #dc2626`: errors, failed status text, severe diagnostics.
+- `warning #d97706`: warnings and degraded quality.
+- `info #2563eb`: selected informational state.
 
 Soft semantic backgrounds:
 
-- `positiveSoft #dcfce7`
-- `negativeSoft #fee2e2`
-- `warningSoft #fef3c7`
-- `infoSoft #dbeafe`
+- `positiveSoft #e7f3ea`
+- `negativeSoft #f8e4e4`
+- `warningSoft #f6ecd4`
+- `infoSoft #e1e8f4`
 
 Chart palettes may use different ECharts colors when the chart needs contrast or continuity. Do not globally change chart palettes just because semantic text needs stronger color.
 
