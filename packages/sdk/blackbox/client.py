@@ -163,15 +163,18 @@ class BlackboxClient:
             }),
         )
 
-    def create_compare_set(self, project_id: str, name: str, run_ids: list[str], layout: dict[str, Any] | None = None) -> dict[str, Any]:
+    def create_compare_set(self, project_id: str, name: str, run_ids: list[str], layout: dict[str, Any] | None = None, research_id: str | None = None) -> dict[str, Any]:
         return self.request(
             "POST",
             "/api/v1/compare-sets",
-            json={"project_id": project_id, "name": name, "run_ids": run_ids, "layout": layout or {}},
+            json=compact_payload({"project_id": project_id, "research_id": research_id, "name": name, "run_ids": run_ids, "layout": layout or {}}),
         )
 
     def list_compare_sets(self, project_id: str) -> list[dict[str, Any]]:
         return self.request("GET", f"/api/v1/projects/{project_id}/compare-sets")
+
+    def list_research_compare_sets(self, research_id: str) -> list[dict[str, Any]]:
+        return self.request("GET", f"/api/v1/researches/{research_id}/compare-sets")
 
     def get_compare_set(self, compare_set_id: str) -> dict[str, Any]:
         return self.request("GET", f"/api/v1/compare-sets/{compare_set_id}")
@@ -181,10 +184,11 @@ class BlackboxClient:
         compare_set_id: str,
         *,
         name: str | None = None,
+        research_id: str | None = None,
         run_ids: list[str] | None = None,
         layout: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        return self.request("PATCH", f"/api/v1/compare-sets/{compare_set_id}", json=compact_payload({"name": name, "run_ids": run_ids, "layout": layout}))
+        return self.request("PATCH", f"/api/v1/compare-sets/{compare_set_id}", json=compact_payload({"name": name, "research_id": research_id, "run_ids": run_ids, "layout": layout}))
 
     def run_compare_set(
         self,

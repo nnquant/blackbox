@@ -78,14 +78,19 @@ def create_compare_set(
     name: str,
     run_ids: list[str],
     layout: dict[str, Any] | None = None,
+    research_id: str | None = None,
     endpoint: str | None = None,
     token: str | None = None,
 ) -> dict[str, Any]:
-    return default_client(endpoint=endpoint, token=token).create_compare_set(project_id, name, run_ids, layout=layout)
+    return default_client(endpoint=endpoint, token=token).create_compare_set(project_id, name, run_ids, layout=layout, research_id=research_id)
 
 
 def list_compare_sets(project_id: str, endpoint: str | None = None, token: str | None = None) -> list[dict[str, Any]]:
     return default_client(endpoint=endpoint, token=token).list_compare_sets(project_id)
+
+
+def list_research_compare_sets(research_id: str, endpoint: str | None = None, token: str | None = None) -> list[dict[str, Any]]:
+    return default_client(endpoint=endpoint, token=token).list_research_compare_sets(research_id)
 
 
 def get_compare_set(compare_set_id: str, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
@@ -96,12 +101,13 @@ def update_compare_set(
     compare_set_id: str,
     *,
     name: str | None = None,
+    research_id: str | None = None,
     run_ids: list[str] | None = None,
     layout: dict[str, Any] | None = None,
     endpoint: str | None = None,
     token: str | None = None,
 ) -> dict[str, Any]:
-    return default_client(endpoint=endpoint, token=token).update_compare_set(compare_set_id, name=name, run_ids=run_ids, layout=layout)
+    return default_client(endpoint=endpoint, token=token).update_compare_set(compare_set_id, name=name, research_id=research_id, run_ids=run_ids, layout=layout)
 
 
 def run_compare_set(

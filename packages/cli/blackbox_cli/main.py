@@ -438,16 +438,19 @@ def build_parser() -> argparse.ArgumentParser:
     compare_set_sub = compare_set.add_subparsers(dest="action", required=True)
     compare_set_create = compare_set_sub.add_parser("create")
     compare_set_create.add_argument("--project-id", required=True)
+    compare_set_create.add_argument("--research-id")
     compare_set_create.add_argument("--name", required=True)
     compare_set_create.add_argument("--run-ids", nargs="+", required=True)
     compare_set_create.add_argument("--layout", default="{}")
     compare_set_list = compare_set_sub.add_parser("list")
-    compare_set_list.add_argument("--project-id", required=True)
+    compare_set_list.add_argument("--project-id")
+    compare_set_list.add_argument("--research-id")
     compare_set_get = compare_set_sub.add_parser("get")
     compare_set_get.add_argument("--compare-set-id", required=True)
     compare_set_update = compare_set_sub.add_parser("update")
     compare_set_update.add_argument("--compare-set-id", required=True)
     compare_set_update.add_argument("--name")
+    compare_set_update.add_argument("--research-id")
     compare_set_update.add_argument("--run-ids", nargs="+")
     compare_set_update.add_argument("--layout")
     compare_set_run = compare_set_sub.add_parser("run")
@@ -864,14 +867,21 @@ def dispatch(args: argparse.Namespace) -> Any:
             args,
             "POST",
             "/api/v1/compare-sets",
-            json={
-                "project_id": args.project_id,
-                "name": args.name,
-                "run_ids": parse_id_values(args.run_ids),
-                "layout": parse_json(args.layout),
-            },
+            json=compact_payload(
+                {
+                    "project_id": args.project_id,
+                    "research_id": args.research_id,
+                    "name": args.name,
+                    "run_ids": parse_id_values(args.run_ids),
+                    "layout": parse_json(args.layout),
+                }
+            ),
         )
     if args.group == "compare-set" and args.action == "list":
+        if args.research_id:
+            return request(args, "GET", f"/api/v1/researches/{args.research_id}/compare-sets")
+        if not args.project_id:
+            raise CliError("VALIDATION_ERROR", "compare-set list requires --project-id or --research-id")
         return request(args, "GET", f"/api/v1/projects/{args.project_id}/compare-sets")
     if args.group == "compare-set" and args.action == "get":
         return request(args, "GET", f"/api/v1/compare-sets/{args.compare_set_id}")
@@ -883,6 +893,7 @@ def dispatch(args: argparse.Namespace) -> Any:
             json=compact_payload(
                 {
                     "name": args.name,
+                    "research_id": args.research_id,
                     "run_ids": parse_id_values(args.run_ids) if args.run_ids is not None else None,
                     "layout": parse_json(args.layout) if args.layout is not None else None,
                 }

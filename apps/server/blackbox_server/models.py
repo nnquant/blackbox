@@ -159,6 +159,14 @@ class RunNote(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
+class RunActivityDailyStat(Base):
+    __tablename__ = "run_activity_daily_stats"
+
+    date: Mapped[str] = mapped_column(String(10), primary_key=True)
+    run_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
 class Artifact(Base):
     __tablename__ = "artifacts"
 
@@ -250,6 +258,7 @@ class CompareSet(Base):
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("compare_set"))
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
+    research_id: Mapped[str | None] = mapped_column(ForeignKey("researches.id"), index=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     run_ids_json: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
     layout_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)

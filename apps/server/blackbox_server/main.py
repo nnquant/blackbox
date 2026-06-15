@@ -15,7 +15,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import func, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
@@ -93,6 +93,7 @@ from .models import (
     RunEvent,
     RunMetric,
     RunNote,
+    RunActivityDailyStat,
     SearchView,
     Sweep,
     SweepRun,
@@ -281,7 +282,8 @@ def create_app() -> FastAPI:
         researches = db.scalars(select(Research).order_by(Research.updated_at.desc())).all()
         branches = db.scalars(select(Branch).order_by(Branch.updated_at.desc())).all()
         runs = db.scalars(select(Run).order_by(Run.updated_at.desc()).limit(200)).all()
-        all_runs = db.scalars(select(Run)).all()
+        recent_run_ids = [run.id for run in runs]
+        recent_run_artifacts = db.scalars(select(Artifact).where(Artifact.run_id.in_(recent_run_ids))).all() if recent_run_ids else []
         artifacts = db.scalars(select(Artifact).order_by(Artifact.created_at.desc()).limit(200)).all()
         notes = db.scalars(select(RunNote).order_by(RunNote.created_at.desc()).limit(200)).all()
         workspace_by_id = {item.id: item for item in workspaces}
@@ -289,11 +291,13 @@ def create_app() -> FastAPI:
         research_by_id = {item.id: item for item in researches}
         branch_by_id = {item.id: item for item in branches}
         run_by_id = {item.id: item for item in runs}
-        artifact_summary_by_run = artifact_summary_by_run_id(artifacts)
+        artifact_summary_by_run = artifact_summary_by_run_id(recent_run_artifacts)
         now = utcnow()
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         since_24h = now - timedelta(hours=24)
         since_7d = now - timedelta(days=7)
+        branch_run_stats = dashboard_branch_run_stats(db, since_7d)
+        champion_by_research = dashboard_champion_runs_by_research(db, branch_by_id, research_by_id, project_by_id)
         return ok(
             {
                 "summary": {
@@ -315,16 +319,16 @@ def create_app() -> FastAPI:
                 },
                 "workspaces": [WorkspaceRead.model_validate(item).model_dump(mode="json") for item in workspaces],
                 "projects": [
-                    project_summary_for_dashboard(item, workspace_by_id, researches, branches, all_runs)
+                    project_summary_for_dashboard_stats(item, workspace_by_id, researches, branches, branch_run_stats)
                     for item in projects
                 ],
                 "researches": [
-                    research_summary_for_dashboard(
+                    research_summary_for_dashboard_stats(
                         item,
                         project_by_id,
                         [branch for branch in branches if branch.research_id == item.id],
-                        all_runs,
-                        since_7d=since_7d,
+                        branch_run_stats,
+                        champion_by_research.get(item.id),
                     )
                     for item in researches
                 ],
@@ -332,7 +336,7 @@ def create_app() -> FastAPI:
                     {
                         **BranchRead.model_validate(item).model_dump(mode="json"),
                         "research_key": research_by_id[item.research_id].key if item.research_id in research_by_id else None,
-                        "run_count": sum(1 for run in all_runs if run.branch_id == item.id),
+                        "run_count": branch_run_stats.get(item.id, {}).get("run_count", 0),
                     }
                     for item in branches
                 ],
@@ -1250,10 +1254,10 @@ def create_app() -> FastAPI:
     @app.post("/api/v1/compare-sets")
     def create_compare_set(payload: CompareSetCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
         require_project(db, payload.project_id)
-        for run_id in payload.run_ids:
-            require_run(db, run_id)
+        validate_compare_set_scope(db, payload.project_id, payload.research_id, payload.run_ids)
         compare_set = CompareSet(
             project_id=payload.project_id,
+            research_id=payload.research_id,
             name=payload.name,
             run_ids_json=payload.run_ids,
             layout_json=payload.layout,
@@ -1270,6 +1274,12 @@ def create_app() -> FastAPI:
         items = db.scalars(select(CompareSet).where(CompareSet.project_id == project_id).order_by(CompareSet.created_at.desc())).all()
         return ok([CompareSetRead.model_validate(item).model_dump(mode="json") for item in items])
 
+    @app.get("/api/v1/researches/{research_id}/compare-sets")
+    def list_research_compare_sets(research_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
+        require_research(db, research_id)
+        items = db.scalars(select(CompareSet).where(CompareSet.research_id == research_id).order_by(CompareSet.created_at.desc())).all()
+        return ok([CompareSetRead.model_validate(item).model_dump(mode="json") for item in items])
+
     @app.get("/api/v1/compare-sets/{compare_set_id}")
     def get_compare_set(compare_set_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
         return ok(CompareSetRead.model_validate(require_compare_set(db, compare_set_id)).model_dump(mode="json"))
@@ -1277,12 +1287,15 @@ def create_app() -> FastAPI:
     @app.patch("/api/v1/compare-sets/{compare_set_id}")
     def update_compare_set(compare_set_id: str, payload: CompareSetUpdate, db: Session = Depends(get_db)) -> dict[str, Any]:
         compare_set = require_compare_set(db, compare_set_id)
+        next_research_id = payload.research_id if "research_id" in payload.model_fields_set else compare_set.research_id
+        next_run_ids = payload.run_ids if payload.run_ids is not None else compare_set.run_ids_json
+        validate_compare_set_scope(db, compare_set.project_id, next_research_id, next_run_ids)
         if payload.run_ids is not None:
-            for run_id in payload.run_ids:
-                require_run(db, run_id)
             compare_set.run_ids_json = payload.run_ids
         if payload.name is not None:
             compare_set.name = payload.name
+        if "research_id" in payload.model_fields_set:
+            compare_set.research_id = payload.research_id
         if payload.layout is not None:
             compare_set.layout_json = payload.layout
         db.commit()
@@ -1548,17 +1561,35 @@ def run_summary_for_dashboard(
 
 
 def run_activity_daily(db: Session) -> list[dict[str, Any]]:
+    ensure_run_activity_daily_cache(db)
+    rows = db.scalars(select(RunActivityDailyStat).order_by(RunActivityDailyStat.date)).all()
+    return [{"date": row.date, "run_count": int(row.run_count or 0)} for row in rows]
+
+
+def ensure_run_activity_daily_cache(db: Session) -> None:
+    run_count = db.scalar(select(func.count(Run.id))) or 0
+    cached_total = db.scalar(select(func.coalesce(func.sum(RunActivityDailyStat.run_count), 0))) or 0
+    latest_run_change = db.scalar(select(func.max(func.coalesce(Run.updated_at, Run.ended_at, Run.started_at, Run.created_at))))
+    cache_updated_at = db.scalar(select(func.max(RunActivityDailyStat.updated_at)))
+    if run_count == cached_total and (not latest_run_change or (cache_updated_at and comparable_datetime(cache_updated_at) >= comparable_datetime(latest_run_change))):
+        return
+    refresh_run_activity_daily_cache(db)
+
+
+def refresh_run_activity_daily_cache(db: Session) -> None:
     activity_date = func.date(func.coalesce(Run.ended_at, Run.started_at, Run.created_at, Run.updated_at))
     rows = db.execute(
         select(activity_date.label("date"), func.count(Run.id).label("run_count"))
         .group_by(activity_date)
         .order_by(activity_date)
     ).all()
-    return [
-        {"date": str(row.date), "run_count": int(row.run_count or 0)}
-        for row in rows
-        if row.date is not None
-    ]
+    refreshed_at = utcnow()
+    db.execute(delete(RunActivityDailyStat))
+    for row in rows:
+        if row.date is None:
+            continue
+        db.add(RunActivityDailyStat(date=str(row.date), run_count=int(row.run_count or 0), updated_at=refreshed_at))
+    db.commit()
 
 
 def run_summaries(db: Session, runs: list[Run]) -> list[dict[str, Any]]:
@@ -1633,6 +1664,96 @@ def note_summary_for_dashboard(
     }
 
 
+def dashboard_branch_run_stats(db: Session, since_7d: datetime) -> dict[str, dict[str, int]]:
+    recent_run_case = case((Run.created_at >= since_7d, 1), else_=0)
+    failed_recent_case = case(
+        (
+            (Run.status == RunStatus.failed.value)
+            & (func.coalesce(Run.updated_at, Run.ended_at, Run.created_at) >= since_7d),
+            1,
+        ),
+        else_=0,
+    )
+    rows = db.execute(
+        select(
+            Run.branch_id,
+            func.count(Run.id).label("run_count"),
+            func.sum(case((Run.status == RunStatus.running.value, 1), else_=0)).label("running_run_count"),
+            func.sum(case((Run.status == RunStatus.failed.value, 1), else_=0)).label("failed_run_count"),
+            func.sum(recent_run_case).label("run_count_7d"),
+            func.sum(failed_recent_case).label("failed_run_count_7d"),
+        ).group_by(Run.branch_id)
+    ).all()
+    return {
+        row.branch_id: {
+            "run_count": int(row.run_count or 0),
+            "running_run_count": int(row.running_run_count or 0),
+            "failed_run_count": int(row.failed_run_count or 0),
+            "run_count_7d": int(row.run_count_7d or 0),
+            "failed_run_count_7d": int(row.failed_run_count_7d or 0),
+        }
+        for row in rows
+    }
+
+
+def dashboard_champion_runs_by_research(
+    db: Session,
+    branch_by_id: dict[str, Branch],
+    research_by_id: dict[str, Research],
+    project_by_id: dict[str, Project],
+) -> dict[str, dict[str, Any]]:
+    rows = db.execute(
+        select(Run.id, Run.branch_id, Run.summary_json)
+        .where(Run.status == RunStatus.completed.value)
+    ).all()
+    best_by_research: dict[str, tuple[float, str]] = {}
+    for row in rows:
+        branch = branch_by_id.get(row.branch_id)
+        if not branch:
+            continue
+        score = get_metric_value(row.summary_json, "strategy.summary.sharpe")
+        try:
+            numeric_score = float(score)
+        except (TypeError, ValueError):
+            numeric_score = float("-inf")
+        current = best_by_research.get(branch.research_id)
+        if current is None or numeric_score > current[0]:
+            best_by_research[branch.research_id] = (numeric_score, row.id)
+    best_run_ids = [run_id for _, run_id in best_by_research.values()]
+    if not best_run_ids:
+        return {}
+    best_runs = db.scalars(select(Run).where(Run.id.in_(best_run_ids))).all()
+    best_run_by_id = {run.id: run for run in best_runs}
+    result: dict[str, dict[str, Any]] = {}
+    for research_id, (_, run_id) in best_by_research.items():
+        run = best_run_by_id.get(run_id)
+        if run:
+            result[research_id] = run_summary_for_dashboard(run, branch_by_id, research_by_id, project_by_id)
+    return result
+
+
+def project_summary_for_dashboard_stats(
+    project: Project,
+    workspace_by_id: dict[str, Workspace],
+    researches: list[Research],
+    branches: list[Branch],
+    branch_run_stats: dict[str, dict[str, int]],
+) -> dict[str, Any]:
+    project_researches = [research for research in researches if research.project_id == project.id]
+    research_ids = {research.id for research in project_researches}
+    project_branches = [branch for branch in branches if branch.research_id in research_ids]
+    workspace = workspace_by_id.get(project.workspace_id)
+    return {
+        **ProjectRead.model_validate(project).model_dump(mode="json"),
+        "workspace_key": workspace.key if workspace else None,
+        "research_count": len(project_researches),
+        "branch_count": len(project_branches),
+        "run_count": sum(branch_run_stats.get(branch.id, {}).get("run_count", 0) for branch in project_branches),
+        "running_run_count": sum(branch_run_stats.get(branch.id, {}).get("running_run_count", 0) for branch in project_branches),
+        "failed_run_count": sum(branch_run_stats.get(branch.id, {}).get("failed_run_count", 0) for branch in project_branches),
+    }
+
+
 def project_summary_for_dashboard(
     project: Project,
     workspace_by_id: dict[str, Workspace],
@@ -1654,6 +1775,25 @@ def project_summary_for_dashboard(
         "run_count": len(project_runs),
         "running_run_count": sum(1 for run in project_runs if run.status == RunStatus.running.value),
         "failed_run_count": sum(1 for run in project_runs if run.status == RunStatus.failed.value),
+    }
+
+
+def research_summary_for_dashboard_stats(
+    research: Research,
+    project_by_id: dict[str, Project],
+    branches: list[Branch],
+    branch_run_stats: dict[str, dict[str, int]],
+    champion_run: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    project = project_by_id.get(research.project_id)
+    return {
+        **ResearchRead.model_validate(research).model_dump(mode="json"),
+        "project_key": project.key if project else None,
+        "branch_count": len(branches),
+        "run_count": sum(branch_run_stats.get(branch.id, {}).get("run_count", 0) for branch in branches),
+        "run_count_7d": sum(branch_run_stats.get(branch.id, {}).get("run_count_7d", 0) for branch in branches),
+        "failed_run_count_7d": sum(branch_run_stats.get(branch.id, {}).get("failed_run_count_7d", 0) for branch in branches),
+        "champion_run": champion_run,
     }
 
 
@@ -1751,6 +1891,21 @@ def require_compare_set(db: Session, compare_set_id: str) -> CompareSet:
     if not compare_set:
         raise ApiError(ErrorCode.not_found, f"compare set {compare_set_id} not found")
     return compare_set
+
+
+def validate_compare_set_scope(db: Session, project_id: str, research_id: str | None, run_ids: list[str]) -> None:
+    research = require_research(db, research_id) if research_id else None
+    if research and research.project_id != project_id:
+        raise ApiError(ErrorCode.validation_error, "compare set research must belong to the selected project")
+    for run_id in run_ids:
+        run = require_run(db, run_id)
+        branch = db.get(Branch, run.branch_id)
+        run_research = db.get(Research, branch.research_id) if branch else None
+        if not run_research or run_research.project_id != project_id:
+            raise ApiError(ErrorCode.validation_error, f"run {run_id} does not belong to project {project_id}")
+        if research:
+            if not branch or branch.research_id != research.id:
+                raise ApiError(ErrorCode.validation_error, f"run {run_id} does not belong to research {research.id}")
 
 
 def default_quick_compare_metrics() -> list[str]:

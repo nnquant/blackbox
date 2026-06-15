@@ -1273,6 +1273,7 @@ function CompareSetCreateForm({ data, onCreated }) {
   const firstProjectId = data?.projects?.[0]?.id || '';
   const [form, setForm] = useState({
     project_id: firstProjectId,
+    research_id: '',
     name: '',
     run_ids: '',
     layout: '{"metrics":["strategy.summary.sharpe"],"series":[]}',
@@ -1280,8 +1281,15 @@ function CompareSetCreateForm({ data, onCreated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const candidateRuns = useMemo(
-    () => (data?.runs || []).filter((run) => !form.project_id || run.project_id === form.project_id),
-    [data?.runs, form.project_id],
+    () => (data?.runs || []).filter((run) => (
+      (!form.project_id || run.project_id === form.project_id)
+      && (!form.research_id || run.research_id === form.research_id)
+    )),
+    [data?.runs, form.project_id, form.research_id],
+  );
+  const researchOptions = useMemo(
+    () => (data?.researches || []).filter((research) => !form.project_id || research.project_id === form.project_id),
+    [data?.researches, form.project_id],
   );
   const selectedRunIds = parseCsv(form.run_ids);
   useEffect(() => {
@@ -1289,9 +1297,15 @@ function CompareSetCreateForm({ data, onCreated }) {
   }, [firstProjectId, form.project_id]);
   const update = (field, value) => {
     setForm((current) => {
-      if (field !== 'project_id') return { ...current, [field]: value };
-      const allowedIds = new Set((data?.runs || []).filter((run) => run.project_id === value).map((run) => run.id));
-      return { ...current, project_id: value, run_ids: parseCsv(current.run_ids).filter((id) => allowedIds.has(id)).join(',') };
+      if (field !== 'project_id' && field !== 'research_id') return { ...current, [field]: value };
+      const nextProjectId = field === 'project_id' ? value : current.project_id;
+      const nextResearchId = field === 'project_id'
+        ? ((data?.researches || []).some((research) => research.id === current.research_id && research.project_id === value) ? current.research_id : '')
+        : value;
+      const allowedIds = new Set((data?.runs || [])
+        .filter((run) => (!nextProjectId || run.project_id === nextProjectId) && (!nextResearchId || run.research_id === nextResearchId))
+        .map((run) => run.id));
+      return { ...current, project_id: nextProjectId, research_id: nextResearchId, run_ids: parseCsv(current.run_ids).filter((id) => allowedIds.has(id)).join(',') };
     });
   };
   const toggleRun = (runId) => {
@@ -1310,6 +1324,7 @@ function CompareSetCreateForm({ data, onCreated }) {
       if (!runIds.length) throw new Error('Choose at least one run.');
       const compareSet = await apiPost('/api/v1/compare-sets', {
         project_id: form.project_id,
+        research_id: form.research_id || null,
         name: form.name,
         run_ids: runIds,
         layout: parseJsonObject(form.layout),
@@ -1328,6 +1343,12 @@ function CompareSetCreateForm({ data, onCreated }) {
           <SelectInput required value={form.project_id} onChange={(event) => update('project_id', event.target.value)}>
             <option value="" disabled>{t("Select project")}</option>
             {(data?.projects || []).map((project) => <option key={project.id} value={project.id}>{project.key}</option>)}
+          </SelectInput>
+        </Field>
+        <Field label="Research">
+          <SelectInput value={form.research_id} onChange={(event) => update('research_id', event.target.value)}>
+            <option value="">{t("Project-level")}</option>
+            {researchOptions.map((research) => <option key={research.id} value={research.id}>{research.key}</option>)}
           </SelectInput>
         </Field>
         <Field label="Name"><TextInput required value={form.name} onChange={(event) => update('name', event.target.value)} placeholder="baseline-vs-candidate" /></Field>
@@ -1726,46 +1747,45 @@ function ProjectResearchHeatPanel({ researches, branches, runs, selectResearch, 
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="Research Activity" icon={Activity} />
-      <div className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4">
-        {rows.length ? rows.map((row) => (
-          <div className="rounded-md border border-line bg-white/45 p-4" key={row.research.id}>
-            <button className="text-left text-sm font-semibold text-ink hover:text-info" onClick={() => selectResearch(row.research.id)}>
-              {row.research.title || row.research.key}
-            </button>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <HeatStat label="7d runs" value={row.runs7d} tone={row.runs7d ? 'positive' : 'neutral'} />
-              <HeatStat label="fail rate" value={`${Math.round(row.failureRate * 100)}%`} tone={row.failureRate > 0.25 ? 'negative' : 'neutral'} />
-              <HeatStat label="branches" value={row.branchCount} tone="info" />
-            </div>
-            <div className="mt-3 min-w-0 overflow-hidden rounded-md bg-white/50 p-3">
-              <div className="text-xs font-semibold uppercase text-muted">{t("Champion")}</div>
-              {row.champion ? (
-                <button className="mt-1 block w-full min-w-0 text-left text-sm font-semibold text-ink hover:text-info" onClick={() => selectRun(row.champion.id)}>
-                  <span className="block break-words [overflow-wrap:anywhere]">{row.champion.name}</span>
-                  <span className="mt-1 block">Sharpe {formatMetric(metricValue(row.champion, 'strategy.summary', 'sharpe'))}</span>
-                </button>
-              ) : <div className="mt-1 text-sm text-muted">{t("No completed runs.")}</div>}
-            </div>
-          </div>
-        )) : <div className="p-5 text-sm text-muted">{t("No research activity yet.")}</div>}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[980px] border-collapse">
+          <thead className="table-head">
+            <tr>
+              <th className="px-4 py-3">{t("Research")}</th>
+              <th className="px-4 py-3 text-right">{t("7D Runs")}</th>
+              <th className="px-4 py-3 text-right">{t("Fail Rate")}</th>
+              <th className="px-4 py-3 text-right">{t("Branches")}</th>
+              <th className="px-4 py-3">{t("Champion")}</th>
+              <th className="px-4 py-3 text-right">{t("Sharpe")}</th>
+              <th className="px-4 py-3 text-right">{t("Last Run")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length ? rows.map((row) => (
+              <tr className="transition hover:bg-white/45" key={row.research.id}>
+                <td className="table-cell">
+                  <button className="font-semibold text-ink hover:text-info" onClick={() => selectResearch(row.research.id)} type="button">
+                    {row.research.title || row.research.key}
+                  </button>
+                </td>
+                <td className="table-cell text-right font-semibold text-positive">{row.runs7d}</td>
+                <td className={`table-cell text-right font-semibold ${row.failureRate > 0.25 ? 'text-negative' : 'text-ink'}`}>{Math.round(row.failureRate * 100)}%</td>
+                <td className="table-cell text-right text-info">{row.branchCount}</td>
+                <td className="table-cell">
+                  {row.champion ? (
+                    <button className="font-semibold text-ink hover:text-info break-words [overflow-wrap:anywhere]" onClick={() => selectRun(row.champion.id)} type="button">
+                      {row.champion.name}
+                    </button>
+                  ) : <span className="text-muted">{t("No completed runs.")}</span>}
+                </td>
+                <td className="table-cell text-right font-semibold text-positive">{formatMetric(metricValue(row.champion, 'strategy.summary', 'sharpe'))}</td>
+                <td className="table-cell text-right text-muted">{formatDate(row.lastRunTime || row.research.updated_at)}</td>
+              </tr>
+            )) : <tr><td className="table-cell text-muted" colSpan="7">{t("No research activity yet.")}</td></tr>}
+          </tbody>
+        </table>
       </div>
     </Panel>
-  );
-}
-
-function HeatStat({ label, value, tone = 'neutral' }) {
-  const colorClass = {
-    positive: 'text-positive',
-    negative: 'text-negative',
-    warning: 'text-warning',
-    info: 'text-info',
-    neutral: 'text-ink',
-  }[tone] || 'text-ink';
-  return (
-    <div className="px-1 py-1">
-      <div className="text-[10px] font-semibold uppercase text-muted">{tx(label)}</div>
-      <div className={`mt-1 text-lg font-semibold ${colorClass}`}>{value}</div>
-    </div>
   );
 }
 
@@ -2220,6 +2240,52 @@ function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch }
   );
 }
 
+function ResearchCompareSetsPanel({ compareSets, error, onSelectCompareSet }) {
+  const rows = [...(compareSets || [])].sort((a, b) => dateMillis(b.created_at) - dateMillis(a.created_at));
+  return (
+    <Panel className="overflow-hidden">
+      <PanelHeader
+        title="Compare Sets"
+        action={<div className="text-xs font-semibold text-muted">{rows.length} sets</div>}
+      />
+      {error ? <div className="px-5 pt-4"><InlineError message={error} /></div> : null}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] border-collapse">
+          <thead className="table-head">
+            <tr>
+              <th className="px-4 py-3">{t("Name")}</th>
+              <th className="px-4 py-3 text-right">{t("Runs")}</th>
+              <th className="px-4 py-3">{t("Layout")}</th>
+              <th className="px-4 py-3 text-right">{t("Created")}</th>
+              <th className="px-4 py-3 text-right">{t("Action")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length ? rows.map((compareSet) => (
+              <tr className="transition hover:bg-white/45" key={compareSet.id}>
+                <td className="table-cell">
+                  <button className="font-semibold text-ink hover:text-info break-words [overflow-wrap:anywhere]" onClick={() => onSelectCompareSet(compareSet.id)} type="button">
+                    {compareSet.name}
+                  </button>
+                  <div className="mt-1 text-xs text-muted break-words [overflow-wrap:anywhere]">{compareSet.id}</div>
+                </td>
+                <td className="table-cell text-right font-semibold text-info">{compareSet.run_ids_json?.length || 0}</td>
+                <td className="table-cell text-muted">{compareSetLayoutSummary(compareSet)}</td>
+                <td className="table-cell text-right text-muted">{formatDate(compareSet.created_at)}</td>
+                <td className="table-cell text-right">
+                  <button className="secondary-button" type="button" onClick={() => onSelectCompareSet(compareSet.id)}>{t("Open")}</button>
+                </td>
+              </tr>
+            )) : (
+              <tr><td className="table-cell text-muted" colSpan="5">{t("No compare sets yet.")}</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
+  );
+}
+
 function ArtifactSummary({ run }) {
   const count = Number(run.artifact_count || 0);
   const kinds = (run.artifact_kinds || []).slice(0, 2);
@@ -2247,13 +2313,15 @@ function runCreator(run) {
   return run.created_by_id ? `${type} / ${run.created_by_id}` : type;
 }
 
-function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, onChanged }) {
+function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selectCompareSet, onChanged }) {
   const research = (data?.researches || []).find((item) => item.id === selectedResearchId) || data?.researches?.[0];
   const branches = (data?.branches || []).filter((branch) => branch.research_id === research?.id);
   const runs = (data?.runs || []).filter((run) => branches.some((branch) => branch.id === run.branch_id));
   const [lineage, setLineage] = useState(null);
   const [lineageError, setLineageError] = useState(null);
   const [lineageExpanded, setLineageExpanded] = useState(false);
+  const [researchCompareSets, setResearchCompareSets] = useState(null);
+  const [compareSetError, setCompareSetError] = useState(null);
   useEffect(() => {
     if (!research?.id) {
       setLineage(null);
@@ -2276,11 +2344,34 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, onCha
       });
     return () => { cancelled = true; };
   }, [research?.id, branches.length, runs.length]);
+  useEffect(() => {
+    if (!research?.id) {
+      setResearchCompareSets(null);
+      setCompareSetError(null);
+      return;
+    }
+    let cancelled = false;
+    apiGet(`/api/v1/researches/${research.id}/compare-sets`)
+      .then((payload) => {
+        if (!cancelled) {
+          setResearchCompareSets(payload);
+          setCompareSetError(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setResearchCompareSets(null);
+          setCompareSetError(null);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [research?.id, data?.summary?.compare_sets]);
   if (!research) return <EmptyState title="No research yet" detail="Create a run through the SDK or bbox CLI, then refresh this page." />;
   const lineageBranches = lineage?.branches || branches;
   const lineageRuns = lineage?.runs || runs;
   const lineageChartOption = lineageOption(lineageBranches, lineageRuns);
   const recentRuns = [...lineageRuns].sort((a, b) => dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at) - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at));
+  const compareSets = researchCompareSets || (data?.compare_sets || []).filter((item) => item.research_id === research.id);
   return (
     <div className="space-y-5">
       <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
@@ -2288,6 +2379,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, onCha
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-8">
           <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+          <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
           <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} />
         </div>
         <ResearchChampionPanel research={research} branches={lineageBranches} runs={lineageRuns} onSelectRun={selectRun} />
@@ -3741,9 +3833,7 @@ function RunResultSummaryPanel({ run, diagnostics, resultItems, keyMetrics, equi
           <div className="text-sm font-semibold text-ink">{t("Result Summary")}</div>
           <div className="mt-1 text-xs text-muted">{t("Current run result coverage, primary curve, metrics, and quality status.")}</div>
         </div>
-        <span className={`rounded-sm px-2 py-1 text-xs font-semibold uppercase ${summary.qualityTone}`}>
-          {summary.qualityLabel}
-        </span>
+        <DiagnosticCountBadges errorCount={summary.errorCount} warningCount={summary.warningCount} showHealthy />
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <ReadOnlyField label="Primary Curve" value={summary.primaryCurve} />
@@ -3768,20 +3858,11 @@ function runResultSummary(run, { diagnostics, resultItems, keyMetrics, equityCha
     .map(([domain, count]) => `${resultDomainLabel(domain)} ${count}`)
     .join(', ');
   const populatedMetrics = (keyMetrics || []).filter((item) => item.value && item.value !== '--').length;
-  const quality = diagnostics?.severity || 'ok';
-  const qualityTone = quality === 'error'
-    ? 'bg-negativeSoft text-negative'
-    : quality === 'warning'
-      ? 'bg-warningSoft text-warning'
-      : 'bg-positiveSoft text-positive';
-  const qualityLabel = quality === 'ok'
-    ? 'healthy'
-    : `${diagnostics.errorCount || 0} error${diagnostics.errorCount === 1 ? '' : 's'} · ${diagnostics.warningCount || 0} warning${diagnostics.warningCount === 1 ? '' : 's'}`;
   const primaryName = primary?.name || equityChart?.sourceName || null;
   const mode = primary?.mode || equityChart?.valueMode || null;
   return {
-    qualityLabel,
-    qualityTone,
+    errorCount: diagnostics?.errorCount || 0,
+    warningCount: diagnostics?.warningCount || 0,
     primaryCurve: primaryName ? `${primaryName}${mode ? ` (${mode})` : ''}` : 'No Series Data Available',
     seriesRange: runSeriesRange(primary),
     domains: domains || 'none',
@@ -3823,6 +3904,31 @@ function RunSummaryStrip({ run }) {
   );
 }
 
+function DiagnosticCountBadges({ errorCount = 0, warningCount = 0, showHealthy = false }) {
+  const errors = Number(errorCount) || 0;
+  const warnings = Number(warningCount) || 0;
+  if (!errors && !warnings && !showHealthy) return null;
+  return (
+    <span className="flex flex-wrap items-center gap-1.5">
+      {errors ? (
+        <span className="rounded-sm bg-negativeSoft px-2 py-1 text-xs font-semibold uppercase text-negative">
+          {errors} {errors === 1 ? 'ERROR' : 'ERRORS'}
+        </span>
+      ) : null}
+      {warnings ? (
+        <span className="rounded-sm bg-warningSoft px-2 py-1 text-xs font-semibold uppercase text-warning">
+          {warnings} {warnings === 1 ? 'WARNING' : 'WARNINGS'}
+        </span>
+      ) : null}
+      {!errors && !warnings && showHealthy ? (
+        <span className="rounded-sm bg-positiveSoft px-2 py-1 text-xs font-semibold uppercase text-positive">
+          HEALTHY
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function RunQualityDiagnosticsCard({ diagnostics }) {
   const [open, setOpen] = useState(false);
   const issues = diagnostics?.issues || [];
@@ -3833,9 +3939,6 @@ function RunQualityDiagnosticsCard({ diagnostics }) {
     : 'border-warning/60 bg-warningSoft/80 text-warning';
   const detailClass = hasError ? 'border-negative/25 bg-white/45' : 'border-warning/25 bg-white/45';
   const Icon = hasError ? XCircle : AlertTriangle;
-  const summary = hasError
-    ? `${diagnostics.errorCount} critical issue${diagnostics.errorCount > 1 ? 's' : ''}${diagnostics.warningCount ? ` · ${diagnostics.warningCount} warning${diagnostics.warningCount > 1 ? 's' : ''}` : ''}`
-    : `${diagnostics.warningCount} warning${diagnostics.warningCount > 1 ? 's' : ''}`;
   return (
     <div className={`overflow-hidden rounded-md border ${toneClass}`}>
       <button className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
@@ -3843,7 +3946,7 @@ function RunQualityDiagnosticsCard({ diagnostics }) {
           <Icon className="h-5 w-5 shrink-0" />
           <span className="min-w-0">
             <span className="block text-sm font-semibold">{t("Result diagnostics")}</span>
-            <span className="mt-1 block truncate text-xs opacity-85">{summary}</span>
+            <span className="mt-1 flex"><DiagnosticCountBadges errorCount={diagnostics.errorCount} warningCount={diagnostics.warningCount} /></span>
           </span>
         </span>
         <CollapseToggleIcon open={open} />
@@ -6003,9 +6106,6 @@ function CompareDiagnosticsPanel({ diagnostics }) {
     : 'border-warning/60 bg-warningSoft/80 text-warning';
   const detailClass = hasError ? 'border-negative/25 bg-white/45' : 'border-warning/25 bg-white/45';
   const Icon = hasError ? XCircle : AlertTriangle;
-  const summary = hasError
-    ? `${errorCount} error${errorCount > 1 ? 's' : ''}${warningCount ? ` · ${warningCount} warning${warningCount > 1 ? 's' : ''}` : ''}`
-    : `${warningCount} warning${warningCount > 1 ? 's' : ''}`;
   return (
     <div className={`overflow-hidden rounded-md border ${toneClass}`}>
       <button className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
@@ -6013,7 +6113,7 @@ function CompareDiagnosticsPanel({ diagnostics }) {
           <Icon className="h-5 w-5 shrink-0" />
           <span className="min-w-0">
             <span className="block text-sm font-semibold">对比诊断</span>
-            <span className="mt-1 block truncate text-xs opacity-85">{summary}</span>
+            <span className="mt-1 flex"><DiagnosticCountBadges errorCount={errorCount} warningCount={warningCount} /></span>
           </span>
         </span>
         <CollapseToggleIcon open={open} />
@@ -6039,19 +6139,32 @@ function CompareDiagnosticsPanel({ diagnostics }) {
 function CompareControlPanel({ data, metricsText, onMetricsChange, seriesText, onSeriesChange, sortMetric, onSortMetricChange, sortDirection, onSortDirectionChange, onRunCompare, onChanged, result, selectedIds, selectedCompareSet, comparedRuns, onClearCompareSet }) {
   const selectedRuns = comparedRuns?.length ? comparedRuns : (data?.runs || []).filter((run) => selectedIds.includes(run.id));
   const defaultProjectId = selectedCompareSet?.project_id || selectedRuns[0]?.project_id || data?.projects?.[0]?.id || '';
+  const commonResearchId = selectedCompareSet?.research_id || commonValue(selectedRuns.map((run) => run.research_id).filter(Boolean)) || '';
   const metrics = parseCsv(metricsText);
-  const [form, setForm] = useState({ project_id: defaultProjectId, name: '' });
+  const [form, setForm] = useState({ project_id: defaultProjectId, research_id: commonResearchId, name: '' });
   const [activePanel, setActivePanel] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const researchOptions = (data?.researches || []).filter((research) => !form.project_id || research.project_id === form.project_id);
   useEffect(() => {
-    if (!form.project_id && defaultProjectId) setForm((current) => ({ ...current, project_id: defaultProjectId }));
-  }, [defaultProjectId, form.project_id]);
+    if (selectedCompareSet) return;
+    setForm((current) => ({
+      ...current,
+      project_id: current.project_id || defaultProjectId,
+      research_id: current.research_id || commonResearchId,
+    }));
+  }, [commonResearchId, defaultProjectId, selectedCompareSet]);
   useEffect(() => {
     if (selectedCompareSet) {
-      setForm({ project_id: selectedCompareSet.project_id || defaultProjectId, name: selectedCompareSet.name || '' });
+      setForm({ project_id: selectedCompareSet.project_id || defaultProjectId, research_id: selectedCompareSet.research_id || '', name: selectedCompareSet.name || '' });
     }
   }, [selectedCompareSet, defaultProjectId]);
+  const updateCompareSetProject = (projectId) => {
+    setForm((current) => {
+      const researchStillValid = (data?.researches || []).some((research) => research.id === current.research_id && research.project_id === projectId);
+      return { ...current, project_id: projectId, research_id: researchStillValid ? current.research_id : '' };
+    });
+  };
   const saveCompareSet = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -6059,6 +6172,7 @@ function CompareControlPanel({ data, metricsText, onMetricsChange, seriesText, o
     try {
       const payload = {
         name: form.name,
+        research_id: form.research_id || null,
         run_ids: selectedIds,
         layout: { metrics: parseCsv(metricsText), series: parseCsv(seriesText), result_summary: result?.metrics || {} },
       };
@@ -6136,9 +6250,15 @@ function CompareControlPanel({ data, metricsText, onMetricsChange, seriesText, o
         {activePanel === 'compare-set' ? <div className="max-w-3xl lg:col-span-2"><FormCard title={selectedCompareSet ? '更新对比集合' : '保存对比集合'}>
           <form className="space-y-2" onSubmit={saveCompareSet}>
             <Field label="Project">
-              <SelectInput required disabled={Boolean(selectedCompareSet)} value={form.project_id} onChange={(event) => setForm((current) => ({ ...current, project_id: event.target.value }))}>
+              <SelectInput required disabled={Boolean(selectedCompareSet)} value={form.project_id} onChange={(event) => updateCompareSetProject(event.target.value)}>
                 <option value="" disabled>{t("Select project")}</option>
                 {(data?.projects || []).map((project) => <option key={project.id} value={project.id}>{project.key}</option>)}
+              </SelectInput>
+            </Field>
+            <Field label="Research">
+              <SelectInput value={form.research_id} onChange={(event) => setForm((current) => ({ ...current, research_id: event.target.value }))}>
+                <option value="">{t("Project-level")}</option>
+                {researchOptions.map((research) => <option key={research.id} value={research.id}>{research.key}</option>)}
               </SelectInput>
             </Field>
             <Field label="名称"><TextInput required value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="baseline-compare" /></Field>
@@ -7066,11 +7186,28 @@ function compareSetSearchText(compareSet) {
     compareSet.id,
     compareSet.name,
     compareSet.project_id,
+    compareSet.research_id,
     ...(compareSet.run_ids_json || []),
     ...listOrCsv(layout.metrics || []),
     ...listOrCsv(layout.series || []),
     JSON.stringify(layout.result_summary || {}),
   ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function commonValue(values) {
+  const normalized = values.filter(Boolean);
+  if (!normalized.length) return '';
+  return normalized.every((value) => value === normalized[0]) ? normalized[0] : '';
+}
+
+function compareSetLayoutSummary(compareSet) {
+  const layout = compareSet.layout_json || {};
+  const metrics = listOrCsv(layout.metrics || []);
+  const series = listOrCsv(layout.series || []);
+  const parts = [];
+  if (metrics.length) parts.push(`${metrics.length} metrics`);
+  if (series.length) parts.push(`${series.length} series`);
+  return parts.length ? parts.join(' / ') : '--';
 }
 
 function savedItemSearchText(item, detail = '') {
@@ -7079,6 +7216,7 @@ function savedItemSearchText(item, detail = '') {
     item.name,
     item.description,
     item.project_id,
+    item.research_id,
     detail,
     JSON.stringify(item.filters_json || {}),
     JSON.stringify(item.layout_json || {}),
@@ -7250,6 +7388,10 @@ function MetricDataModal({ item, onClose }) {
   const [markdownText, setMarkdownText] = useState('');
   const [error, setError] = useState(null);
   const [activeView, setActiveView] = useState(() => artifactDataViews(item.artifact, item)[0] || 'table');
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
   useEffect(() => {
     let cancelled = false;
     setDetail(item.artifact);
@@ -7277,14 +7419,14 @@ function MetricDataModal({ item, onClose }) {
         if (!cancelled) setError(err.message);
       });
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') onCloseRef.current();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       cancelled = true;
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [item.artifact.id, onClose]);
+  }, [item.artifact.id]);
   const columns = metricDataColumns(rows, detail.preview_json || {});
   const availableViews = artifactDataViews(detail, item);
   const showTabs = availableViews.length > 1;
@@ -10037,6 +10179,7 @@ function buildPageContext(data, active, selections, runDetail) {
     project = projects.find((item) => item.id === research?.project_id || item.id === branch?.project_id) || selectedProject;
   } else if (active === 'compare') {
     extra = { label: 'Compare', value: entityName(selectedCompareSet), id: selectedCompareSet?.id };
+    research = researches.find((item) => item.id === selectedCompareSet?.research_id) || null;
     project = projects.find((item) => item.id === selectedCompareSet?.project_id) || selectedProject;
   } else if (active === 'search') {
     extra = { label: 'Search', value: entityName(selectedSearchView), id: selectedSearchView?.id };
@@ -10320,7 +10463,7 @@ function App() {
     if (!data && loading) return <EmptyState title="Loading Blackbox" detail="Fetching live data from the API." />;
     if (!data) return <EmptyState title="No API data" detail="Start the FastAPI server or set VITE_BLACKBOX_API_BASE." />;
     if (active === 'project') return <ProjectPage data={data} selectedProjectId={selectedProjectId} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectSearchView={selectSearchView} onChanged={onChanged} />;
-    if (active === 'research') return <ResearchPage data={data} selectedResearchId={selectedResearchId} selectBranch={selectBranch} selectRun={selectRun} onChanged={onChanged} />;
+    if (active === 'research') return <ResearchPage data={data} selectedResearchId={selectedResearchId} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} onChanged={onChanged} />;
     if (active === 'branch') return <BranchPage data={data} selectedBranchId={selectedBranchId} selectBranch={selectBranch} selectRun={selectRun} onChanged={onChanged} />;
     if (active === 'runs') return <RunsBoardPage data={data} selectRun={selectRun} selectBranch={selectBranch} />;
     if (active === 'run') return <RunPage runDetail={runDetail} data={data} onRunChanged={onRunChanged} />;

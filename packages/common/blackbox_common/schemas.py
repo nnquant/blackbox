@@ -438,6 +438,7 @@ class SweepRunRead(ORMModel):
 
 class CompareSetCreate(BaseModel):
     project_id: str
+    research_id: str | None = None
     name: str
     run_ids: list[str]
     layout: dict[str, Any] = Field(default_factory=dict)
@@ -445,6 +446,7 @@ class CompareSetCreate(BaseModel):
 
 class CompareSetUpdate(BaseModel):
     name: str | None = None
+    research_id: str | None = None
     run_ids: list[str] | None = None
     layout: dict[str, Any] | None = None
 
@@ -452,6 +454,7 @@ class CompareSetUpdate(BaseModel):
 class CompareSetRead(ORMModel):
     id: str
     project_id: str
+    research_id: str | None = None
     name: str
     run_ids_json: list[str] = Field(default_factory=list)
     layout_json: dict[str, Any] = Field(default_factory=dict)

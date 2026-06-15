@@ -1663,7 +1663,7 @@ def test_compare_set_get_and_update_dispatch_requests(monkeypatch) -> None:
 
     commands = [
         ["compare-set", "get", "--compare-set-id", "cmp_1"],
-        ["compare-set", "update", "--compare-set-id", "cmp_1", "--name", "updated", "--run-ids", "run_1,run_2", "--layout", '{"metrics":["strategy.summary.sharpe"]}'],
+        ["compare-set", "update", "--compare-set-id", "cmp_1", "--name", "updated", "--research-id", "rsr_1", "--run-ids", "run_1,run_2", "--layout", '{"metrics":["strategy.summary.sharpe"]}'],
     ]
     for command in commands:
         assert cli_main.dispatch(cli_main.build_parser().parse_args(command)) == {"ok": True}
@@ -1675,6 +1675,7 @@ def test_compare_set_get_and_update_dispatch_requests(monkeypatch) -> None:
             "path": "/api/v1/compare-sets/cmp_1",
             "json": {
                 "name": "updated",
+                "research_id": "rsr_1",
                 "run_ids": ["run_1", "run_2"],
                 "layout": {"metrics": ["strategy.summary.sharpe"]},
             },
@@ -1695,7 +1696,7 @@ def test_compare_set_create_and_batch_compare_accept_space_separated_run_ids(mon
     monkeypatch.setattr(cli_main, "request", fake_request)
 
     create_args = cli_main.build_parser().parse_args(
-        ["compare-set", "create", "--project-id", "prj_1", "--name", "winners", "--run-ids", "run_1", "run_2", "run_3"]
+        ["compare-set", "create", "--project-id", "prj_1", "--research-id", "rsr_1", "--name", "winners", "--run-ids", "run_1", "run_2", "run_3"]
     )
     batch_args = cli_main.build_parser().parse_args(["batch", "compare", "--run-ids", "run_1", "run_2", "--metrics", "strategy.summary.sharpe"])
 
@@ -1705,7 +1706,7 @@ def test_compare_set_create_and_batch_compare_accept_space_separated_run_ids(mon
         {
             "method": "POST",
             "path": "/api/v1/compare-sets",
-            "json": {"project_id": "prj_1", "name": "winners", "run_ids": ["run_1", "run_2", "run_3"], "layout": {}},
+            "json": {"project_id": "prj_1", "research_id": "rsr_1", "name": "winners", "run_ids": ["run_1", "run_2", "run_3"], "layout": {}},
         },
         {
             "method": "POST",

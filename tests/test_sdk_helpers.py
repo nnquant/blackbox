@@ -720,10 +720,11 @@ def test_client_saved_view_paths_match_api_contract() -> None:
 
     client.request = fake_request  # type: ignore[method-assign]
 
-    client.create_compare_set("prj_1", "winners", ["run_1"], layout={"metrics": ["strategy.summary.sharpe"]})
+    client.create_compare_set("prj_1", "winners", ["run_1"], layout={"metrics": ["strategy.summary.sharpe"]}, research_id="rsr_1")
     client.list_compare_sets("prj_1")
+    client.list_research_compare_sets("rsr_1")
     client.get_compare_set("cmp_1")
-    client.update_compare_set("cmp_1", name="updated", run_ids=["run_1", "run_2"])
+    client.update_compare_set("cmp_1", name="updated", research_id="rsr_1", run_ids=["run_1", "run_2"])
     client.run_compare_set("cmp_1", with_config_diff=False)
     client.create_search_view("prj_1", "strong runs", {"project_key": "alpha"}, description="baseline")
     client.list_search_views("prj_1")
@@ -735,11 +736,12 @@ def test_client_saved_view_paths_match_api_contract() -> None:
         {
             "method": "POST",
             "path": "/api/v1/compare-sets",
-            "json": {"project_id": "prj_1", "name": "winners", "run_ids": ["run_1"], "layout": {"metrics": ["strategy.summary.sharpe"]}},
+            "json": {"project_id": "prj_1", "research_id": "rsr_1", "name": "winners", "run_ids": ["run_1"], "layout": {"metrics": ["strategy.summary.sharpe"]}},
         },
         {"method": "GET", "path": "/api/v1/projects/prj_1/compare-sets"},
+        {"method": "GET", "path": "/api/v1/researches/rsr_1/compare-sets"},
         {"method": "GET", "path": "/api/v1/compare-sets/cmp_1"},
-        {"method": "PATCH", "path": "/api/v1/compare-sets/cmp_1", "json": {"name": "updated", "run_ids": ["run_1", "run_2"]}},
+        {"method": "PATCH", "path": "/api/v1/compare-sets/cmp_1", "json": {"name": "updated", "research_id": "rsr_1", "run_ids": ["run_1", "run_2"]}},
         {"method": "GET", "path": "/api/v1/compare-sets/cmp_1"},
         {
             "method": "POST",

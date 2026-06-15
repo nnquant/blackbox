@@ -575,11 +575,14 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         compare_set = post(
             client,
             "/api/v1/compare-sets",
-            {"project_id": project["id"], "name": "baseline-compare", "run_ids": [run["id"]]},
+            {"project_id": project["id"], "research_id": research["id"], "name": "baseline-compare", "run_ids": [run["id"]]},
         )
+        assert compare_set["research_id"] == research["id"]
         assert compare_set["run_ids_json"] == [run["id"]]
         compare_sets = get(client, f"/api/v1/projects/{project['id']}/compare-sets")
         assert compare_sets[0]["name"] == "baseline-compare"
+        research_compare_sets = get(client, f"/api/v1/researches/{research['id']}/compare-sets")
+        assert research_compare_sets[0]["id"] == compare_set["id"]
         compare_set_detail = get(client, f"/api/v1/compare-sets/{compare_set['id']}")
         assert compare_set_detail["id"] == compare_set["id"]
         patched_compare_set = patch(
