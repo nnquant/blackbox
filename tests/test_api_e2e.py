@@ -661,6 +661,7 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         with SessionLocal() as db:
             db.get(RunModel, run["id"]).ended_at = datetime(2026, 6, 1, 15, 0, tzinfo=timezone.utc)
             db.get(RunModel, sweep_run_2_source["id"]).ended_at = datetime(2026, 6, 2, 15, 0, tzinfo=timezone.utc)
+            db.get(RunModel, incomplete_run["id"]).updated_at = datetime(2020, 1, 1, 0, 0, tzinfo=timezone.utc)
             db.commit()
 
         dashboard = get(client, "/api/v1/dashboard")
@@ -699,6 +700,22 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert sum(dashboard_activity.values()) == 6
         runs_activity = get(client, "/api/v1/runs/activity/daily")
         assert runs_activity == dashboard["run_activity_daily"]
+        management = get(client, "/api/v1/management/research-summary?stale_days=1&limit=5")
+        assert management["summary"]["projects"] == 1
+        assert management["summary"]["researches"] == 1
+        assert management["summary"]["runs"] == 6
+        assert management["summary"]["running_runs"] == 2
+        assert management["summary"]["stale_running_runs"] == 1
+        assert management["summary"]["compare_sets"] == 1
+        assert management["summary"]["search_views"] == 1
+        assert management["summary"]["artifact_bytes"] > 0
+        assert management["projects"][0]["key"] == "alpha-lab"
+        assert management["projects"][0]["run_count"] == 6
+        assert management["top_research_by_runs"][0]["key"] == "csi500-reversal"
+        assert management["top_research_by_runs"][0]["artifact_count"] >= 9
+        assert management["top_branches_by_runs"][0]["key"] == "baseline-v1"
+        assert management["stale_running_runs"][0]["id"] == incomplete_run["id"]
+        assert management["artifact_names_by_bytes"]
         project_detail = get(client, f"/api/v1/projects/{project['id']}")
         assert project_detail["workspace_key"] == "research-lab"
         assert project_detail["research_count"] == 1

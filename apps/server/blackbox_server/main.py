@@ -366,6 +366,14 @@ def create_app() -> FastAPI:
     def runs_activity_daily(db: Session = Depends(get_db)) -> dict[str, Any]:
         return ok(run_activity_daily(db))
 
+    @app.get("/api/v1/management/research-summary")
+    def management_research_summary(
+        stale_days: int = Query(14, ge=1, le=365),
+        limit: int = Query(25, ge=1, le=100),
+        db: Session = Depends(get_db),
+    ) -> dict[str, Any]:
+        return ok(build_management_research_summary(db, stale_days=stale_days, limit=limit))
+
     @app.post("/api/v1/workspaces")
     def create_workspace(payload: WorkspaceCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
         existing = db.scalar(select(Workspace).where(Workspace.key == payload.key))
@@ -1560,6 +1568,209 @@ def run_summary_for_dashboard(
     }
 
 
+def build_management_research_summary(db: Session, *, stale_days: int = 14, limit: int = 25) -> dict[str, Any]:
+    stale_days = max(1, min(int(stale_days), 365))
+    stale_cutoff = utcnow() - timedelta(days=stale_days)
+    limit = max(1, min(int(limit), 100))
+
+    project_rows = management_project_rows(db)
+    research_rows = management_research_rows(db)
+    branch_rows = management_branch_rows(db)
+    artifact_name_rows = management_artifact_name_rows(db, limit=limit)
+    stale_running_run_count = db.scalar(
+        select(func.count(Run.id))
+        .where(Run.status == RunStatus.running.value)
+        .where(func.coalesce(Run.updated_at, Run.started_at, Run.created_at) < stale_cutoff)
+    ) or 0
+    stale_running_runs = management_stale_running_runs(db, stale_cutoff=stale_cutoff, limit=limit)
+    stale_researches = [
+        row for row in research_rows
+        if row.get("status") == "active" and is_before_or_missing(row.get("latest_run_at"), stale_cutoff)
+    ]
+
+    return {
+        "summary": {
+            "projects": db.scalar(select(func.count(Project.id))) or 0,
+            "researches": db.scalar(select(func.count(Research.id))) or 0,
+            "active_researches": db.scalar(select(func.count(Research.id)).where(Research.status == "active")) or 0,
+            "stale_active_researches": len(stale_researches),
+            "branches": db.scalar(select(func.count(Branch.id))) or 0,
+            "active_branches": db.scalar(select(func.count(Branch.id)).where(Branch.status == "active")) or 0,
+            "runs": db.scalar(select(func.count(Run.id))) or 0,
+            "running_runs": db.scalar(select(func.count(Run.id)).where(Run.status == RunStatus.running.value)) or 0,
+            "stale_running_runs": stale_running_run_count,
+            "artifacts": db.scalar(select(func.count(Artifact.id))) or 0,
+            "artifact_bytes": int(db.scalar(select(func.coalesce(func.sum(Artifact.size_bytes), 0))) or 0),
+            "compare_sets": db.scalar(select(func.count(CompareSet.id))) or 0,
+            "search_views": db.scalar(select(func.count(SearchView.id))) or 0,
+            "sweeps": db.scalar(select(func.count(Sweep.id))) or 0,
+            "stale_days": stale_days,
+        },
+        "projects": project_rows,
+        "top_research_by_runs": sorted(research_rows, key=lambda row: row.get("run_count") or 0, reverse=True)[:limit],
+        "top_research_by_artifacts": sorted(research_rows, key=lambda row: row.get("artifact_bytes") or 0, reverse=True)[:limit],
+        "stale_active_researches": stale_researches[:limit],
+        "top_branches_by_runs": sorted(branch_rows, key=lambda row: row.get("run_count") or 0, reverse=True)[:limit],
+        "top_branches_by_artifacts": sorted(branch_rows, key=lambda row: row.get("artifact_bytes") or 0, reverse=True)[:limit],
+        "stale_running_runs": stale_running_runs,
+        "artifact_names_by_bytes": artifact_name_rows,
+    }
+
+
+def management_project_rows(db: Session) -> list[dict[str, Any]]:
+    rows = db.execute(
+        select(
+            Project.id.label("id"),
+            Project.key.label("key"),
+            Project.title.label("title"),
+            func.count(func.distinct(Research.id)).label("research_count"),
+            func.count(func.distinct(Branch.id)).label("branch_count"),
+            func.count(func.distinct(Run.id)).label("run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.running.value, Run.id)))).label("running_run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.failed.value, Run.id)))).label("failed_run_count"),
+            func.count(Artifact.id).label("artifact_count"),
+            func.coalesce(func.sum(Artifact.size_bytes), 0).label("artifact_bytes"),
+            func.min(Run.created_at).label("first_run_at"),
+            func.max(func.coalesce(Run.updated_at, Run.ended_at, Run.started_at, Run.created_at)).label("latest_run_at"),
+        )
+        .select_from(Project)
+        .join(Research, Research.project_id == Project.id, isouter=True)
+        .join(Branch, Branch.research_id == Research.id, isouter=True)
+        .join(Run, Run.branch_id == Branch.id, isouter=True)
+        .join(Artifact, Artifact.run_id == Run.id, isouter=True)
+        .group_by(Project.id)
+    ).mappings().all()
+    return [management_count_row(row) for row in rows]
+
+
+def management_research_rows(db: Session) -> list[dict[str, Any]]:
+    rows = db.execute(
+        select(
+            Research.id.label("id"),
+            Research.key.label("key"),
+            Research.title.label("title"),
+            Research.status.label("status"),
+            Research.updated_at.label("updated_at"),
+            Project.id.label("project_id"),
+            Project.key.label("project_key"),
+            Project.title.label("project_title"),
+            func.count(func.distinct(Branch.id)).label("branch_count"),
+            func.count(func.distinct(Run.id)).label("run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.running.value, Run.id)))).label("running_run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.failed.value, Run.id)))).label("failed_run_count"),
+            func.count(Artifact.id).label("artifact_count"),
+            func.coalesce(func.sum(Artifact.size_bytes), 0).label("artifact_bytes"),
+            func.min(Run.created_at).label("first_run_at"),
+            func.max(func.coalesce(Run.updated_at, Run.ended_at, Run.started_at, Run.created_at)).label("latest_run_at"),
+        )
+        .select_from(Research)
+        .join(Project, Project.id == Research.project_id)
+        .join(Branch, Branch.research_id == Research.id, isouter=True)
+        .join(Run, Run.branch_id == Branch.id, isouter=True)
+        .join(Artifact, Artifact.run_id == Run.id, isouter=True)
+        .group_by(Research.id, Project.id)
+    ).mappings().all()
+    return [management_count_row(row) for row in rows]
+
+
+def management_branch_rows(db: Session) -> list[dict[str, Any]]:
+    rows = db.execute(
+        select(
+            Branch.id.label("id"),
+            Branch.key.label("key"),
+            Branch.title.label("title"),
+            Branch.status.label("status"),
+            Branch.updated_at.label("updated_at"),
+            Research.id.label("research_id"),
+            Research.key.label("research_key"),
+            Research.title.label("research_title"),
+            Project.id.label("project_id"),
+            Project.key.label("project_key"),
+            func.count(func.distinct(Run.id)).label("run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.running.value, Run.id)))).label("running_run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.failed.value, Run.id)))).label("failed_run_count"),
+            func.count(Artifact.id).label("artifact_count"),
+            func.coalesce(func.sum(Artifact.size_bytes), 0).label("artifact_bytes"),
+            func.min(Run.created_at).label("first_run_at"),
+            func.max(func.coalesce(Run.updated_at, Run.ended_at, Run.started_at, Run.created_at)).label("latest_run_at"),
+        )
+        .select_from(Branch)
+        .join(Research, Research.id == Branch.research_id)
+        .join(Project, Project.id == Research.project_id)
+        .join(Run, Run.branch_id == Branch.id, isouter=True)
+        .join(Artifact, Artifact.run_id == Run.id, isouter=True)
+        .group_by(Branch.id, Research.id, Project.id)
+    ).mappings().all()
+    return [management_count_row(row) for row in rows]
+
+
+def management_artifact_name_rows(db: Session, *, limit: int) -> list[dict[str, Any]]:
+    rows = db.execute(
+        select(
+            Artifact.name.label("name"),
+            Artifact.kind.label("kind"),
+            func.count(Artifact.id).label("artifact_count"),
+            func.coalesce(func.sum(Artifact.size_bytes), 0).label("artifact_bytes"),
+            func.max(Artifact.size_bytes).label("max_artifact_bytes"),
+        )
+        .group_by(Artifact.name, Artifact.kind)
+        .order_by(func.coalesce(func.sum(Artifact.size_bytes), 0).desc())
+        .limit(limit)
+    ).mappings().all()
+    return [management_count_row(row) for row in rows]
+
+
+def management_stale_running_runs(db: Session, *, stale_cutoff: datetime, limit: int) -> list[dict[str, Any]]:
+    rows = db.execute(
+        select(Run, Branch, Research, Project)
+        .join(Branch, Branch.id == Run.branch_id)
+        .join(Research, Research.id == Branch.research_id)
+        .join(Project, Project.id == Research.project_id)
+        .where(Run.status == RunStatus.running.value)
+        .where(func.coalesce(Run.updated_at, Run.started_at, Run.created_at) < stale_cutoff)
+        .order_by(func.coalesce(Run.updated_at, Run.started_at, Run.created_at).asc())
+        .limit(limit)
+    ).all()
+    return [
+        {
+            "id": run.id,
+            "name": run.name,
+            "status": run.status,
+            "created_at": run.created_at,
+            "updated_at": run.updated_at,
+            "started_at": run.started_at,
+            "branch_id": branch.id,
+            "branch_key": branch.key,
+            "research_id": research.id,
+            "research_key": research.key,
+            "research_title": research.title,
+            "project_id": project.id,
+            "project_key": project.key,
+        }
+        for run, branch, research, project in rows
+    ]
+
+
+def management_count_row(row: Any) -> dict[str, Any]:
+    data = dict(row)
+    for key in [
+        "research_count",
+        "branch_count",
+        "run_count",
+        "running_run_count",
+        "failed_run_count",
+        "artifact_count",
+        "artifact_bytes",
+        "max_artifact_bytes",
+    ]:
+        if key in data:
+            data[key] = int(data.get(key) or 0)
+    return data
+
+
+def is_before_or_missing(value: datetime | None, cutoff: datetime) -> bool:
+    comparable = comparable_datetime(value)
+    return comparable is None or comparable < comparable_datetime(cutoff)
 def run_activity_daily(db: Session) -> list[dict[str, Any]]:
     ensure_run_activity_daily_cache(db)
     rows = db.scalars(select(RunActivityDailyStat).order_by(RunActivityDailyStat.date)).all()
@@ -1678,8 +1889,8 @@ def dashboard_branch_run_stats(db: Session, since_7d: datetime) -> dict[str, dic
         select(
             Run.branch_id,
             func.count(Run.id).label("run_count"),
-            func.sum(case((Run.status == RunStatus.running.value, 1), else_=0)).label("running_run_count"),
-            func.sum(case((Run.status == RunStatus.failed.value, 1), else_=0)).label("failed_run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.running.value, Run.id)))).label("running_run_count"),
+            func.count(func.distinct(case((Run.status == RunStatus.failed.value, Run.id)))).label("failed_run_count"),
             func.sum(recent_run_case).label("run_count_7d"),
             func.sum(failed_recent_case).label("failed_run_count_7d"),
         ).group_by(Run.branch_id)

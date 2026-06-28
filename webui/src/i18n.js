@@ -6,6 +6,7 @@ let currentLocale = DEFAULT_LOCALE;
 
 const zhCN = {
   Dashboard: '总览',
+  Manage: '管理',
   Workspace: '工作区',
   Workspaces: '工作区',
   Project: '项目',
