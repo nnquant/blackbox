@@ -90,6 +90,22 @@ Run 是 Blackbox 的最小运行单位。Project / Research / Branch 只负责�
 主曲线使用 `series_values` 和显式 `mode`：
 
 ```powershell
+bbox run publish-performance `
+  --run-id run_new `
+  --curve-file .\equity.csv `
+  --mode nav `
+  --summary-file .\summary.json `
+  --summary-unit percentage-point `
+  --idempotency-prefix agent-task-123-performance `
+  --finish `
+  --agent-output
+```
+
+这是 AI agent 的首选入口：CLI 会安全推断标准日期列和 `nav` / `ret` / `pnl` 等常见数值列，复制为 `series_values`，补全 `metadata.result`，并在上传后核对主序列名称、完整行数和起止日期。百分比单位必须通过 `--summary-unit` 显式声明，不按数值大小猜测。
+
+自定义结果契约仍可使用底层命令：
+
+```powershell
 bbox run log-series `
   --run-id run_new `
   --name equity_curve `

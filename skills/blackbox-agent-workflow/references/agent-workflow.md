@@ -2,6 +2,17 @@
 
 This guide is the operational contract for AI agents and batch jobs that write to Blackbox through `bbox`, the Python SDK, and the WebUI-backed API.
 
+## Contents
+
+- [Defaults](#defaults)
+- [Recommended Online Loop](#recommended-online-loop)
+- [WebUI-Compatible Data Contract](#webui-compatible-data-contract)
+- [Batch Operations](#batch-operations)
+- [Offline Loop](#offline-loop)
+- [Idempotency Keys](#idempotency-keys)
+- [Error Handling](#error-handling)
+- [WebUI Verification](#webui-verification)
+
 ## Defaults
 
 - CLI entrypoint: `bbox`
@@ -11,6 +22,7 @@ This guide is the operational contract for AI agents and batch jobs that write t
 - Token environment: `BLACKBOX_TOKEN` or `BLACKBOX_API_TOKEN`
 - Default local data directory: `~/.blackbox`
 - Offline spool layout: `~/.blackbox/queue`, `~/.blackbox/artifacts`, `~/.blackbox/manifests`
+- Preferred CLI performance publisher: `bbox run publish-performance`; use `--agent-output` to avoid repeated prose diagnostics.
 
 For agent automation, prefer JSON output and narrow payloads:
 
@@ -18,7 +30,7 @@ For agent automation, prefer JSON output and narrow payloads:
 bbox search runs --where 'metrics.strategy.summary.sharpe > 1 and tags contains "baseline"' --select id,name,status,branch_key,summary_json --json
 ```
 
-Global flags such as `--json`, `--select`, `--endpoint`, and `--token` can be placed before or after the subcommand.
+Global flags such as `--json`, `--select`, `--endpoint`, `--token`, and `--agent-output` can be placed before or after the subcommand.
 
 ## Recommended Online Loop
 
@@ -67,12 +79,6 @@ bbox run start `
 ```powershell
 bbox run log-event --run-id run_new --event-type stage_started --stage backtest --payload '{"step":"backtest"}' --client-event-id agent-task-123-evt-backtest-start --json
 
-bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"annual_return":18.5,"annual_volatility":12.4,"max_drawdown":-9.0,"sharpe":1.34,"sortino":1.88,"calmar":2.06,"turnover":0.42}' --client-event-id agent-task-123-met-summary --strict-contract --json
-
-bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y series_values --mode nav --kind table_csv --result-domain performance --result-name primary_performance --result-role primary_curve --idempotency-key agent-task-123-series-equity --strict-contract --json
-
-bbox run log-series --run-id run_new --name drawdown_series --data-file .\drawdown.json --x date --y drawdown --mode drawdown --kind table_csv --result-domain performance --result-name primary_drawdown --result-role drawdown --idempotency-key agent-task-123-series-drawdown --strict-contract --json
-
 bbox dataset register `
   --run-id run_new `
   --dataset-name csi500_daily `
@@ -86,14 +92,26 @@ bbox dataset register `
   --json
 
 bbox artifact upload --run-id run_new --name post_cost_report --kind report_html --path .\report.html --idempotency-key agent-task-123-art-report --json
+
+bbox run publish-performance `
+  --run-id run_new `
+  --curve-file .\equity.csv `
+  --mode nav `
+  --summary '{"annual_return":0.185,"annual_volatility":0.124,"max_drawdown":-0.09,"sharpe":1.34,"sortino":1.88,"calmar":2.06,"turnover":0.42}' `
+  --summary-unit decimal `
+  --drawdown-file .\drawdown.csv `
+  --idempotency-prefix agent-task-123-performance `
+  --expected-start 2023-01-03 `
+  --expected-end 2026-05-07 `
+  --expected-rows 820 `
+  --finish `
+  --fail-on-warning `
+  --agent-output
 ```
 
 5. Finish or fail the run.
 
-```powershell
-bbox run validate --run-id run_new --expected-start 2023-01-03 --expected-end 2026-05-07 --expected-rows 820 --primary-series equity_curve --fail-on-warning --json
-bbox run finish --run-id run_new --fail-on-warning --json
-```
+`publish-performance --finish` performs post-upload validation and the finish quality gate. Omit `--finish` when more writes remain, then call `bbox run finish --run-id run_new --fail-on-warning --agent-output` after them.
 
 ```powershell
 bbox run fail --run-id run_new --error '{"code":"BACKTEST_ERROR","message":"input data missing"}' --json
@@ -497,6 +515,23 @@ Preferred drawdown file `drawdown.json`:
 CLI:
 
 ```powershell
+bbox run publish-performance `
+  --run-id run_new `
+  --curve-file .\equity.json `
+  --mode nav `
+  --summary-file .\summary.json `
+  --summary-unit percentage-point `
+  --drawdown-file .\drawdown.json `
+  --idempotency-prefix agent-task-123-performance `
+  --finish `
+  --agent-output
+```
+
+`publish-performance` accepts JSON, JSONL, CSV, YAML, and Parquet rows. It infers exactly one standard date column and common mode-specific value names such as `nav`, `ret`, `pnl`, and `drawdown`; pass `--x`, `--value`, or `--drawdown-value` when inference is ambiguous. It copies the source value into canonical `series_values`, preserves the original columns, and reports every normalization. Percentage units are never inferred: use `--summary-unit decimal` for values such as `0.18`, or `--summary-unit percentage-point` for values such as `18.0`.
+
+Use the low-level commands only for custom contracts not covered by the publisher:
+
+```powershell
 bbox run log-series `
   --run-id run_new `
   --name equity_curve `
@@ -595,9 +630,9 @@ Rules:
 
 ### Required upload-side validation
 
-Agents must use local upload preflight first, then validate the run before `bbox run finish`.
+For standard performance results, agents should use `publish-performance`. It applies safe normalization, strict contract preflight, stored-result validation, and optional finish without a repair loop. Use `--dry-run` when the source columns or units need inspection; a successful real publication does not require a separate dry-run command.
 
-Upload preflight:
+Low-level upload preflight:
 
 - CLI: pass `--strict-contract --dry-run` on `bbox run log-series` and `bbox run log-metric` before the real upload, or set `BLACKBOX_AGENT_STRICT_UPLOAD=1` for the process.
 - SDK: set `BLACKBOX_AGENT_STRICT_UPLOAD=1`, or pass `strict_contract=True` where the helper exposes it.
@@ -613,6 +648,7 @@ Strict upload preflight fails before writing when:
 
 Upload diagnostic response contract:
 
+- `--agent-output` removes duplicated message/detail prose and returns compact machine-readable issue fields.
 - CLI/API failures use the standard envelope and put machine-readable diagnostics under `error.details.issues`.
 - CLI/SDK dry-runs return diagnostics under `data.validation.issues`.
 - SDK strict failures raise `blackbox.UploadValidationError`, which is still a `ValueError`; parse `exc.report["issues"]`.
@@ -635,13 +671,15 @@ Example failed CLI/API issue:
 
 Common fix branches for agents:
 
-- `SERIES_Y_COLUMN_NOT_FOUND`: add or rename the numeric value field to `series_values`, then pass `--y series_values`.
+- `SUMMARY_UNIT_AMBIGUOUS`: rerun with `--summary-unit decimal` or `--summary-unit percentage-point`; never infer the financial unit from magnitude.
+- `SERIES_X_AMBIGUOUS` / `SERIES_VALUE_AMBIGUOUS`: pass `--x` / `--value` explicitly.
+- `SERIES_Y_COLUMN_NOT_FOUND`, `SERIES_RESULT_METADATA_MISSING`, and `PERFORMANCE_VALUE_COLUMN_NOT_SERIES_VALUES` are normally avoided by `publish-performance`; handle them manually only on low-level uploads.
 - `PERFORMANCE_MODE_INVALID`: choose `mode=nav`, `mode=return`, or `mode=pnl` according to the source series semantics.
 - `SERIES_RESULT_METADATA_MISSING`: add `--result-domain performance --result-name primary_performance --result-role primary_curve` for primary curves.
 - `SUMMARY_PERCENT_DECIMAL_UNIT`: convert percentage-style summary metrics from decimals to percentage points.
 - `DRAWDOWN_UNIT_SUSPICIOUS`: use decimal drawdown for nav/return runs, or `mode=pnl` only for absolute drawdown values.
 
-After uploading metrics and series, run-level validation is still required before finish. Use `bbox run validate --expected-start ... --expected-end ... --expected-rows ... --primary-series ... --fail-on-warning` when the research spec has a known date range and row count.
+`publish-performance` automatically checks the stored primary series name, full row count, and first/last x values against the normalized source. Explicit `--expected-start`, `--expected-end`, and `--expected-rows` override those source-derived expectations. For low-level uploads, run `bbox run validate --expected-start ... --expected-end ... --expected-rows ... --primary-series ... --fail-on-warning` before finish.
 
 WebUI Run Detail now shows a Result Summary panel at the top of a run. Check it before reading charts: it shows the primary curve, date range, result domains, key metric coverage, artifact counts, update time, and quality status. If the diagnostics card appears, expand it and follow the suggested fix command.
 
@@ -650,7 +688,7 @@ Result view templates are registry-driven. Built-in domains cover `performance`,
 Minimum checks:
 
 - One primary curve series exists with `x == "date"`, `y == "series_values"`, and `mode` in `{"nav", "return", "pnl"}`. Valid names are `equity_curve`, `returns_series`, `pnl_series`, or `absolute_return_series`.
-- `drawdown_series` exists when the run provides explicit drawdown, with `y == "drawdown"`. Use decimal drawdowns for return/net-value runs and absolute drawdowns for absolute-change runs.
+- `drawdown_series` exists when the run provides explicit drawdown, with canonical `y == "series_values"` from `publish-performance` or legacy low-level `y == "drawdown"`. Use decimal drawdowns for return/net-value runs and absolute drawdowns for absolute-change runs.
 - Full series rows cover the intended date range. For the current CSI500 example, first date must be `2023-01-03` and last date must be `2026-05-07`.
 - The full row count must match the source dataframe length. Do not use `preview_json.rows.length` as the full row count; it may be a preview.
 - `strategy.summary` percent metrics are percentage points, not decimals.

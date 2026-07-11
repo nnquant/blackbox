@@ -110,12 +110,11 @@ bbox branch create --research csi500-reversal --key baseline --title "Baseline" 
 bbox run start --project alpha-lab --research csi500-reversal --branch baseline --name run-001 --created-by-type agent --created-by-id codex --idempotency-key codex-demo:run:start --json
 ```
 
-Log data and finish:
+Publish performance data and finish:
 
 ```powershell
-bbox run log-metric --run-id <run_id> --namespace strategy.summary --values '{"sharpe":1.2,"max_drawdown":0.08}' --client-event-id codex-demo:metric:summary --json
+bbox run publish-performance --run-id <run_id> --curve-file .\equity.csv --mode nav --summary '{"sharpe":1.2,"max_drawdown":-0.08}' --summary-unit decimal --idempotency-prefix codex-demo:performance --finish --agent-output
 bbox note add --run-id <run_id> --kind decision --summary "Keep for review" --author-type agent --client-event-id codex-demo:note:decision --json
-bbox run finish --run-id <run_id> --json
 ```
 
 Search and compare:
@@ -162,6 +161,8 @@ bbox sync --spool-dir "$HOME\.blackbox" --endpoint http://127.0.0.1:8010 --json
 ## Agent Rules
 
 - Prefer JSON output and use `--select` to reduce context.
+- Prefer `bbox run publish-performance --agent-output` over manually constructing performance `log-metric` and `log-series` contracts.
+- Always declare performance `--mode` and summary `--summary-unit`; Blackbox does not guess financial units.
 - Preserve idempotency keys and `client_event_id` values across retries.
 - Use `created_by_type=agent` and a stable `created_by_id`.
 - Retry transient network/storage failures with the same idempotency key.

@@ -269,12 +269,18 @@ def validate_series_upload(payload: dict[str, Any], *, strict: bool = False) -> 
     return validation_report(issues)
 
 
-def validate_metric_upload(namespace: str, values: dict[str, Any], *, strict: bool = False) -> dict[str, Any]:
+def validate_metric_upload(
+    namespace: str,
+    values: dict[str, Any],
+    *,
+    strict: bool = False,
+    percent_unit: str | None = None,
+) -> dict[str, Any]:
     issues: list[Issue] = []
     if not isinstance(values, dict) or not values:
         add_issue(issues, "error", "Metric values are empty", "Metric uploads must provide a non-empty JSON object.")
         return validation_report(issues)
-    if str(namespace or "").lower() == "strategy.summary":
+    if str(namespace or "").lower() == "strategy.summary" and percent_unit is None:
         before = len(issues)
         validate_summary_units(issues, {"summary_json": {"strategy.summary": values}})
         if strict:
@@ -506,6 +512,8 @@ def validate_drawdown_values(issues: list[Issue], item: dict[str, Any], label: s
 
 
 def validate_summary_units(issues: list[Issue], run: dict[str, Any]) -> None:
+    if summary_percent_unit(run) in {"percentage_point", "percentage-point"}:
+        return
     for key in ["annual_return", "annualized_return", "annual_volatility", "annualized_volatility", "max_drawdown"]:
         value = first_summary_metric(run, [key])
         number = to_number(value)
@@ -515,6 +523,16 @@ def validate_summary_units(issues: list[Issue], run: dict[str, Any]) -> None:
             add_issue(issues, "warning", f"{key} may use decimal units", f"Summary {key} is {number}; percentage metrics should use percentage points, e.g. 18.5 means 18.50%.")
         if key == "max_drawdown" and -1 < number < 0:
             add_issue(issues, "warning", "max_drawdown may use decimal units", f"Summary max_drawdown is {number}; percentage metrics should use percentage points, e.g. -9.0 means -9.00%.")
+
+
+def summary_percent_unit(run: dict[str, Any]) -> str | None:
+    for metric in run.get("metrics") or []:
+        if not isinstance(metric, dict) or str(metric.get("namespace") or "").lower() != "strategy.summary":
+            continue
+        coord = metric.get("point_coord_json")
+        if isinstance(coord, dict) and coord.get("percent_unit"):
+            return str(coord["percent_unit"]).lower()
+    return None
 
 
 def run_expects_performance_result(run: dict[str, Any], result_items: list[dict[str, Any]], series_items: list[dict[str, Any]]) -> bool:

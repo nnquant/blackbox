@@ -11,8 +11,9 @@ This guide is the operational contract for AI agents and batch jobs that write t
 - Token environment: `BLACKBOX_TOKEN` or `BLACKBOX_API_TOKEN`
 - Default local data directory: `~/.blackbox`
 - Offline spool layout: `~/.blackbox/queue`, `~/.blackbox/artifacts`, `~/.blackbox/manifests`
-- Agent upload preflight: pass `--strict-contract --dry-run` on `bbox run log-series` / `bbox run log-metric` before real uploads, or set `BLACKBOX_AGENT_STRICT_UPLOAD=1` for the process. Use `--skip-upload-validation` only for an explicit legacy/manual override.
-- Upload diagnostics: parse `error.details.issues` on CLI/API failure, `data.validation.issues` on dry-run, or `UploadValidationError.report["issues"]` in SDK. Issues include stable `code`, `field`, `fix`, and optional `example`; apply the fix before retrying unchanged `VALIDATION_ERROR` payloads.
+- Preferred performance publisher: `bbox run publish-performance`. It normalizes safe structural differences, runs strict preflight, uploads, validates stored rows, and optionally finishes the run.
+- Low-level upload preflight: pass `--strict-contract` on `bbox run log-series` / `bbox run log-metric`, or set `BLACKBOX_AGENT_STRICT_UPLOAD=1`. Use `--skip-upload-validation` only for an explicit legacy/manual override.
+- Upload diagnostics: add `--agent-output` for compact `code`/`field`/`fix` issues. Full CLI/API failures retain diagnostics under `error.details.issues`; SDK failures expose `UploadValidationError.report["issues"]`.
 
 For agent automation, prefer JSON output and narrow payloads:
 
@@ -20,7 +21,7 @@ For agent automation, prefer JSON output and narrow payloads:
 bbox search runs --where 'metrics.strategy.summary.sharpe > 1 and tags contains "baseline"' --select id,name,status,branch_key,summary_json --json
 ```
 
-Global flags such as `--json`, `--select`, `--endpoint`, and `--token` can be placed before or after the subcommand.
+Global flags such as `--json`, `--select`, `--endpoint`, `--token`, and `--agent-output` can be placed before or after the subcommand.
 
 ## Recommended Online Loop
 
@@ -69,10 +70,6 @@ bbox run start `
 ```powershell
 bbox run log-event --run-id run_new --event-type stage_started --stage backtest --payload '{"step":"backtest"}' --client-event-id agent-task-123-evt-backtest-start --json
 
-bbox run log-metric --run-id run_new --namespace strategy.summary --values '{"annual_return":18.5,"max_drawdown":-8.0,"sharpe":1.34,"turnover":0.42}' --client-event-id agent-task-123-met-summary --strict-contract --json
-
-bbox run log-series --run-id run_new --name equity_curve --data-file .\equity.json --x date --y series_values --mode nav --kind table_csv --result-domain performance --result-name primary_performance --result-role primary_curve --idempotency-key agent-task-123-series-equity --strict-contract --json
-
 bbox dataset register `
   --run-id run_new `
   --dataset-name csi500_daily `
@@ -86,14 +83,25 @@ bbox dataset register `
   --json
 
 bbox artifact upload --run-id run_new --name post_cost_report --kind report_html --path .\report.html --idempotency-key agent-task-123-art-report --json
+
+bbox run publish-performance `
+  --run-id run_new `
+  --curve-file .\equity.csv `
+  --mode nav `
+  --summary '{"annual_return":0.185,"max_drawdown":-0.08,"sharpe":1.34,"turnover":0.42}' `
+  --summary-unit decimal `
+  --idempotency-prefix agent-task-123-performance `
+  --expected-start 2023-01-03 `
+  --expected-end 2026-05-07 `
+  --expected-rows 820 `
+  --finish `
+  --fail-on-warning `
+  --agent-output
 ```
 
 5. Finish or fail the run.
 
-```powershell
-bbox run validate --run-id run_new --expected-start 2023-01-03 --expected-end 2026-05-07 --expected-rows 820 --primary-series equity_curve --fail-on-warning --json
-bbox run finish --run-id run_new --fail-on-warning --json
-```
+`publish-performance --finish` already performs the post-upload validation and finish quality gate. Omit `--finish` when more artifacts still need to be attached, then run `bbox run finish --run-id run_new --fail-on-warning --agent-output` after the remaining writes.
 
 Run Detail shows a Result Summary panel above the tabs. Use it as the first check for primary curve, date range, result domains, key metric coverage, artifact counts, update time, and quality status. Expand Result diagnostics when present; each issue includes a suggested fix command.
 

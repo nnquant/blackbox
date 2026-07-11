@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -741,6 +742,153 @@ def test_run_log_metric_dry_run_validates_without_request(monkeypatch) -> None:
     assert result["dry_run"] is True
     assert result["kind"] == "metric"
     assert result["validation"]["severity"] == "ok"
+
+
+def test_publish_performance_dry_run_normalizes_curve_and_summary(monkeypatch, tmp_path) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+    curve_path = tmp_path / "equity.csv"
+    curve_path.write_text("date,nav\n2026-01-01,1.0\n2026-01-02,1.1\n", encoding="utf-8")
+
+    monkeypatch.setattr(cli_main, "request", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("dry-run must not call the API")))
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "publish-performance",
+            "--run-id",
+            "run_1",
+            "--curve-file",
+            str(curve_path),
+            "--mode",
+            "nav",
+            "--summary",
+            '{"annual_return":0.18,"max_drawdown":-0.09,"sharpe":1.2}',
+            "--summary-unit",
+            "decimal",
+            "--idempotency-prefix",
+            "agent-task-1",
+            "--dry-run",
+        ]
+    )
+
+    result = cli_main.dispatch(args)
+
+    assert result["dry_run"] is True
+    assert result["primary_series"] == "equity_curve"
+    assert result["rows"] == 2
+    assert result["preflight"]["curve"]["severity"] == "ok"
+    assert result["preflight"]["summary"]["severity"] == "ok"
+    assert {item["code"] for item in result["normalizations"]} == {
+        "INFER_X_COLUMN",
+        "INFER_VALUE_COLUMN",
+        "COPY_VALUE_COLUMN",
+        "CONVERT_SUMMARY_PERCENT_UNIT",
+    }
+
+
+def test_publish_performance_uploads_validates_and_finishes(monkeypatch, tmp_path) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+    curve_path = tmp_path / "returns.json"
+    curve_path.write_text('[{"trade_date":"2026-01-01","ret":0.01},{"trade_date":"2026-01-02","ret":-0.02}]', encoding="utf-8")
+    calls: list[dict[str, Any]] = []
+    state: dict[str, Any] = {"summary": {}, "artifacts": []}
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> Any:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        if path.endswith("/metrics"):
+            state["summary"] = kwargs["json"]["values"]
+            return [{"id": "metric_1"}]
+        if path.endswith("/series"):
+            payload = kwargs["json"]
+            artifact = {
+                "id": "artifact_1",
+                "name": payload["name"],
+                "kind": payload["kind"],
+                "metadata_json": {"series": {"name": payload["name"], "x": payload["x"], "y": payload["y"], "mode": payload["mode"], "namespace": payload["namespace"]}, "result": payload["result"]},
+                "preview_json": {"row_count": len(payload["data"]), "rows": payload["data"]},
+            }
+            state["artifacts"].append(artifact)
+            return artifact
+        if method == "GET":
+            return {"id": "run_1", "status": "running", "summary_json": {"strategy.summary": state["summary"]}, "artifacts": state["artifacts"]}
+        if path.endswith("/finish"):
+            return {"id": "run_1", "status": "completed"}
+        raise AssertionError((method, path))
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "run",
+            "publish-performance",
+            "--run-id",
+            "run_1",
+            "--curve-file",
+            str(curve_path),
+            "--mode",
+            "return",
+            "--summary",
+            '{"annual_return":18.0,"max_drawdown":-9.0,"sharpe":1.2}',
+            "--summary-unit",
+            "percentage-point",
+            "--idempotency-prefix",
+            "agent-task-1",
+            "--finish",
+        ]
+    )
+
+    result = cli_main.dispatch(args)
+
+    assert result["finished"] is True
+    assert result["validation"]["severity"] == "ok"
+    assert [call["path"] for call in calls] == [
+        "/api/v1/runs/run_1/metrics",
+        "/api/v1/runs/run_1/series",
+        "/api/v1/runs/run_1",
+        "/api/v1/runs/run_1/finish",
+    ]
+    series_call = calls[1]
+    assert series_call["headers"] == {"Idempotency-Key": "agent-task-1-curve"}
+    assert series_call["json"]["name"] == "returns_series"
+    assert series_call["json"]["data"][0]["series_values"] == 0.01
+    assert series_call["json"]["result"]["role"] == "primary_curve"
+
+
+def test_agent_output_compacts_publish_validation_error(tmp_path, capsys) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+    curve_path = tmp_path / "equity.json"
+    curve_path.write_text('[{"date":"2026-01-01","nav":1.0}]', encoding="utf-8")
+
+    exit_code = cli_main.main(
+        [
+            "run",
+            "publish-performance",
+            "--run-id",
+            "run_1",
+            "--curve-file",
+            str(curve_path),
+            "--mode",
+            "nav",
+            "--summary",
+            '{"annual_return":0.18}',
+            "--idempotency-prefix",
+            "agent-task-1",
+            "--dry-run",
+            "--agent-output",
+        ]
+    )
+
+    assert exit_code == 4
+    payload = json.loads(capsys.readouterr().err)
+    assert payload["error"]["code"] == "VALIDATION_ERROR"
+    assert payload["error"]["issues"] == [
+        {
+            "code": "SUMMARY_UNIT_AMBIGUOUS",
+            "field": "summary-unit",
+            "keys": ["annual_return"],
+            "choices": ["decimal", "percentage-point"],
+        }
+    ]
+    assert "details" not in payload["error"]
 
 
 def test_artifact_get_and_note_list_dispatch_requests(monkeypatch) -> None:

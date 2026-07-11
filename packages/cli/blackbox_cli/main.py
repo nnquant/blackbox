@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import math
 import os
 import re
 import shlex
@@ -30,7 +32,8 @@ def main(argv: list[str] | None = None) -> int:
         write_success(args, data)
         return command_exit_code(args, data)
     except CliError as exc:
-        print(json.dumps({"ok": False, "data": None, "error": exc.payload}, ensure_ascii=False), file=sys.stderr)
+        error = compact_agent_error(exc.payload) if getattr(args, "agent_output", False) else exc.payload
+        print(json.dumps({"ok": False, "data": None, "error": error}, ensure_ascii=False), file=sys.stderr)
         return exc.exit_code
     except Exception as exc:
         print(json.dumps({"ok": False, "data": None, "error": {"code": "CLI_ERROR", "message": str(exc)}}, ensure_ascii=False), file=sys.stderr)
@@ -44,7 +47,7 @@ class CliError(Exception):
         self.payload = {"code": code, "message": message, "hint": hint, "details": details}
 
 
-GLOBAL_FLAG_OPTIONS = {"--json", "--quiet", "--compact"}
+GLOBAL_FLAG_OPTIONS = {"--json", "--quiet", "--compact", "--agent-output"}
 GLOBAL_VALUE_OPTIONS = {"--endpoint", "--token", "--output", "--select"}
 
 
@@ -92,6 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--select", help="Comma-separated fields to keep from data, for example id,name,status.")
     parser.add_argument("--compact", action="store_true")
+    parser.add_argument("--agent-output", action="store_true", help="Emit compact, non-duplicated diagnostics for AI agents.")
     sub = parser.add_subparsers(dest="group", required=True)
 
     workspace = sub.add_parser("workspace")
@@ -267,6 +271,24 @@ def build_parser() -> argparse.ArgumentParser:
     run_series.add_argument("--strict-contract", action="store_true", help="Fail upload preflight on contract warnings. Also enabled by BLACKBOX_AGENT_STRICT_UPLOAD=1.")
     run_series.add_argument("--skip-upload-validation", action="store_true", help="Bypass local upload preflight checks.")
     run_series.add_argument("--dry-run", action="store_true", help="Validate the upload payload locally without writing it.")
+    run_publish_performance = run_sub.add_parser("publish-performance")
+    run_publish_performance.add_argument("--run-id", required=True)
+    run_publish_performance.add_argument("--curve-file", required=True, help="Performance rows in JSON, JSONL, CSV, YAML, or Parquet format.")
+    run_publish_performance.add_argument("--mode", required=True, choices=["nav", "return", "pnl"])
+    run_publish_performance.add_argument("--x", help="Date/time column. Inferred when exactly one standard date column exists.")
+    run_publish_performance.add_argument("--value", help="Value column. Inferred from mode aliases or a single numeric column.")
+    run_publish_performance.add_argument("--summary", default="{}", help="strategy.summary values as JSON.")
+    run_publish_performance.add_argument("--summary-file", help="strategy.summary values in JSON or YAML format.")
+    run_publish_performance.add_argument("--summary-unit", choices=["percentage-point", "decimal"], help="Unit for percentage-style summary metrics; required when such metrics are present.")
+    run_publish_performance.add_argument("--drawdown-file", help="Optional drawdown rows in JSON, JSONL, CSV, YAML, or Parquet format.")
+    run_publish_performance.add_argument("--drawdown-value", help="Drawdown value column; inferred when omitted.")
+    run_publish_performance.add_argument("--idempotency-prefix", required=True, help="Stable prefix reused when retrying the same logical publication.")
+    run_publish_performance.add_argument("--expected-start")
+    run_publish_performance.add_argument("--expected-end")
+    run_publish_performance.add_argument("--expected-rows", type=int)
+    run_publish_performance.add_argument("--finish", action="store_true", help="Finish the run after post-upload validation passes.")
+    run_publish_performance.add_argument("--fail-on-warning", action="store_true", help="Block publication or finish on quality warnings.")
+    run_publish_performance.add_argument("--dry-run", action="store_true", help="Normalize and validate locally without writing.")
     run_finish = run_sub.add_parser("finish")
     run_finish.add_argument("--run-id", required=True)
     run_finish.add_argument("--status", default="completed", choices=["completed"])
@@ -676,6 +698,8 @@ def dispatch(args: argparse.Namespace) -> Any:
             headers=headers,
             json=series_payload,
         )
+    if args.group == "run" and args.action == "publish-performance":
+        return publish_performance(args)
     if args.group == "run" and args.action == "finish":
         params = compact_payload({"fail_on_warning": args.fail_on_warning or None, "skip_quality_gate": args.skip_quality_gate or None})
         return request(
@@ -975,6 +999,372 @@ def dispatch(args: argparse.Namespace) -> Any:
     raise CliError("VALIDATION_ERROR", "unsupported command")
 
 
+PERCENT_SUMMARY_KEYS = {
+    "annual_return",
+    "annualized_return",
+    "annual_volatility",
+    "annualized_volatility",
+    "max_drawdown",
+}
+
+
+def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
+    curve_rows = parse_rows_file(args.curve_file, "curve file")
+    curve_rows, x_key, value_key, normalizations = normalize_performance_rows(
+        curve_rows,
+        mode=args.mode,
+        x=args.x,
+        value=args.value,
+        label="performance curve",
+    )
+    curve_name, namespace = performance_contract(args.mode)
+    curve_payload = {
+        "name": curve_name,
+        "data": curve_rows,
+        "x": x_key,
+        "y": "series_values",
+        "mode": args.mode,
+        "namespace": namespace,
+        "kind": "table_csv",
+        "filename": f"{curve_name}.csv",
+        "metadata": {},
+        "result": {
+            "domain": "performance",
+            "name": "primary_performance",
+            "role": "primary_curve",
+            "title": "Performance Curve",
+            "group": "performance.primary",
+            "order": 10,
+            "view": {"default": "performance_chart", "x": x_key, "y": "series_values", "mode": args.mode, "chart": "line_drawdown"},
+        },
+    }
+    curve_report = validate_series_upload(curve_payload, strict=True)
+    enforce_upload_preflight(curve_report, fail_on_warning=args.fail_on_warning)
+
+    summary = parse_structured_object_file(args.summary_file, "summary file") if args.summary_file else parse_json_object_arg(args.summary, "summary")
+    summary, summary_normalizations = normalize_summary_metrics(summary, args.summary_unit)
+    normalizations.extend(summary_normalizations)
+    summary_report = validate_metric_upload("strategy.summary", summary, strict=True, percent_unit="percentage_point") if summary else empty_validation_report()
+    if summary:
+        enforce_upload_preflight(summary_report, fail_on_warning=args.fail_on_warning)
+
+    drawdown_payload: dict[str, Any] | None = None
+    drawdown_report = empty_validation_report()
+    if args.drawdown_file:
+        drawdown_rows = parse_rows_file(args.drawdown_file, "drawdown file")
+        drawdown_rows, drawdown_x, _, drawdown_normalizations = normalize_performance_rows(
+            drawdown_rows,
+            mode="drawdown",
+            x=args.x or x_key,
+            value=args.drawdown_value,
+            label="drawdown series",
+        )
+        normalizations.extend(drawdown_normalizations)
+        drawdown_payload = {
+            "name": "drawdown_series",
+            "data": drawdown_rows,
+            "x": drawdown_x,
+            "y": "series_values",
+            "mode": "drawdown",
+            "namespace": "strategy.drawdown",
+            "kind": "table_csv",
+            "filename": "drawdown_series.csv",
+            "metadata": {},
+            "result": {
+                "domain": "performance",
+                "name": "primary_drawdown",
+                "role": "drawdown",
+                "title": "Drawdown",
+                "group": "performance.primary",
+                "order": 20,
+                "view": {"default": "drawdown", "x": drawdown_x, "y": "series_values", "mode": "drawdown", "chart": "area"},
+            },
+        }
+        drawdown_report = validate_series_upload(drawdown_payload, strict=True)
+        enforce_upload_preflight(drawdown_report, fail_on_warning=args.fail_on_warning)
+
+    preflight = {
+        "curve": compact_validation_report(curve_report),
+        "summary": compact_validation_report(summary_report),
+        "drawdown": compact_validation_report(drawdown_report),
+    }
+    if args.dry_run:
+        return {
+            "action": "publish-performance",
+            "dry_run": True,
+            "run_id": args.run_id,
+            "mode": args.mode,
+            "primary_series": curve_name,
+            "rows": len(curve_rows),
+            "summary_metrics": len(summary),
+            "normalizations": normalizations,
+            "preflight": preflight,
+            "finished": False,
+        }
+
+    uploaded: list[dict[str, Any]] = []
+    if summary:
+        metric_result = request(
+            args,
+            "POST",
+            f"/api/v1/runs/{args.run_id}/metrics",
+            json={
+                "namespace": "strategy.summary",
+                "values": summary,
+                "point": {"kind": "summary", "coord": {"percent_unit": "percentage_point"}},
+                "client_event_id": f"{args.idempotency_prefix}-summary",
+            },
+        )
+        uploaded.append({"kind": "metric", "namespace": "strategy.summary", "count": len(metric_result) if isinstance(metric_result, list) else len(summary)})
+
+    curve_result = request(
+        args,
+        "POST",
+        f"/api/v1/runs/{args.run_id}/series",
+        headers={"Idempotency-Key": f"{args.idempotency_prefix}-curve"},
+        json=curve_payload,
+    )
+    uploaded.append({"kind": "series", "name": curve_name, "artifact_id": curve_result.get("id") if isinstance(curve_result, dict) else None, "rows": len(curve_rows)})
+
+    if drawdown_payload is not None:
+        drawdown_result = request(
+            args,
+            "POST",
+            f"/api/v1/runs/{args.run_id}/series",
+            headers={"Idempotency-Key": f"{args.idempotency_prefix}-drawdown"},
+            json=drawdown_payload,
+        )
+        uploaded.append({"kind": "series", "name": "drawdown_series", "artifact_id": drawdown_result.get("id") if isinstance(drawdown_result, dict) else None, "rows": len(drawdown_payload["data"])})
+
+    detail = request(args, "GET", f"/api/v1/runs/{args.run_id}")
+    quality_report = validate_run_detail(
+        detail,
+        expected_start=args.expected_start or str(curve_rows[0][x_key]),
+        expected_end=args.expected_end or str(curve_rows[-1][x_key]),
+        expected_rows=args.expected_rows if args.expected_rows is not None else len(curve_rows),
+        primary_series_name=curve_name,
+    )
+    if upload_report_failed(quality_report, fail_on_warning=args.fail_on_warning):
+        raise CliError(
+            "VALIDATION_ERROR",
+            "published performance result failed the post-upload quality gate",
+            exit_code=4,
+            hint=quality_report.get("hint"),
+            details=quality_report,
+        )
+
+    finished = False
+    if args.finish:
+        params = {"fail_on_warning": True} if args.fail_on_warning else {}
+        request(args, "POST", f"/api/v1/runs/{args.run_id}/finish", **({"params": params} if params else {}))
+        finished = True
+
+    return {
+        "action": "publish-performance",
+        "run_id": args.run_id,
+        "mode": args.mode,
+        "primary_series": curve_name,
+        "rows": len(curve_rows),
+        "summary_metrics": len(summary),
+        "normalizations": normalizations,
+        "uploaded": uploaded,
+        "validation": compact_validation_report(quality_report),
+        "finished": finished,
+    }
+
+
+def parse_rows_file(path_value: str, label: str) -> list[dict[str, Any]]:
+    path = Path(path_value)
+    suffix = path.suffix.lower()
+    try:
+        if suffix == ".csv":
+            with path.open("r", encoding="utf-8-sig", newline="") as handle:
+                return [{key: parse_csv_scalar(value) for key, value in row.items()} for row in csv.DictReader(handle)]
+        if suffix in {".jsonl", ".ndjson"}:
+            rows = [parse_json(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            return rows
+        if suffix in {".parquet", ".pq"}:
+            try:
+                import pandas as pd
+            except ImportError as exc:
+                raise CliError("VALIDATION_ERROR", f"pandas is required to read {label}: {path}", hint="install blackbox[data] or convert the file to CSV/JSON") from exc
+            return pd.read_parquet(path).to_dict(orient="records")
+        parsed = parse_structured_file(path_value, label)
+    except OSError as exc:
+        raise CliError("VALIDATION_ERROR", f"cannot read {label}: {path}") from exc
+    if isinstance(parsed, dict) and isinstance(parsed.get("rows"), list):
+        parsed = parsed["rows"]
+    if not isinstance(parsed, list):
+        raise CliError("VALIDATION_ERROR", f"{label} must contain a list of row objects")
+    return parsed
+
+
+def parse_csv_scalar(value: str | None) -> Any:
+    if value is None or value == "":
+        return None
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return value
+
+
+def normalize_performance_rows(
+    rows: list[dict[str, Any]],
+    *,
+    mode: str,
+    x: str | None,
+    value: str | None,
+    label: str,
+) -> tuple[list[dict[str, Any]], str, str, list[dict[str, Any]]]:
+    if not rows or any(not isinstance(row, dict) for row in rows):
+        report = validate_series_upload({"name": label, "data": rows, "x": x, "y": value, "mode": mode}, strict=True)
+        enforce_upload_preflight(report)
+    columns = list(dict.fromkeys(key for row in rows for key in row))
+    actions: list[dict[str, Any]] = []
+    x_key = infer_x_column(columns, x)
+    if x is None:
+        actions.append({"code": "INFER_X_COLUMN", "value": x_key})
+    value_key = infer_value_column(rows, columns, x_key, mode, value)
+    if value is None:
+        actions.append({"code": "INFER_VALUE_COLUMN", "value": value_key})
+
+    normalized: list[dict[str, Any]] = []
+    invalid_rows: list[int] = []
+    for index, row in enumerate(rows):
+        number = finite_number(row.get(value_key))
+        if number is None:
+            invalid_rows.append(index + 1)
+            continue
+        normalized.append({**row, "series_values": number})
+    if invalid_rows:
+        raise CliError(
+            "VALIDATION_ERROR",
+            f"{label} column {value_key} contains missing or non-finite values",
+            exit_code=4,
+            details={"issues": [{"code": "SERIES_Y_NOT_NUMERIC", "field": value_key, "rows": invalid_rows[:20], "fix": "Provide a finite numeric value in every published row."}]},
+        )
+    if value_key != "series_values":
+        actions.append({"code": "COPY_VALUE_COLUMN", "from": value_key, "to": "series_values"})
+    return normalized, x_key, value_key, actions
+
+
+def infer_x_column(columns: list[str], requested: str | None) -> str:
+    if requested:
+        if requested not in columns:
+            raise CliError("VALIDATION_ERROR", f"x column {requested} is not present", exit_code=4, details={"issues": [{"code": "SERIES_X_COLUMN_NOT_FOUND", "field": "x", "candidates": columns}]})
+        return requested
+    aliases = {"date", "datetime", "trade_date", "end_date", "time", "timestamp"}
+    candidates = [column for column in columns if str(column).lower() in aliases]
+    if len(candidates) == 1:
+        return candidates[0]
+    raise CliError(
+        "VALIDATION_ERROR",
+        "cannot infer a unique x column",
+        exit_code=4,
+        hint="pass --x with the date/time column",
+        details={"issues": [{"code": "SERIES_X_AMBIGUOUS", "field": "x", "candidates": candidates or columns}]},
+    )
+
+
+def infer_value_column(rows: list[dict[str, Any]], columns: list[str], x_key: str, mode: str, requested: str | None) -> str:
+    if requested:
+        if requested not in columns:
+            raise CliError("VALIDATION_ERROR", f"value column {requested} is not present", exit_code=4, details={"issues": [{"code": "SERIES_Y_COLUMN_NOT_FOUND", "field": "value", "candidates": columns}]})
+        return requested
+    if "series_values" in columns:
+        return "series_values"
+    aliases = {
+        "nav": ["nav", "net_value", "equity", "净值"],
+        "return": ["return", "returns", "ret", "period_return", "收益率"],
+        "pnl": ["pnl", "profit", "change", "盈亏"],
+        "drawdown": ["drawdown", "dd", "回撤"],
+    }.get(mode, [])
+    alias_candidates = [column for column in columns if str(column).lower() in {alias.lower() for alias in aliases}]
+    if len(alias_candidates) == 1:
+        return alias_candidates[0]
+    numeric_candidates = [column for column in columns if column != x_key and any(finite_number(row.get(column)) is not None for row in rows)]
+    if len(numeric_candidates) == 1:
+        return numeric_candidates[0]
+    raise CliError(
+        "VALIDATION_ERROR",
+        "cannot infer a unique performance value column",
+        exit_code=4,
+        hint="pass --value or --drawdown-value explicitly",
+        details={"issues": [{"code": "SERIES_VALUE_AMBIGUOUS", "field": "value", "candidates": alias_candidates or numeric_candidates or columns}]},
+    )
+
+
+def finite_number(value: Any) -> float | None:
+    if value is None or value == "" or isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def normalize_summary_metrics(values: dict[str, Any], unit: str | None) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    percent_keys = [key for key in values if key in PERCENT_SUMMARY_KEYS]
+    if percent_keys and unit is None:
+        raise CliError(
+            "VALIDATION_ERROR",
+            "summary percentage unit is ambiguous",
+            exit_code=4,
+            hint="pass --summary-unit decimal or --summary-unit percentage-point",
+            details={"issues": [{"code": "SUMMARY_UNIT_AMBIGUOUS", "field": "summary-unit", "keys": percent_keys, "choices": ["decimal", "percentage-point"]}]},
+        )
+    normalized = dict(values)
+    actions: list[dict[str, Any]] = []
+    for key in percent_keys:
+        number = finite_number(values[key])
+        if number is None:
+            raise CliError("VALIDATION_ERROR", f"summary metric {key} must be numeric", exit_code=4, details={"issues": [{"code": "SUMMARY_METRIC_NOT_NUMERIC", "field": f"strategy.summary.{key}"}]})
+        normalized[key] = number * 100.0 if unit == "decimal" else number
+    if percent_keys and unit == "decimal":
+        actions.append({"code": "CONVERT_SUMMARY_PERCENT_UNIT", "from": "decimal", "to": "percentage-point", "fields": percent_keys})
+    return normalized, actions
+
+
+def performance_contract(mode: str) -> tuple[str, str]:
+    return {
+        "nav": ("equity_curve", "strategy.equity"),
+        "return": ("returns_series", "strategy.returns"),
+        "pnl": ("pnl_series", "strategy.pnl"),
+    }[mode]
+
+
+def empty_validation_report() -> dict[str, Any]:
+    return {"schema_version": 1, "severity": "ok", "error_count": 0, "warning_count": 0, "issues": []}
+
+
+def compact_validation_report(report: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "severity": report.get("severity", "ok"),
+        "error_count": int(report.get("error_count") or 0),
+        "warning_count": int(report.get("warning_count") or 0),
+        "issues": [compact_issue(issue) for issue in report.get("issues") or []],
+    }
+
+
+def compact_agent_error(payload: dict[str, Any]) -> dict[str, Any]:
+    details = payload.get("details")
+    issues = details.get("issues") if isinstance(details, dict) else None
+    compact = {"code": payload.get("code"), "message": short_error_message(payload), "hint": payload.get("hint")}
+    if isinstance(issues, list):
+        compact["issues"] = [compact_issue(issue) for issue in issues if isinstance(issue, dict)]
+    return compact_payload(compact)
+
+
+def short_error_message(payload: dict[str, Any]) -> str:
+    message = str(payload.get("message") or "request failed")
+    return message.split(":", 1)[0] if message.startswith("upload preflight validation failed:") else message
+
+
+def compact_issue(issue: dict[str, Any]) -> dict[str, Any]:
+    return compact_payload({key: issue.get(key) for key in ["code", "severity", "field", "fix", "rows", "keys", "choices", "candidates"]})
+
+
 def database_status() -> Any:
     try:
         from blackbox_server.db import engine
@@ -1054,7 +1444,7 @@ def write_success(args: argparse.Namespace, data: Any) -> None:
     if args.output == "yaml":
         print(format_yaml(payload))
         return
-    print(json.dumps(payload, ensure_ascii=False, indent=None if args.compact else 2))
+    print(json.dumps(payload, ensure_ascii=False, indent=None if args.compact or args.agent_output else 2))
 
 
 def command_exit_code(args: argparse.Namespace, data: Any) -> int:

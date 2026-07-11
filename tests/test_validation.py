@@ -86,6 +86,27 @@ def test_validate_run_detail_warns_on_decimal_percent_summary() -> None:
     assert "percentage points" in issue["fix"]
 
 
+def test_validate_run_detail_trusts_explicit_summary_percent_unit() -> None:
+    report = validate_run_detail(
+        {
+            "id": "run_1",
+            "status": "running",
+            "summary_json": {"strategy.summary": {"annual_return": 0.18}},
+            "metrics": [
+                {
+                    "namespace": "strategy.summary",
+                    "key": "annual_return",
+                    "point_coord_json": {"percent_unit": "percentage_point"},
+                }
+            ],
+            "artifacts": [],
+        }
+    )
+
+    assert report["severity"] == "ok"
+    assert report["issues"] == []
+
+
 def test_validate_series_upload_warns_on_legacy_performance_contract() -> None:
     report = validate_series_upload(
         {
@@ -151,6 +172,18 @@ def test_validate_metric_upload_strict_fails_decimal_percent_units() -> None:
 
     assert report["severity"] == "error"
     assert any(issue["title"] == "annual_return may use decimal units" for issue in report["issues"])
+
+
+def test_validate_metric_upload_accepts_explicit_percent_unit() -> None:
+    report = validate_metric_upload(
+        "strategy.summary",
+        {"annual_return": 0.18},
+        strict=True,
+        percent_unit="percentage_point",
+    )
+
+    assert report["severity"] == "ok"
+    assert report["issues"] == []
 
 
 def test_validate_run_detail_checks_expected_primary_series_range() -> None:

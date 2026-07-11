@@ -602,7 +602,7 @@ WebUI 测试：
 | --- | --- | --- | --- |
 | Workspace / Project / Research / Branch | `workspace` / `project` / `research` / `branch` create/get/list/update | Dashboard、Project、Research、Branch 页面与顶部 `New` 菜单 | 已对接 |
 | Run lifecycle | `run start/get/update/clone/finish/fail/cancel`、SDK `start_run` | Run Detail 元数据、Record -> Lifecycle / Clone | 已对接 |
-| Events / Metrics / Series / Notes | `run log-event/log-metric/log-series`、`note add/list`、SDK `log_*` | Run Detail Record 动作、Events / Metrics / Notes / Primary Series / Series Preview | 已对接 |
+| Events / Metrics / Series / Notes | `run log-event/log-metric/log-series/publish-performance`、`note add/list`、SDK `log_*`；`publish-performance` 面向 Agent 自动归一化并校验绩效结果 | Run Detail Record 动作、Events / Metrics / Notes / Primary Series / Series Preview | 已对接 |
 | Artifacts | `artifact upload/init-upload/complete-upload/register-external/list/get/download`、SDK artifact helpers | Run Detail Record -> Upload / Staged Upload / External Artifact，Artifacts 详情与下载 | 已对接 |
 | Snapshots / Dataset / Env | `snapshot add/list`、`dataset register`、SDK 自动 code/env snapshot | Run Detail Record -> Code / Dataset / Environment / Snapshot JSON，Code / Data / Env 页面 | 已对接 |
 | Sweep | `sweep create/list/get/summary/attach-run`、SDK `create_sweep` / `attach_sweep` / `log_sweep_coord` / `get_sweep*` | Sweep 页面与 Branch Sweep Management | 已对接 |
