@@ -97,7 +97,8 @@ bbox run publish-performance `
   --run-id run_new `
   --curve-file .\equity.csv `
   --mode nav `
-  --summary '{"annual_return":0.185,"annual_volatility":0.124,"max_drawdown":-0.09,"sharpe":1.34,"sortino":1.88,"calmar":2.06,"turnover":0.42}' `
+  --periods-per-year 252 `
+  --summary '{"turnover":0.42}' `
   --summary-unit decimal `
   --drawdown-file .\drawdown.csv `
   --idempotency-prefix agent-task-123-performance `
@@ -111,7 +112,7 @@ bbox run publish-performance `
 
 5. Finish or fail the run.
 
-`publish-performance --finish` performs post-upload validation and the finish quality gate. Omit `--finish` when more writes remain, then call `bbox run finish --run-id run_new --fail-on-warning --agent-output` after them.
+`publish-performance` computes the canonical performance summary from the full curve and stores `periods_per_year` as a separate summary metric. `--finish` performs post-upload validation and the finish quality gate. Omit `--finish` when more writes remain, then call `bbox run finish --run-id run_new --fail-on-warning --agent-output` after them.
 
 ```powershell
 bbox run fail --run-id run_new --error '{"code":"BACKTEST_ERROR","message":"input data missing"}' --json
@@ -121,6 +122,8 @@ bbox run fail --run-id run_new --error '{"code":"BACKTEST_ERROR","message":"inpu
 
 ```powershell
 bbox compare runs --run-ids run_abc run_new --metrics strategy.summary.sharpe,strategy.summary.max_drawdown --series equity_curve --json
+
+bbox research review --research-id res_csi500_reversal --metric strategy.summary.sharpe --stale-days 14 --json
 
 bbox note add `
   --run-id run_new `
@@ -132,6 +135,8 @@ bbox note add `
   --client-event-id agent-task-123-note-decision `
   --json
 ```
+
+`bbox research review` returns the current research state, ranked candidate set, saved compare sets, decision notes, and conservative archive suggestions. It does not mutate branch status; use `bbox batch mark-branch-status --status archived` only after reviewing the suggested archive queue.
 
 The WebUI will show the resulting run, artifacts, compare output, lineage, notes, and creator/source fields after refresh or websocket update.
 
@@ -150,7 +155,8 @@ The Run Detail metric cards read from `summary_json.strategy.summary` only. Use 
   "max_drawdown": -9.0,
   "sharpe": 1.34,
   "sortino": 1.88,
-  "calmar": 2.06
+  "calmar": 2.06,
+  "periods_per_year": 252
 }
 ```
 
@@ -159,6 +165,7 @@ Rules:
 - `annual_return`, `annual_volatility`, and `max_drawdown` are percentage-point values for summary cards. Use `18.5` for `18.50%`, not `0.185`.
 - `max_drawdown` should be negative when representing a loss, for example `-9.0`.
 - `sharpe`, `sortino`, `calmar`, and `turnover` are plain ratios unless the strategy convention explicitly says otherwise.
+- `periods_per_year` is the explicit annualization period count and appears in its own Run Detail card; the annual compound return card label does not include `252`.
 - Keep additional metrics under stable namespaces, but do not expect custom names like `annual_ret`, `ann_vol`, `mdd`, or `drawdown` to populate the default cards.
 
 CLI:
@@ -410,12 +417,13 @@ Preferred SDK helpers:
 import blackbox as bb
 
 bb.log_performance_result(
-    metrics={"annual_return": 18.5, "max_drawdown": -9.0, "sharpe": 1.34},
+    metrics={"turnover": 0.42},
     curve=[
         {"date": "2026-01-02", "series_values": 1.000},
         {"date": "2026-01-05", "series_values": 1.012},
     ],
     mode="nav",
+    periods_per_year=252,
     drawdown=[
         {"date": "2026-01-02", "drawdown": 0.0},
         {"date": "2026-01-05", "drawdown": -0.004},
@@ -591,6 +599,7 @@ bb.log_performance_result(
         {"date": "2026-01-06", "series_values": 1.0310},
     ],
     mode="nav",
+    periods_per_year=252,
     idempotency_prefix="agent-task-123",
 )
 

@@ -132,9 +132,10 @@ blackbox-server/
 {
   "namespace": "strategy.summary",
   "values": {
-    "annual_return": 0.18,
+    "annual_return": 18.0,
     "sharpe": 1.42,
-    "max_drawdown": 0.09,
+    "max_drawdown": -9.0,
+    "periods_per_year": 252,
     "turnover": 3.8
   },
   "point": {

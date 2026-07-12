@@ -19,11 +19,17 @@ def main() -> None:
     ):
         bb.log_event("stage_completed", stage="data_loaded", payload={"rows": 3200000})
         bb.log_factor_summary({"ic_mean": 0.034, "ic_ir": 0.61, "coverage": 0.94})
-        bb.log_backtest_summary({"sharpe": 1.42, "max_drawdown": 0.09, "annual_return": 0.18})
+        bb.log_performance_result(
+            curve=[
+                {"date": "2026-01-02", "series_values": 1.0},
+                {"date": "2026-01-05", "series_values": 1.02},
+            ],
+            mode="nav",
+            periods_per_year=252,
+        )
         bb.log_artifact("post_cost_report", report, kind="report_html")
         bb.log_note("decision", "Keep baseline for comparison", "Baseline is usable for the next branch.")
 
 
 if __name__ == "__main__":
     main()
-

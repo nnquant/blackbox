@@ -182,9 +182,10 @@ function Sidebar({ active, onSelect }) {
   );
 }
 
-function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, children }) {
+function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, loading = false, children }) {
   return (
     <div className="min-h-screen">
+      <LoadingRail active={loading} />
       <TopBar data={data} onCreated={onCreated} onOpenSearch={onOpenSearch} />
       <Sidebar active={active} onSelect={onSelect} />
       <main className="pt-14 md:pl-64">
@@ -2616,6 +2617,8 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
   const [lineageExpanded, setLineageExpanded] = useState(false);
   const [researchCompareSets, setResearchCompareSets] = useState(null);
   const [compareSetError, setCompareSetError] = useState(null);
+  const [researchReview, setResearchReview] = useState(null);
+  const [reviewError, setReviewError] = useState(null);
   useEffect(() => {
     if (!research?.id) {
       setLineage(null);
@@ -2660,6 +2663,28 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
       });
     return () => { cancelled = true; };
   }, [research?.id, data?.summary?.compare_sets]);
+  useEffect(() => {
+    if (!research?.id) {
+      setResearchReview(null);
+      setReviewError(null);
+      return;
+    }
+    let cancelled = false;
+    apiGet(`/api/v1/researches/${research.id}/review-board?limit=10`)
+      .then((payload) => {
+        if (!cancelled) {
+          setResearchReview(payload);
+          setReviewError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setResearchReview(null);
+          setReviewError(err.message);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [research?.id, data?.summary?.runs, data?.summary?.compare_sets, branches.length, runs.length]);
   if (!research) return <EmptyState title="No research yet" detail="Create a run through the SDK or bbox CLI, then refresh this page." />;
   const lineageBranches = lineage?.branches || branches;
   const lineageRuns = lineage?.runs || runs;
@@ -2670,6 +2695,14 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
     <div className="space-y-5">
       <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
       <ResearchWorkspaceSummary research={research} branches={lineageBranches} runs={lineageRuns} />
+      <ResearchReviewPanel
+        review={researchReview}
+        error={reviewError}
+        onSelectRun={selectRun}
+        onSelectBranch={selectBranch}
+        onSelectCompareSet={selectCompareSet}
+        onChanged={onChanged}
+      />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-8">
           <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
@@ -2727,6 +2760,180 @@ function ResearchWorkspaceSummary({ research, branches, runs }) {
   );
 }
 
+function ResearchReviewPanel({ review, error, onSelectRun, onSelectBranch, onSelectCompareSet, onChanged }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [message, setMessage] = useState('');
+  const state = review?.state || {};
+  const candidateSet = review?.candidate_set || {};
+  const candidates = review?.candidate_runs || [];
+  const compareSets = review?.compare_sets || [];
+  const archiveCandidates = review?.archive_candidates || [];
+  const decisionNotes = review?.decision_notes || [];
+  const recommendedIds = candidateSet.recommended_compare_run_ids || [];
+  const saveCandidateSet = async () => {
+    if (!review?.research?.project_id || !review?.research?.id || !recommendedIds.length) return;
+    setSaving(true);
+    setSaveError(null);
+    setMessage('');
+    try {
+      const compareSet = await apiPost('/api/v1/compare-sets', {
+        project_id: review.research.project_id,
+        research_id: review.research.id,
+        name: `${review.research.key || 'research'}-candidates-${new Date().toISOString().slice(0, 10)}`,
+        run_ids: recommendedIds,
+        layout: { metrics: [candidateSet.metric || 'strategy.summary.sharpe'] },
+      });
+      setMessage(`Saved compare set ${compareSet.name}.`);
+      await onChanged?.();
+      onSelectCompareSet?.(compareSet.id);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <Panel className="overflow-hidden">
+      <PanelHeader
+        title="Research Review"
+        action={(
+          <button className="secondary-button" disabled={saving || !recommendedIds.length} onClick={saveCandidateSet} type="button">
+            {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Layers3 className="h-4 w-4" />}
+            Save candidate set
+          </button>
+        )}
+      />
+      {error ? <div className="px-5 pt-4"><InlineError message={error} /></div> : null}
+      {!review && !error ? <div className="p-5 text-sm text-muted">Loading review board...</div> : null}
+      {review ? (
+        <div className="space-y-4 p-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+            <ReadOnlyField label="State" value={tStatus(state.status || 'active')} />
+            <ReadOnlyField label="Candidates" value={state.candidate_run_count ?? 0} />
+            <ReadOnlyField label="Compare Sets" value={state.compare_set_count ?? 0} />
+            <ReadOnlyField label="Decision Notes" value={state.decision_note_count ?? 0} />
+            <ReadOnlyField label="Archive Queue" value={state.archive_candidate_count ?? 0} />
+            <ReadOnlyField label="Next" value={(state.next_actions || []).join(', ') || '--'} />
+          </div>
+          <InlineError message={saveError} />
+          {message ? <div className="rounded-md bg-positiveSoft px-3 py-2 text-xs font-semibold text-positive">{message}</div> : null}
+          <div className="grid gap-4 xl:grid-cols-2">
+            <ResearchReviewCandidatesTable runs={candidates} metric={candidateSet.metric} onSelectRun={onSelectRun} onSelectBranch={onSelectBranch} />
+            <ResearchReviewArchiveTable branches={archiveCandidates} onSelectBranch={onSelectBranch} />
+          </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <ResearchReviewCompareSetsTable compareSets={compareSets} onSelectCompareSet={onSelectCompareSet} />
+            <ResearchReviewDecisionNotes notes={decisionNotes} onSelectRun={onSelectRun} />
+          </div>
+        </div>
+      ) : null}
+    </Panel>
+  );
+}
+
+function LoadingRail({ active }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if (!active) {
+      setVisible(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setVisible(true), 180);
+    return () => window.clearTimeout(timer);
+  }, [active]);
+  return <div className={`loading-rail ${visible ? 'loading-rail-visible' : ''}`} aria-hidden="true"><span /></div>;
+}
+
+function AppLoadingAnimation() {
+  return (
+    <div className="loading-stage" role="status" aria-label={t('Loading Blackbox')}>
+      <span className="loading-22" aria-hidden="true" />
+    </div>
+  );
+}
+
+function ResearchReviewCandidatesTable({ runs, metric, onSelectRun, onSelectBranch }) {
+  return (
+    <div className="overflow-hidden rounded-md border border-line bg-panel2/40">
+      <div className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">Candidate Set</div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[680px] text-left text-sm">
+          <thead className="table-head"><tr><th className="table-cell">Run</th><th className="table-cell">Branch</th><th className="table-cell text-right">Metric</th><th className="table-cell text-right">Compared</th><th className="table-cell text-right">Updated</th></tr></thead>
+          <tbody>
+            {runs.length ? runs.map((run) => (
+              <tr className="table-row" key={run.id}>
+                <td className="table-cell"><button className="font-semibold text-ink hover:underline" onClick={() => onSelectRun(run.id)} type="button">{run.name}</button></td>
+                <td className="table-cell"><button className="text-muted hover:text-ink hover:underline" onClick={() => onSelectBranch(run.branch_id)} type="button">{run.branch_key || run.branch_id || '--'}</button></td>
+                <td className="table-cell text-right font-semibold text-positive" title={metric || ''}>{formatMetric(run.candidate_metric_value)}</td>
+                <td className="table-cell text-right text-muted">{run.in_compare_set ? 'yes' : 'no'}</td>
+                <td className="table-cell text-right text-muted">{formatDate(run.updated_at || run.ended_at || run.started_at || run.created_at)}</td>
+              </tr>
+            )) : <tr><td className="table-cell text-muted" colSpan="5">No completed candidates yet.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ResearchReviewArchiveTable({ branches, onSelectBranch }) {
+  return (
+    <div className="overflow-hidden rounded-md border border-line bg-panel2/40">
+      <div className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">Archive Queue</div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="table-head"><tr><th className="table-cell">Branch</th><th className="table-cell">Status</th><th className="table-cell text-right">Runs</th><th className="table-cell">Reason</th><th className="table-cell text-right">Latest</th></tr></thead>
+          <tbody>
+            {branches.length ? branches.map((branch) => (
+              <tr className="table-row" key={branch.id}>
+                <td className="table-cell"><button className="font-semibold text-ink hover:underline" onClick={() => onSelectBranch(branch.id)} type="button">{branch.title || branch.key}</button></td>
+                <td className="table-cell"><StatusBadge status={branch.status} /></td>
+                <td className="table-cell text-right">{branch.run_count || 0}</td>
+                <td className="table-cell text-muted">{(branch.archive_reasons || []).join(', ') || '--'}</td>
+                <td className="table-cell text-right text-muted">{formatDate(branch.latest_activity_at || branch.updated_at)}</td>
+              </tr>
+            )) : <tr><td className="table-cell text-muted" colSpan="5">No archive candidates.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ResearchReviewCompareSetsTable({ compareSets, onSelectCompareSet }) {
+  return (
+    <div className="overflow-hidden rounded-md border border-line bg-panel2/40">
+      <div className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">Compare Sets</div>
+      <div className="divide-y divide-line">
+        {compareSets.length ? compareSets.map((compareSet) => (
+          <button className="block w-full px-4 py-3 text-left transition hover:bg-white/45" key={compareSet.id} onClick={() => onSelectCompareSet(compareSet.id)} type="button">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-semibold text-ink">{compareSet.name}</span>
+              <span className="text-xs font-semibold text-muted">{compareSet.run_ids_json?.length || 0} runs</span>
+            </div>
+          </button>
+        )) : <div className="p-4 text-sm text-muted">No saved compare sets.</div>}
+      </div>
+    </div>
+  );
+}
+
+function ResearchReviewDecisionNotes({ notes, onSelectRun }) {
+  return (
+    <div className="overflow-hidden rounded-md border border-line bg-panel2/40">
+      <div className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">Decision Notes</div>
+      <div className="divide-y divide-line">
+        {notes.length ? notes.map((note) => (
+          <button className="block w-full px-4 py-3 text-left transition hover:bg-white/45" key={note.id} onClick={() => onSelectRun(note.run_id)} type="button">
+            <div className="text-sm font-semibold text-ink">{note.summary}</div>
+            <div className="mt-1 text-xs text-muted">{note.run_name || note.run_id} · {formatDate(note.created_at)}</div>
+          </button>
+        )) : <div className="p-4 text-sm text-muted">No decision notes yet.</div>}
+      </div>
+    </div>
+  );
+}
 function ResearchLineageEdgesPanel({ edges, branches, runs, onSelectBranch, onSelectRun }) {
   const branchById = Object.fromEntries((branches || []).map((branch) => [branch.id, branch]));
   const runById = Object.fromEntries((runs || []).map((run) => [run.id, run]));
@@ -4459,7 +4666,7 @@ function PerformanceResultsSection({ chart, items, keyMetrics, onOpenArtifact, o
         </div>
       </div>
       {keyMetrics.length ? (
-        <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-7">
           {keyMetrics.map((item) => <StatTile key={item.label} label={item.label} value={item.value} tone={item.tone} />)}
         </div>
       ) : null}
@@ -4468,6 +4675,7 @@ function PerformanceResultsSection({ chart, items, keyMetrics, onOpenArtifact, o
           <ReactECharts option={runEquityChartOption(chart)} style={{ height: 420 }} />
         ) : <div className="p-8 text-center text-sm font-semibold text-muted">{t("No Series Data Available")}</div>}
       </div>
+      <MonthlyReturnHeatmap chart={chart} />
       {summaryItems.length ? (
         <div className="mt-4">
           <ResultTemplateBlock title="Performance Summary" detail={`${summaryItems.length} summary table${summaryItems.length > 1 ? 's' : ''}`}>
@@ -4487,6 +4695,17 @@ function PerformanceResultsSection({ chart, items, keyMetrics, onOpenArtifact, o
   );
 }
 
+function MonthlyReturnHeatmap({ chart }) {
+  const heatmap = useMemo(() => monthlyReturnHeatmapData(chart), [chart]);
+  if (!heatmap) return null;
+  return (
+    <div className="mt-4">
+      <ResultTemplateBlock title={t("Monthly Returns")} detail={t('{{months}} months, {{start}} to {{end}}', { months: heatmap.monthCount, start: heatmap.startDate, end: heatmap.endDate })}>
+        <ReactECharts option={monthlyReturnHeatmapOption(heatmap)} style={{ height: Math.max(220, 92 + heatmap.rows.length * 42) }} />
+      </ResultTemplateBlock>
+    </div>
+  );
+}
 const defaultResultDomainTemplateRegistry = {
   factor: {
     blocks: [
@@ -9490,6 +9709,7 @@ function runKeyMetricTiles(run, equityChart = null) {
     const pnlMetrics = [
       { label: 'Total PnL', paths: ['strategy.pnl.total_pnl', 'strategy.raw_pnl.total_pnl', 'strategy.summary.total_pnl'], tone: 'positive' },
       { label: 'Annualized PnL', paths: ['strategy.pnl.annualized_pnl', 'strategy.raw_pnl.annualized_pnl', 'strategy.summary.annualized_pnl'], tone: 'positive' },
+      { label: 'Annualization Periods', paths: ['strategy.summary.periods_per_year'], tone: 'neutral' },
       { label: 'Max Drawdown', paths: ['strategy.pnl.max_drawdown', 'strategy.raw_pnl.max_drawdown'], tone: 'negative' },
       { label: 'Sharpe', paths: ['strategy.pnl.sharpe', 'strategy.raw_pnl.sharpe', 'strategy.summary.sharpe'], tone: 'positive' },
       { label: 'Sortino', paths: ['strategy.pnl.sortino', 'strategy.raw_pnl.sortino', 'strategy.summary.sortino'], tone: 'positive' },
@@ -9503,8 +9723,9 @@ function runKeyMetricTiles(run, equityChart = null) {
   }
   const derived = deriveRunPerformanceMetrics(equityChart);
   const preferred = [
-    { label: 'Annual Return', keys: ['annual_return', 'annualized_return', 'annualized_pnl'], tone: 'positive', percent: true },
-    { label: 'Annual Volatility', keys: ['annual_volatility', 'annualized_volatility', 'annualized_vol', 'volatility', 'daily_vol'], tone: 'neutral', percent: true },
+    { label: 'Annual Compound Return', keys: ['annual_return', 'annualized_return'], tone: 'positive', percent: true },
+    { label: 'Annualization Periods', keys: ['periods_per_year'], tone: 'neutral' },
+    { label: 'Annual Volatility', keys: ['annual_volatility', 'annualized_volatility', 'annualized_vol', 'volatility'], tone: 'neutral', percent: true },
     { label: 'Max Drawdown', keys: ['max_drawdown', 'maximum_drawdown'], tone: 'negative', percent: true },
     { label: 'Sharpe', keys: ['sharpe'], tone: 'positive' },
     { label: 'Sortino', keys: ['sortino'], tone: 'positive' },
@@ -9528,24 +9749,19 @@ function deriveRunPerformanceMetrics(chart) {
       const number = toNumber(value);
       return { x, nav: chart.valueAsPercent ? 1 + number : number };
     })
-    .filter((point) => Number.isFinite(point.nav) && point.nav > 0);
-  if (navPoints.length < 2) return {};
+    .filter((point) => Number.isFinite(point.nav) && (chart.valueAsPercent ? point.nav >= 0 : point.nav > 0));
+  if (navPoints.length < (chart.valueMode === 'period_return' ? 1 : 2)) return {};
 
-  const returns = [];
-  for (let index = 1; index < navPoints.length; index += 1) {
-    const previous = navPoints[index - 1].nav;
-    const current = navPoints[index].nav;
-    if (previous > 0 && Number.isFinite(current)) returns.push(current / previous - 1);
-  }
+  const returns = chart.valueMode === 'period_return' && Array.isArray(chart.periodReturns)
+    ? chart.periodReturns.map(toNumber).filter(Number.isFinite)
+    : navPoints.slice(1).map((point, index) => point.nav / navPoints[index].nav - 1);
   if (!returns.length) return {};
 
   const first = navPoints[0];
   const last = navPoints[navPoints.length - 1];
-  const elapsedDays = elapsedCalendarDays(first.x, last.x);
-  const periodsPerYear = elapsedDays > 0 ? returns.length / (elapsedDays / 365.25) : 252;
-  const annualReturn = elapsedDays > 0 && first.nav > 0
-    ? (Math.exp(Math.log(last.nav / first.nav) * (365.25 / elapsedDays)) - 1)
-    : mean(returns) * periodsPerYear;
+  const periodsPerYear = 252;
+  const growth = chart.valueMode === 'period_return' ? last.nav : last.nav / first.nav;
+  const annualReturn = growth === 0 ? -1 : Math.exp(Math.log(growth) * (periodsPerYear / returns.length)) - 1;
   const returnDeviation = standardDeviation(returns);
   const volatility = returnDeviation * Math.sqrt(periodsPerYear);
   const downsideDeviation = downsideRiskDeviation(returns) * Math.sqrt(periodsPerYear);
@@ -9554,20 +9770,13 @@ function deriveRunPerformanceMetrics(chart) {
 
   return {
     annual_return: annualReturn * 100,
+    periods_per_year: periodsPerYear,
     annual_volatility: Number.isFinite(volatility) ? volatility * 100 : NaN,
     max_drawdown: Number.isFinite(maxDrawdown) ? maxDrawdown * 100 : NaN,
     sharpe: returnDeviation > 0 ? (averageReturn / returnDeviation) * Math.sqrt(periodsPerYear) : NaN,
     sortino: downsideDeviation > 0 ? (averageReturn * periodsPerYear) / downsideDeviation : NaN,
     calmar: Number.isFinite(maxDrawdown) && maxDrawdown < 0 ? annualReturn / Math.abs(maxDrawdown) : NaN,
   };
-}
-
-function elapsedCalendarDays(start, end) {
-  const startDate = parseDateValue(start);
-  const endDate = parseDateValue(end);
-  if (!startDate || !endDate) return NaN;
-  const days = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
-  return days > 0 ? days : NaN;
 }
 
 function mean(values) {
@@ -9896,12 +10105,14 @@ function runEquityChartData(items) {
   const xKey = equityItem.x;
   const valueMode = seriesValueMode(equityItem, equityKey);
   const equityPoints = [];
+  const periodReturns = [];
   let compounded = 1;
   let cumulative = 0;
   for (const { row, x } of sortedChartRows(equityItem.rows || [], xKey)) {
     const raw = toNumber(row?.[equityKey]);
     if (!Number.isFinite(raw)) continue;
     if (valueMode === 'period_return') {
+      periodReturns.push(raw);
       compounded *= 1 + raw;
       equityPoints.push({ x, value: compounded - 1 });
     } else if (valueMode === 'absolute_change') {
@@ -9945,6 +10156,7 @@ function runEquityChartData(items) {
     valueAsPercent: valueMode === 'period_return',
     drawdownAsPercent: valueMode !== 'absolute_change',
     valueMode,
+    periodReturns,
   };
 }
 
@@ -10117,7 +10329,7 @@ function normalizeDrawdown(value, valueMode = 'level') {
 }
 
 function computeDrawdownPoints(equityPoints, valueMode) {
-  let runningPeak = -Infinity;
+  let runningPeak = valueMode === 'period_return' ? 1 : -Infinity;
   return equityPoints.map((point) => {
     if (valueMode === 'absolute_change') {
       if (!Number.isFinite(point.value)) return { x: point.x, value: null };
@@ -10131,6 +10343,170 @@ function computeDrawdownPoints(equityPoints, valueMode) {
   }).filter((point) => Number.isFinite(point.value));
 }
 
+const monthlyReturnMonthLabels = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+function monthlyReturnHeatmapData(chart) {
+  if (!chart || chart.valueMode === 'absolute_change') return null;
+  const points = (chart.equityData || [])
+    .map((point) => {
+      const x = Array.isArray(point) ? point[0] : point?.x;
+      const rawValue = Array.isArray(point) ? point[1] : point?.value;
+      const parsed = parseChartDate(x);
+      const number = toNumber(rawValue);
+      const nav = chart.valueAsPercent ? 1 + number : number;
+      if (!parsed || !Number.isFinite(nav) || nav <= 0) return null;
+      return {
+        x: parsed.iso,
+        timestamp: parsed.timestamp,
+        year: Number(parsed.iso.slice(0, 4)),
+        month: Number(parsed.iso.slice(5, 7)) - 1,
+        nav,
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.timestamp - right.timestamp);
+  if (points.length < 2) return null;
+
+  const buckets = [];
+  let currentBucket = null;
+  for (const point of points) {
+    const key = `${point.year}-${point.month}`;
+    if (!currentBucket || currentBucket.key !== key) {
+      currentBucket = {
+        key,
+        year: point.year,
+        month: point.month,
+        firstNav: point.nav,
+        endNav: point.nav,
+        firstDate: point.x,
+        lastDate: point.x,
+        count: 0,
+      };
+      buckets.push(currentBucket);
+    }
+    currentBucket.endNav = point.nav;
+    currentBucket.lastDate = point.x;
+    currentBucket.count += 1;
+  }
+
+  const cellsByYear = new Map();
+  let previousEndNav = chart.valueAsPercent ? 1 : null;
+  for (const bucket of buckets) {
+    const startNav = Number.isFinite(previousEndNav) && previousEndNav > 0 ? previousEndNav : bucket.firstNav;
+    const value = startNav > 0 ? bucket.endNav / startNav - 1 : NaN;
+    previousEndNav = bucket.endNav;
+    if (!Number.isFinite(value)) continue;
+    if (!cellsByYear.has(bucket.year)) cellsByYear.set(bucket.year, Array.from({ length: 12 }, () => null));
+    cellsByYear.get(bucket.year)[bucket.month] = {
+      value,
+      firstDate: bucket.firstDate,
+      lastDate: bucket.lastDate,
+      count: bucket.count,
+    };
+  }
+
+  const rows = Array.from(cellsByYear.keys()).sort((left, right) => left - right).map((year) => {
+    const cells = cellsByYear.get(year);
+    const presentCells = cells.filter(Boolean);
+    const values = presentCells.map((cell) => cell.value).filter(Number.isFinite);
+    return {
+      year,
+      cells,
+      sum: values.length ? values.reduce((total, value) => total + value, 0) : null,
+      monthCount: values.length,
+      firstDate: presentCells[0]?.firstDate || null,
+      lastDate: presentCells[presentCells.length - 1]?.lastDate || null,
+    };
+  }).filter((row) => row.monthCount);
+  if (!rows.length) return null;
+
+  const monthlyValues = rows.flatMap((row) => row.cells.map((cell) => cell?.value).filter(Number.isFinite));
+  return {
+    rows,
+    monthCount: monthlyValues.length,
+    startDate: points[0].x,
+    endDate: points[points.length - 1].x,
+    maxAbs: Math.max(0.001, ...monthlyValues.map((value) => Math.abs(value))),
+  };
+}
+
+function monthlyReturnHeatmapOption(heatmap) {
+  const xLabels = [...monthlyReturnMonthLabels, t('Sum')];
+  const data = [];
+  heatmap.rows.forEach((row, rowIndex) => {
+    row.cells.forEach((cell, monthIndex) => {
+      if (!cell || !Number.isFinite(cell.value)) return;
+      data.push({ value: [monthIndex, rowIndex, cell.value, cell.firstDate, cell.lastDate] });
+    });
+    if (Number.isFinite(row.sum)) {
+      data.push({
+        value: [12, rowIndex, row.sum, row.firstDate, row.lastDate],
+        itemStyle: { borderColor: '#cfd1cc', borderWidth: 2 },
+      });
+    }
+  });
+  return {
+    animation: false,
+    tooltip: {
+      position: 'top',
+      formatter: (params) => {
+        const value = params.value || [];
+        const monthIndex = Number(value[0]);
+        const rowIndex = Number(value[1]);
+        const cellValue = Number(value[2]);
+        const year = heatmap.rows[rowIndex]?.year || '--';
+        const label = monthIndex === 12 ? t('Row Sum') : monthlyReturnMonthLabels[monthIndex] || '--';
+        const range = value[3] && value[4] ? `<br/>${value[3]} to ${value[4]}` : '';
+        return `${year} ${label}<br/>${formatMonthlyReturnPercent(cellValue)}${range}`;
+      },
+    },
+    grid: { top: 28, left: 52, right: 16, bottom: 28 },
+    xAxis: {
+      type: 'category',
+      data: xLabels,
+      position: 'top',
+      axisLine: { lineStyle: { color: '#d7dce2' } },
+      axisTick: { show: false },
+      axisLabel: { color: '#5f6b7a', fontSize: 11 },
+      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.18)'] } },
+    },
+    yAxis: {
+      type: 'category',
+      data: heatmap.rows.map((row) => String(row.year)),
+      inverse: true,
+      axisLine: { lineStyle: { color: '#d7dce2' } },
+      axisTick: { show: false },
+      axisLabel: { color: '#5f6b7a', fontSize: 11, fontWeight: 600 },
+      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)'] } },
+    },
+    visualMap: {
+      show: false,
+      min: -heatmap.maxAbs,
+      max: heatmap.maxAbs,
+      inRange: { color: ['#dcfce7', '#ffffff', '#fee2e2'] },
+    },
+    series: [{
+      name: t('Monthly Returns'),
+      type: 'heatmap',
+      data,
+      label: {
+        show: true,
+        color: '#202326',
+        fontSize: 11,
+        formatter: (params) => formatMonthlyReturnPercent(Number(params.value?.[2])),
+      },
+      itemStyle: { borderColor: '#fbfbf8', borderWidth: 2 },
+      emphasis: { itemStyle: { borderColor: '#202326', borderWidth: 1 } },
+    }],
+  };
+}
+
+function formatMonthlyReturnPercent(value) {
+  if (!Number.isFinite(value)) return '--';
+  const percent = value * 100;
+  const digits = Math.abs(percent) < 1 ? 2 : 1;
+  return `${percent > 0 ? '+' : ''}${percent.toFixed(digits)}%`;
+}
 function runEquityChartOption(chart) {
   const drawdowns = chart.drawdownData.map((point) => point[1]).filter(Number.isFinite);
   const minDrawdown = drawdowns.length ? Math.min(...drawdowns) : 0;
@@ -10781,7 +11157,7 @@ function App() {
   const initialRoute = initialRouteRef.current;
   const [active, setActive] = useState(initialRoute.active);
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedResearchId, setSelectedResearchId] = useState(initialRoute.researchId || null);
   const [selectedBranchId, setSelectedBranchId] = useState(initialRoute.branchId || null);
@@ -11009,7 +11385,7 @@ function App() {
 
   const page = useMemo(() => {
     if (error) return <EmptyState title="API unavailable" detail={error} />;
-    if (!data && loading) return <EmptyState title="Loading Blackbox" detail="Fetching live data from the API." />;
+    if (!data && loading) return <AppLoadingAnimation />;
     if (!data) return <EmptyState title="No API data" detail="Start the FastAPI server or set VITE_BLACKBOX_API_BASE." />;
     if (active === 'management') return <ManagementPage data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} />;
     if (active === 'project') return <ProjectPage data={data} selectedProjectId={selectedProjectId} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectSearchView={selectSearchView} onChanged={onChanged} />;
@@ -11033,8 +11409,11 @@ function App() {
         onCreated={onCreated}
         onOpenSearch={() => setQuickRunSearchOpen(true)}
         contextNav={<ContextNav items={contextItems} />}
+        loading={loading}
       >
-        {page}
+        <div className="page-enter" key={`${active}:${data ? 'ready' : 'pending'}`}>
+          {page}
+        </div>
       </Shell>
       <QuickRunSearchModal open={quickRunSearchOpen} data={data} onClose={() => setQuickRunSearchOpen(false)} onSelectRun={selectRun} />
     </>

@@ -19,8 +19,7 @@ with bb.init(
 ) as run:
     bb.log({"rows": 3200000}, namespace="pipeline.stage", point={"kind": "event", "name": "data_loaded"})
     bb.log_factor_summary({"ic_mean": 0.034, "ic_ir": 0.61, "coverage": 0.94})
-    bb.log_backtest_summary({"sharpe": 1.42, "max_drawdown": 0.09, "annual_return": 0.18})
-    bb.log_series("equity_curve", equity_df, x="date", y=["nav", "benchmark"])
+    bb.log_performance_result(curve=equity_df, mode="nav", x="date", y="nav", periods_per_year=252)
     bb.log_artifact("post_cost_report", "reports/post_cost.html", kind="report_html")
 ```
 

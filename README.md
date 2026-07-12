@@ -106,7 +106,7 @@ Use `BLACKBOX_ENDPOINT`, `BLACKBOX_TOKEN`, or `BLACKBOX_API_TOKEN` to avoid repe
 Agents should publish standard backtest outputs through the high-level command so Blackbox normalizes the performance contract and validates the stored result in one pass:
 
 ```powershell
-bbox run publish-performance --run-id run_001 --curve-file .\equity.csv --mode nav --summary-file .\summary.json --summary-unit percentage-point --idempotency-prefix agent-task-1-performance --finish --agent-output
+bbox run publish-performance --run-id run_001 --curve-file .\equity.csv --mode nav --periods-per-year 252 --summary-file .\summary.json --summary-unit percentage-point --idempotency-prefix agent-task-1-performance --finish --agent-output
 ```
 
 ## SDK Quick Start

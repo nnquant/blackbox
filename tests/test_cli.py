@@ -777,12 +777,15 @@ def test_publish_performance_dry_run_normalizes_curve_and_summary(monkeypatch, t
     assert result["rows"] == 2
     assert result["preflight"]["curve"]["severity"] == "ok"
     assert result["preflight"]["summary"]["severity"] == "ok"
-    assert {item["code"] for item in result["normalizations"]} == {
+    assert {item["code"] for item in result["normalizations"]} >= {
         "INFER_X_COLUMN",
         "INFER_VALUE_COLUMN",
         "COPY_VALUE_COLUMN",
         "CONVERT_SUMMARY_PERCENT_UNIT",
+        "COMPUTE_PERFORMANCE_SUMMARY",
+        "REPLACE_REPORTED_PERFORMANCE_METRIC",
     }
+    assert result["computed_summary"]["periods_per_year"] == 252
 
 
 def test_publish_performance_uploads_validates_and_finishes(monkeypatch, tmp_path) -> None:
@@ -851,12 +854,14 @@ def test_publish_performance_uploads_validates_and_finishes(monkeypatch, tmp_pat
     assert series_call["json"]["name"] == "returns_series"
     assert series_call["json"]["data"][0]["series_values"] == 0.01
     assert series_call["json"]["result"]["role"] == "primary_curve"
+    assert series_call["json"]["metadata"]["performance"]["periods_per_year"] == 252
+    assert calls[0]["json"]["values"]["periods_per_year"] == 252
 
 
 def test_agent_output_compacts_publish_validation_error(tmp_path, capsys) -> None:
     cli_main = importlib.import_module("blackbox_cli.main")
     curve_path = tmp_path / "equity.json"
-    curve_path.write_text('[{"date":"2026-01-01","nav":1.0}]', encoding="utf-8")
+    curve_path.write_text('[{"date":"2026-01-01","nav":1.0},{"date":"2026-01-02","nav":1.01}]', encoding="utf-8")
 
     exit_code = cli_main.main(
         [
@@ -1429,6 +1434,43 @@ def test_update_commands_dispatch_patch_requests(monkeypatch) -> None:
         {"method": "PATCH", "path": "/api/v1/runs/run_1", "json": {"title": "patched", "config": {"lookback": 30}}},
     ]
 
+
+def test_research_review_dispatches_request(monkeypatch) -> None:
+    cli_main = importlib.import_module("blackbox_cli.main")
+
+    calls: list[dict[str, Any]] = []
+
+    def fake_request(args, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        del args
+        calls.append({"method": method, "path": path, **kwargs})
+        return {"ok": True}
+
+    monkeypatch.setattr(cli_main, "request", fake_request)
+    args = cli_main.build_parser().parse_args(
+        [
+            "research",
+            "review",
+            "--research-id",
+            "res_1",
+            "--metric",
+            "strategy.summary.calmar",
+            "--direction",
+            "max",
+            "--stale-days",
+            "30",
+            "--limit",
+            "12",
+        ]
+    )
+
+    assert cli_main.dispatch(args) == {"ok": True}
+    assert calls == [
+        {
+            "method": "GET",
+            "path": "/api/v1/researches/res_1/review-board",
+            "params": {"metric": "strategy.summary.calmar", "direction": "max", "stale_days": 30, "limit": 12},
+        }
+    ]
 
 def test_search_view_commands_dispatch_requests(monkeypatch) -> None:
     cli_main = importlib.import_module("blackbox_cli.main")

@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
+from .performance import compute_performance_summary
+
 
 Issue = dict[str, Any]
 PERFORMANCE_RESULT_NAMES = {"equity_curve", "returns_series", "pnl_series", "absolute_return_series"}
@@ -168,6 +170,7 @@ def validate_run_detail(
             continue
         validate_series_item(issues, item, label=item.get("name") or item.get("artifact_name") or "Series artifact", role=(item.get("result") or {}).get("role"))
     validate_summary_units(issues, run)
+    validate_summary_consistency(issues, run, primary_series)
 
     return validation_report(issues)
 
@@ -344,6 +347,7 @@ def run_series_items(artifacts: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "rows": rows,
                 "preview_row_count": (artifact.get("preview_json") or {}).get("row_count"),
                 "result": artifact_result_metadata(artifact),
+                "performance": metadata.get("performance") if isinstance(metadata.get("performance"), dict) else {},
             }
         )
     return items
@@ -523,6 +527,57 @@ def validate_summary_units(issues: list[Issue], run: dict[str, Any]) -> None:
             add_issue(issues, "warning", f"{key} may use decimal units", f"Summary {key} is {number}; percentage metrics should use percentage points, e.g. 18.5 means 18.50%.")
         if key == "max_drawdown" and -1 < number < 0:
             add_issue(issues, "warning", "max_drawdown may use decimal units", f"Summary max_drawdown is {number}; percentage metrics should use percentage points, e.g. -9.0 means -9.00%.")
+
+
+def validate_summary_consistency(issues: list[Issue], run: dict[str, Any], primary_series: dict[str, Any] | None) -> None:
+    if not primary_series:
+        return
+    mode = str(primary_series.get("mode") or "").lower()
+    if mode not in PERFORMANCE_MODES:
+        return
+    performance = primary_series.get("performance") or {}
+    periods_per_year = to_number(first_summary_metric(run, ["periods_per_year"])) or to_number(performance.get("periods_per_year")) or 252.0
+    value_key = choose_series_key(primary_series, ["series_values", "nav", "return", "ret", "pnl", "change"])
+    if not value_key:
+        return
+    try:
+        computed = compute_performance_summary(
+            primary_series.get("rows") or [],
+            mode=mode,
+            value_key=value_key,
+            periods_per_year=periods_per_year,
+            risk_free_rate=to_number(performance.get("risk_free_rate")) or 0.0,
+            mar=to_number(performance.get("mar")) or 0.0,
+            capital_base=to_number(performance.get("capital_base")),
+        )
+    except ValueError as exc:
+        add_issue(
+            issues,
+            "warning",
+            "Performance summary cannot be recomputed",
+            str(exc),
+            code="PERFORMANCE_CALCULATION_INVALID",
+            field="primary_curve",
+            fix="Correct the primary curve values or performance metadata.",
+        )
+        return
+
+    for key, expected in computed.items():
+        actual = to_number(first_summary_metric(run, [key]))
+        if actual is None:
+            continue
+        tolerance = max(0.05 if key in {"annual_return", "annual_volatility", "max_drawdown"} else 0.001, abs(expected) * 0.0001)
+        if abs(actual - expected) <= tolerance:
+            continue
+        add_issue(
+            issues,
+            "warning",
+            f"{key} differs from canonical calculation",
+            f"Summary {key} is {actual}, while the primary curve gives {expected} with periods_per_year={periods_per_year}.",
+            code="PERFORMANCE_METRIC_MISMATCH",
+            field=f"strategy.summary.{key}",
+            fix="Publish the canonical curve-derived value or correct the performance calculation metadata.",
+        )
 
 
 def summary_percent_unit(run: dict[str, Any]) -> str | None:

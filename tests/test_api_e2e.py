@@ -667,9 +667,9 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         dashboard = get(client, "/api/v1/dashboard")
         assert dashboard["summary"]["workspaces"] == 2
         assert dashboard["summary"]["projects"] == 1
-        assert dashboard["summary"]["runs"] == 6
-        assert dashboard["summary"]["today_runs"] == 6
-        assert dashboard["summary"]["running_runs"] == 2
+        assert dashboard["summary"]["runs"] == 7
+        assert dashboard["summary"]["today_runs"] == 7
+        assert dashboard["summary"]["running_runs"] == 3
         assert dashboard["summary"]["failed_runs"] == 1
         assert dashboard["summary"]["failed_runs_24h"] == 1
         assert dashboard["summary"]["new_branches_24h"] == 1
@@ -681,14 +681,14 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert dashboard["projects"][0]["workspace_key"] == "research-lab"
         assert dashboard["projects"][0]["research_count"] == 1
         assert dashboard["projects"][0]["branch_count"] == 1
-        assert dashboard["projects"][0]["run_count"] == 6
-        assert dashboard["projects"][0]["running_run_count"] == 2
+        assert dashboard["projects"][0]["run_count"] == 7
+        assert dashboard["projects"][0]["running_run_count"] == 3
         assert dashboard["projects"][0]["failed_run_count"] == 1
-        assert dashboard["researches"][0]["run_count"] == 6
-        assert dashboard["researches"][0]["run_count_7d"] == 6
+        assert dashboard["researches"][0]["run_count"] == 7
+        assert dashboard["researches"][0]["run_count_7d"] == 7
         assert dashboard["researches"][0]["failed_run_count_7d"] == 1
         assert dashboard["researches"][0]["champion_run"]["id"] == run["id"]
-        assert dashboard["branches"][0]["run_count"] == 6
+        assert dashboard["branches"][0]["run_count"] == 7
         assert dashboard["sweeps"][0]["run_count"] == 2
         assert dashboard["runs"][0]["project_key"] == "alpha-lab"
         assert dashboard["runs"][0]["research_key"] == "csi500-reversal"
@@ -697,20 +697,20 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         dashboard_activity = {item["date"]: item["run_count"] for item in dashboard["run_activity_daily"]}
         assert dashboard_activity["2026-06-01"] == 1
         assert dashboard_activity["2026-06-02"] == 1
-        assert sum(dashboard_activity.values()) == 6
+        assert sum(dashboard_activity.values()) == 7
         runs_activity = get(client, "/api/v1/runs/activity/daily")
         assert runs_activity == dashboard["run_activity_daily"]
         management = get(client, "/api/v1/management/research-summary?stale_days=1&limit=5")
         assert management["summary"]["projects"] == 1
         assert management["summary"]["researches"] == 1
-        assert management["summary"]["runs"] == 6
-        assert management["summary"]["running_runs"] == 2
+        assert management["summary"]["runs"] == 7
+        assert management["summary"]["running_runs"] == 3
         assert management["summary"]["stale_running_runs"] == 1
         assert management["summary"]["compare_sets"] == 1
         assert management["summary"]["search_views"] == 1
         assert management["summary"]["artifact_bytes"] > 0
         assert management["projects"][0]["key"] == "alpha-lab"
-        assert management["projects"][0]["run_count"] == 6
+        assert management["projects"][0]["run_count"] == 7
         assert management["top_research_by_runs"][0]["key"] == "csi500-reversal"
         assert management["top_research_by_runs"][0]["artifact_count"] >= 9
         assert management["top_branches_by_runs"][0]["key"] == "baseline-v1"
@@ -720,13 +720,33 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         assert project_detail["workspace_key"] == "research-lab"
         assert project_detail["research_count"] == 1
         assert project_detail["branch_count"] == 1
-        assert project_detail["run_count"] == 6
+        assert project_detail["run_count"] == 7
         assert [item["id"] for item in project_detail["researches"]] == [research["id"]]
         assert [item["id"] for item in project_detail["branches"]] == [branch["id"]]
         assert {item["id"] for item in project_detail["runs"]} >= {run["id"], sweep_run_2_source["id"]}
         assert project_detail["runs"][0]["project_key"] == "alpha-lab"
         assert project_detail["compare_sets"][0]["id"] == compare_set["id"]
         assert project_detail["search_views"][0]["id"] == search_view["id"]
+        rejected_branch = post(
+            client,
+            "/api/v1/branches",
+            {"research_id": research["id"], "key": "rejected-no-edge", "title": "Rejected No Edge", "status": "rejected"},
+        )
+        rejected_run = post(client, "/api/v1/runs", {"branch_id": rejected_branch["id"], "name": "rejected-failed-run"})
+        post(client, f"/api/v1/runs/{rejected_run['id']}/fail", {"message": "screened out"})
+        review_board = get(client, f"/api/v1/researches/{research['id']}/review-board?limit=5&stale_days=1")
+        assert review_board["research"]["id"] == research["id"]
+        assert review_board["state"]["candidate_run_count"] == 2
+        assert review_board["state"]["compare_set_count"] == 1
+        assert review_board["state"]["decision_note_count"] == 1
+        assert review_board["candidate_set"]["recommended_compare_run_ids"][:2] == [run["id"], sweep_run_2_source["id"]]
+        assert [item["id"] for item in review_board["candidate_runs"][:2]] == [run["id"], sweep_run_2_source["id"]]
+        assert review_board["candidate_runs"][0]["in_compare_set"] is True
+        assert review_board["compare_sets"][0]["id"] == compare_set["id"]
+        assert review_board["decision_notes"][0]["summary"] == "keep as baseline"
+        archive_candidate = next(item for item in review_board["archive_candidates"] if item["id"] == rejected_branch["id"])
+        assert "rejected" in archive_candidate["archive_reasons"]
+        assert archive_candidate["suggested_status"] == "archived"
         child_branch = post(
             client,
             "/api/v1/branches",
@@ -791,7 +811,17 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
             bb.log_backtest_summary({"sharpe": 1.11})
             bb.log_artifact("offline_report", offline_report, kind="report_html")
             bb.log_table("positions", [{"date": "2026-01-01", "weight": 0.5}], kind="table_csv")
-            bb.log_series("returns", [{"date": "2026-01-01", "ret": 0.01}], x="date", y="ret")
+            bb.log_series(
+                "returns",
+                [
+                    {"date": "2026-01-01", "series_values": 0.01},
+                    {"date": "2026-01-02", "series_values": -0.002},
+                ],
+                x="date",
+                y="series_values",
+                mode="return",
+                result={"domain": "performance", "name": "offline_performance", "role": "primary_curve"},
+            )
             bb.register_dataset(
                 name="rqdata-cn-eq",
                 version="2026-01-01",
@@ -820,14 +850,20 @@ def test_api_e2e(tmp_path: Path, monkeypatch) -> None:
         offline_report_artifact = next(item for item in synced_detail["artifacts"] if item["name"] == "offline_report")
         assert offline_report_artifact["preview_json"]["title"] == "Offline Report"
         returns_artifact = next(item for item in synced_detail["artifacts"] if item["name"] == "returns")
-        assert returns_artifact["metadata_json"]["series"] == {"name": "returns", "x": "date", "y": "ret", "mode": None, "namespace": None}
+        assert returns_artifact["metadata_json"]["series"] == {
+            "name": "returns",
+            "x": "date",
+            "y": "series_values",
+            "mode": "return",
+            "namespace": None,
+        }
         series_compare = post(
             client,
             "/api/v1/compare/runs",
             {"run_ids": [remote_run["id"]], "series": ["returns"], "with_config_diff": False},
         )
         assert series_compare["series"]["returns"][remote_run["id"]]["x"] == "date"
-        assert series_compare["series"]["returns"][remote_run["id"]]["rows"][0]["ret"] == "0.01"
+        assert series_compare["series"]["returns"][remote_run["id"]]["rows"][0]["series_values"] == "0.01"
         assert len(synced_detail["artifacts"]) == 3
         assert len(synced_detail["snapshots"]["code"]) == 1
         assert len(synced_detail["snapshots"]["data"]) == 1

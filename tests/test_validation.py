@@ -223,3 +223,67 @@ def test_validate_run_detail_checks_expected_primary_series_range() -> None:
         "Primary curve start does not match expected date",
         "Primary curve end does not match expected date",
     }
+
+
+def test_validate_run_detail_accepts_canonical_curve_derived_summary() -> None:
+    report = validate_run_detail(
+        {
+            "id": "run_1",
+            "status": "completed",
+            "summary_json": {"strategy.summary": {"annual_return": 10.0, "max_drawdown": 0.0, "periods_per_year": 2}},
+            "artifacts": [
+                {
+                    "id": "art_1",
+                    "name": "returns_series",
+                    "kind": "table_csv",
+                    "metadata_json": {
+                        "series": {"name": "returns_series", "x": "date", "y": ["series_values"], "mode": "return"},
+                        "result": {"domain": "performance", "role": "primary_curve", "name": "primary_performance"},
+                        "performance": {"periods_per_year": 2, "calculator_version": "performance-v1"},
+                    },
+                    "preview_json": {
+                        "row_count": 2,
+                        "rows": [
+                            {"date": "2026-01-01", "series_values": 0.1},
+                            {"date": "2026-01-02", "series_values": 0.0},
+                        ],
+                    },
+                }
+            ],
+        }
+    )
+
+    assert report["severity"] == "ok"
+    assert report["issues"] == []
+
+
+def test_validate_run_detail_warns_when_summary_differs_from_curve() -> None:
+    report = validate_run_detail(
+        {
+            "id": "run_1",
+            "status": "running",
+            "summary_json": {"strategy.summary": {"annual_return": 0.0, "periods_per_year": 2}},
+            "artifacts": [
+                {
+                    "id": "art_1",
+                    "name": "returns_series",
+                    "kind": "table_csv",
+                    "metadata_json": {
+                        "series": {"name": "returns_series", "x": "date", "y": ["series_values"], "mode": "return"},
+                        "result": {"domain": "performance", "role": "primary_curve", "name": "primary_performance"},
+                        "performance": {"periods_per_year": 2},
+                    },
+                    "preview_json": {
+                        "row_count": 2,
+                        "rows": [
+                            {"date": "2026-01-01", "series_values": 0.1},
+                            {"date": "2026-01-02", "series_values": 0.0},
+                        ],
+                    },
+                }
+            ],
+        }
+    )
+
+    issue = next(issue for issue in report["issues"] if issue["code"] == "PERFORMANCE_METRIC_MISMATCH")
+    assert issue["field"] == "strategy.summary.annual_return"

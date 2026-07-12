@@ -83,7 +83,8 @@ Run 是 Blackbox 的最小运行单位。Project / Research / Branch 只负责�
   "max_drawdown": -9.0,
   "sharpe": 1.34,
   "sortino": 1.88,
-  "calmar": 2.06
+  "calmar": 2.06,
+  "periods_per_year": 252
 }
 ```
 
@@ -94,6 +95,7 @@ bbox run publish-performance `
   --run-id run_new `
   --curve-file .\equity.csv `
   --mode nav `
+  --periods-per-year 252 `
   --summary-file .\summary.json `
   --summary-unit percentage-point `
   --idempotency-prefix agent-task-123-performance `

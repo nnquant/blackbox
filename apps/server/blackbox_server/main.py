@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from contextlib import asynccontextmanager
 from collections.abc import Sequence
 import csv
@@ -21,7 +22,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from blackbox_common.enums import EventType, RunStatus
+from blackbox_common.enums import BranchStatus, EventType, RunStatus
 from blackbox_common.errors import ApiError, ErrorCode
 from blackbox_common.ids import new_id
 from blackbox_common.schemas import (
@@ -373,6 +374,17 @@ def create_app() -> FastAPI:
         db: Session = Depends(get_db),
     ) -> dict[str, Any]:
         return ok(build_management_research_summary(db, stale_days=stale_days, limit=limit))
+
+    @app.get("/api/v1/researches/{research_id}/review-board")
+    def research_review_board(
+        research_id: str,
+        metric: str = Query("strategy.summary.sharpe", min_length=1),
+        direction: str = Query("max", pattern="^(max|min)$"),
+        stale_days: int = Query(14, ge=1, le=365),
+        limit: int = Query(10, ge=1, le=100),
+        db: Session = Depends(get_db),
+    ) -> dict[str, Any]:
+        return ok(build_research_review_board(db, research_id=research_id, metric=metric, direction=direction, stale_days=stale_days, limit=limit))
 
     @app.post("/api/v1/workspaces")
     def create_workspace(payload: WorkspaceCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
@@ -1615,6 +1627,223 @@ def build_management_research_summary(db: Session, *, stale_days: int = 14, limi
         "stale_running_runs": stale_running_runs,
         "artifact_names_by_bytes": artifact_name_rows,
     }
+
+
+def build_research_review_board(
+    db: Session,
+    *,
+    research_id: str,
+    metric: str = "strategy.summary.sharpe",
+    direction: str = "max",
+    stale_days: int = 14,
+    limit: int = 10,
+) -> dict[str, Any]:
+    research = require_research(db, research_id)
+    project = require_project(db, research.project_id)
+    stale_days = max(1, min(int(stale_days), 365))
+    limit = max(1, min(int(limit), 100))
+    direction = "min" if str(direction).lower() == "min" else "max"
+    stale_cutoff = utcnow() - timedelta(days=stale_days)
+
+    branches = db.scalars(select(Branch).where(Branch.research_id == research.id).order_by(Branch.updated_at.desc())).all()
+    branch_ids = [branch.id for branch in branches]
+    runs = db.scalars(select(Run).where(Run.branch_id.in_(branch_ids)).order_by(Run.updated_at.desc())).all() if branch_ids else []
+    run_ids = [run.id for run in runs]
+    artifacts = db.scalars(select(Artifact).where(Artifact.run_id.in_(run_ids))).all() if run_ids else []
+    project_compare_sets = db.scalars(select(CompareSet).where(CompareSet.project_id == project.id).order_by(CompareSet.created_at.desc())).all()
+    run_id_set = set(run_ids)
+    compare_sets = [
+        compare_set for compare_set in project_compare_sets
+        if compare_set.research_id == research.id or (compare_set.research_id is None and run_id_set.intersection(compare_set.run_ids_json or []))
+    ]
+    decision_notes = (
+        db.scalars(
+            select(RunNote)
+            .where(RunNote.run_id.in_(run_ids), RunNote.kind == "decision")
+            .order_by(RunNote.created_at.desc())
+            .limit(100)
+        ).all()
+        if run_ids
+        else []
+    )
+
+    branch_by_id = {branch.id: branch for branch in branches}
+    research_by_id = {research.id: research}
+    project_by_id = {project.id: project}
+    run_by_id = {run.id: run for run in runs}
+    run_summaries_list = run_summaries_with_maps(runs, branches, [research], [project], artifact_summary_by_run_id(artifacts))
+    compared_run_ids = {run_id for compare_set in compare_sets for run_id in (compare_set.run_ids_json or [])}
+    decision_count_by_run = Counter(note.run_id for note in decision_notes)
+
+    candidate_runs_all = []
+    for summary in run_summaries_list:
+        if summary.get("status") != RunStatus.completed.value:
+            continue
+        metric_value = get_metric_value(summary.get("summary_json") or {}, metric)
+        candidate_runs_all.append(
+            {
+                **summary,
+                "candidate_metric": metric,
+                "candidate_metric_value": metric_value,
+                "in_compare_set": summary.get("id") in compared_run_ids,
+                "decision_note_count": int(decision_count_by_run.get(summary.get("id"), 0)),
+            }
+        )
+    candidate_runs_all.sort(key=lambda item: review_metric_sort_key(item.get("candidate_metric_value"), direction))
+    candidate_runs = candidate_runs_all[:limit]
+    candidate_branch_ids = {item.get("branch_id") for item in candidate_runs if item.get("branch_id")}
+
+    archive_candidates = build_research_archive_candidates(
+        branches,
+        runs,
+        compared_run_ids=compared_run_ids,
+        candidate_branch_ids=candidate_branch_ids,
+        stale_cutoff=stale_cutoff,
+        limit=limit,
+    )
+    run_status_counts = Counter(run.status for run in runs)
+    branch_status_counts = Counter(branch.status for branch in branches)
+    latest_run_at = max_datetime([run.updated_at or run.ended_at or run.started_at or run.created_at for run in runs])
+    latest_decision_at = max_datetime([note.created_at for note in decision_notes])
+    recommended_compare_run_ids = [item["id"] for item in candidate_runs if item.get("id")][: min(6, len(candidate_runs))]
+    next_actions = research_review_next_actions(
+        running_runs=int(run_status_counts.get(RunStatus.running.value, 0)),
+        candidate_count=len(candidate_runs_all),
+        compare_set_count=len(compare_sets),
+        decision_note_count=len(decision_notes),
+        archive_candidate_count=len(archive_candidates),
+    )
+
+    return {
+        "research": research_summary_for_dashboard(research, {project.id: project}, branches, runs),
+        "state": {
+            "status": research.status,
+            "branch_status_counts": dict(branch_status_counts),
+            "run_status_counts": dict(run_status_counts),
+            "branch_count": len(branches),
+            "run_count": len(runs),
+            "running_run_count": int(run_status_counts.get(RunStatus.running.value, 0)),
+            "completed_run_count": int(run_status_counts.get(RunStatus.completed.value, 0)),
+            "candidate_run_count": len(candidate_runs_all),
+            "compare_set_count": len(compare_sets),
+            "decision_note_count": len(decision_notes),
+            "archive_candidate_count": len(archive_candidates),
+            "latest_run_at": latest_run_at,
+            "latest_decision_at": latest_decision_at,
+            "stale_days": stale_days,
+            "next_actions": next_actions,
+        },
+        "candidate_set": {
+            "metric": metric,
+            "direction": direction,
+            "run_count": len(candidate_runs_all),
+            "recommended_compare_run_ids": recommended_compare_run_ids,
+        },
+        "candidate_runs": candidate_runs,
+        "compare_sets": [CompareSetRead.model_validate(item).model_dump(mode="json") for item in compare_sets],
+        "decision_notes": [note_summary_for_dashboard(note, run_by_id, branch_by_id, research_by_id) for note in decision_notes[:limit]],
+        "archive_candidates": archive_candidates,
+    }
+
+
+def review_metric_sort_key(value: Any, direction: str) -> tuple[int, float]:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return (1, 0.0)
+    if direction == "min":
+        return (0, number)
+    return (0, -number)
+
+
+def build_research_archive_candidates(
+    branches: list[Branch],
+    runs: list[Run],
+    *,
+    compared_run_ids: set[str],
+    candidate_branch_ids: set[str],
+    stale_cutoff: datetime,
+    limit: int,
+) -> list[dict[str, Any]]:
+    runs_by_branch: dict[str, list[Run]] = {}
+    for run in runs:
+        runs_by_branch.setdefault(run.branch_id, []).append(run)
+    rows: list[dict[str, Any]] = []
+    terminal_statuses = {RunStatus.completed.value, RunStatus.failed.value, RunStatus.cancelled.value}
+    for branch in branches:
+        if branch.status == BranchStatus.archived.value:
+            continue
+        branch_runs = runs_by_branch.get(branch.id, [])
+        run_ids = {run.id for run in branch_runs}
+        status_counts = Counter(run.status for run in branch_runs)
+        running_count = int(status_counts.get(RunStatus.running.value, 0))
+        completed_count = int(status_counts.get(RunStatus.completed.value, 0))
+        latest_activity_at = max_datetime([branch.updated_at, *(run.updated_at or run.ended_at or run.started_at or run.created_at for run in branch_runs)])
+        reasons: list[str] = []
+        if branch.status == BranchStatus.rejected.value:
+            reasons.append("rejected")
+        if branch_runs and not completed_count and not running_count and all(run.status in terminal_statuses for run in branch_runs):
+            reasons.append("no_completed_runs")
+        if (
+            branch.status in {BranchStatus.active.value, BranchStatus.paused.value}
+            and not running_count
+            and is_before_or_missing(latest_activity_at, stale_cutoff)
+            and branch.id not in candidate_branch_ids
+            and not (run_ids & compared_run_ids)
+        ):
+            reasons.append("stale_non_candidate")
+        if not reasons:
+            continue
+        rows.append(
+            {
+                **BranchRead.model_validate(branch).model_dump(mode="json"),
+                "run_count": len(branch_runs),
+                "running_run_count": running_count,
+                "completed_run_count": completed_count,
+                "failed_run_count": int(status_counts.get(RunStatus.failed.value, 0)),
+                "cancelled_run_count": int(status_counts.get(RunStatus.cancelled.value, 0)),
+                "latest_activity_at": latest_activity_at,
+                "archive_reasons": reasons,
+                "suggested_status": BranchStatus.archived.value,
+            }
+        )
+    rows.sort(key=lambda row: comparable_datetime(row.get("latest_activity_at")) or datetime.min)
+    return rows[:limit]
+
+
+def research_review_next_actions(
+    *,
+    running_runs: int,
+    candidate_count: int,
+    compare_set_count: int,
+    decision_note_count: int,
+    archive_candidate_count: int,
+) -> list[str]:
+    actions: list[str] = []
+    if running_runs:
+        actions.append("monitor_running_runs")
+    if candidate_count and not compare_set_count:
+        actions.append("save_candidate_compare_set")
+    if candidate_count and compare_set_count and not decision_note_count:
+        actions.append("write_decision_note")
+    if archive_candidate_count:
+        actions.append("archive_stale_or_rejected_branches")
+    if not candidate_count and not running_runs:
+        actions.append("run_or_import_candidate_results")
+    return actions
+
+
+def max_datetime(values: Sequence[datetime | None]) -> datetime | None:
+    best_value: datetime | None = None
+    best_comparable: datetime | None = None
+    for value in values:
+        comparable = comparable_datetime(value)
+        if comparable is None:
+            continue
+        if best_comparable is None or comparable > best_comparable:
+            best_value = value
+            best_comparable = comparable
+    return best_value
 
 
 def management_project_rows(db: Session) -> list[dict[str, Any]]:

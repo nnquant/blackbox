@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from blackbox_common.performance import compute_performance_summary, performance_metadata
 from blackbox_common.validation import validate_series_upload
 
 from .client import BlackboxClient, agent_strict_upload, current_run, enforce_upload_preflight
@@ -82,7 +83,10 @@ def create_compare_set(
     endpoint: str | None = None,
     token: str | None = None,
 ) -> dict[str, Any]:
-    return default_client(endpoint=endpoint, token=token).create_compare_set(project_id, name, run_ids, layout=layout, research_id=research_id)
+    kwargs = {"layout": layout}
+    if research_id is not None:
+        kwargs["research_id"] = research_id
+    return default_client(endpoint=endpoint, token=token).create_compare_set(project_id, name, run_ids, **kwargs)
 
 
 def list_compare_sets(project_id: str, endpoint: str | None = None, token: str | None = None) -> list[dict[str, Any]]:
@@ -551,13 +555,36 @@ def log_performance_result(
     drawdown: Any | None = None,
     drawdown_y: str | list[str] = "drawdown",
     idempotency_prefix: str | None = None,
+    periods_per_year: float = 252.0,
+    risk_free_rate: float = 0.0,
+    mar: float = 0.0,
+    capital_base: float | None = None,
 ) -> dict[str, Any]:
-    metric_rows = log_backtest_summary(metrics) if metrics else []
     artifacts: list[dict[str, Any]] = []
     normalized_mode = canonical_performance_mode(mode)
     curve_name = performance_curve_artifact_name(normalized_mode)
     namespace = {"nav": "strategy.equity", "return": "strategy.returns", "pnl": "strategy.pnl"}.get(normalized_mode, "strategy.performance")
+    computed_metrics: dict[str, Any] = {}
+    summary_metrics = dict(metrics or {})
     if curve is not None:
+        y_keys = [y] if isinstance(y, str) else list(y)
+        if len(y_keys) != 1:
+            raise ValueError("log_performance_result requires exactly one primary y column")
+        computed_metrics = compute_performance_summary(
+            normalize_rows(curve),
+            mode=normalized_mode,
+            value_key=y_keys[0],
+            periods_per_year=periods_per_year,
+            risk_free_rate=risk_free_rate,
+            mar=mar,
+            capital_base=capital_base,
+        )
+        canonical_keys = {
+            "annual_return", "annualized_return", "annual_volatility", "annualized_volatility",
+            "max_drawdown", "sharpe", "sortino", "calmar", "periods_per_year", "total_pnl", "annualized_pnl",
+        }
+        summary_metrics = {key: value for key, value in summary_metrics.items() if key not in canonical_keys}
+        summary_metrics.update(computed_metrics)
         artifacts.append(
             log_result_series(
                 curve_name,
@@ -573,6 +600,16 @@ def log_performance_result(
                 y=y,
                 mode=normalized_mode,
                 namespace=namespace,
+                metadata={
+                    "performance": performance_metadata(
+                        mode=normalized_mode,
+                        periods_per_year=periods_per_year,
+                        risk_free_rate=risk_free_rate,
+                        mar=mar,
+                        capital_base=capital_base,
+                    ),
+                    **({"reported_summary": metrics} if metrics else {}),
+                },
                 kind="returns_series_parquet",
                 filename=f"{curve_name}.parquet",
                 idempotency_key=f"{idempotency_prefix}-performance-curve" if idempotency_prefix else None,
@@ -599,7 +636,8 @@ def log_performance_result(
                 idempotency_key=f"{idempotency_prefix}-drawdown" if idempotency_prefix else None,
             )
         )
-    return {"metrics": metric_rows, "artifacts": artifacts}
+    metric_rows = log_backtest_summary(summary_metrics) if summary_metrics else []
+    return {"metrics": metric_rows, "artifacts": artifacts, "computed_metrics": computed_metrics}
 
 
 def log_factor_result(

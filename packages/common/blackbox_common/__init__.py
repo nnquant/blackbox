@@ -12,7 +12,9 @@ __all__ = [
     "NoteKind",
     "PointKind",
     "RunStatus",
+    "compute_performance_summary",
     "new_id",
+    "performance_metadata",
     "validate_metric_upload",
     "validate_run_detail",
     "validate_series_upload",
@@ -36,4 +38,11 @@ def __getattr__(name: str):
         from .validation import validate_metric_upload
 
         return validate_metric_upload
+    if name in {"compute_performance_summary", "performance_metadata"}:
+        from .performance import compute_performance_summary, performance_metadata
+
+        return {
+            "compute_performance_summary": compute_performance_summary,
+            "performance_metadata": performance_metadata,
+        }[name]
     raise AttributeError(name)

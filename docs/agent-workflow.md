@@ -88,7 +88,8 @@ bbox run publish-performance `
   --run-id run_new `
   --curve-file .\equity.csv `
   --mode nav `
-  --summary '{"annual_return":0.185,"max_drawdown":-0.08,"sharpe":1.34,"turnover":0.42}' `
+  --periods-per-year 252 `
+  --summary '{"turnover":0.42}' `
   --summary-unit decimal `
   --idempotency-prefix agent-task-123-performance `
   --expected-start 2023-01-03 `
@@ -101,7 +102,7 @@ bbox run publish-performance `
 
 5. Finish or fail the run.
 
-`publish-performance --finish` already performs the post-upload validation and finish quality gate. Omit `--finish` when more artifacts still need to be attached, then run `bbox run finish --run-id run_new --fail-on-warning --agent-output` after the remaining writes.
+`publish-performance` derives annual compound return, annual volatility, max drawdown, Sharpe, Sortino, and Calmar from the full primary curve. It stores `periods_per_year` separately so Run Detail can show the annualization period in its own card. `--finish` performs the post-upload validation and finish quality gate. Omit `--finish` when more artifacts still need to be attached, then run `bbox run finish --run-id run_new --fail-on-warning --agent-output` after the remaining writes.
 
 Run Detail shows a Result Summary panel above the tabs. Use it as the first check for primary curve, date range, result domains, key metric coverage, artifact counts, update time, and quality status. Expand Result diagnostics when present; each issue includes a suggested fix command.
 
@@ -116,6 +117,8 @@ bbox run fail --run-id run_new --error '{"code":"BACKTEST_ERROR","message":"inpu
 ```powershell
 bbox compare runs --run-ids run_abc run_new --metrics strategy.summary.sharpe,strategy.summary.max_drawdown --series equity_curve --json
 
+bbox research review --research-id res_csi500_reversal --metric strategy.summary.sharpe --stale-days 14 --json
+
 bbox note add `
   --run-id run_new `
   --kind decision `
@@ -126,6 +129,8 @@ bbox note add `
   --client-event-id agent-task-123-note-decision `
   --json
 ```
+
+`bbox research review` returns the current research state, ranked candidate set, saved compare sets, decision notes, and conservative archive suggestions. It does not mutate branch status; use `bbox batch mark-branch-status --status archived` only after reviewing the suggested archive queue.
 
 The WebUI will show the resulting run, artifacts, compare output, lineage, notes, and creator/source fields after refresh or websocket update.
 

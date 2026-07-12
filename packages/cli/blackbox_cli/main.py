@@ -13,6 +13,7 @@ from typing import Any
 
 import httpx
 
+from blackbox_common.performance import compute_performance_summary, performance_metadata
 from blackbox_common.validation import (
     format_upload_report_for_agent,
     upload_report_failed,
@@ -153,6 +154,12 @@ def build_parser() -> argparse.ArgumentParser:
     research_update.add_argument("--hypothesis")
     research_update.add_argument("--status")
     research_update.add_argument("--tags")
+    research_review = research_sub.add_parser("review")
+    research_review.add_argument("--research-id", required=True)
+    research_review.add_argument("--metric", default="strategy.summary.sharpe")
+    research_review.add_argument("--direction", choices=["max", "min"], default="max")
+    research_review.add_argument("--stale-days", type=int, default=14)
+    research_review.add_argument("--limit", type=int, default=10)
 
     branch = sub.add_parser("branch")
     branch_sub = branch.add_subparsers(dest="action", required=True)
@@ -275,6 +282,10 @@ def build_parser() -> argparse.ArgumentParser:
     run_publish_performance.add_argument("--run-id", required=True)
     run_publish_performance.add_argument("--curve-file", required=True, help="Performance rows in JSON, JSONL, CSV, YAML, or Parquet format.")
     run_publish_performance.add_argument("--mode", required=True, choices=["nav", "return", "pnl"])
+    run_publish_performance.add_argument("--periods-per-year", type=float, default=252.0, help="Explicit annualization periods. Defaults to 252.")
+    run_publish_performance.add_argument("--risk-free-rate", type=float, default=0.0, help="Annual risk-free rate as a decimal, for example 0.02.")
+    run_publish_performance.add_argument("--mar", type=float, default=0.0, help="Annual minimum acceptable return as a decimal for Sortino.")
+    run_publish_performance.add_argument("--capital-base", type=float, help="Capital base required to derive percentage metrics from mode=pnl.")
     run_publish_performance.add_argument("--x", help="Date/time column. Inferred when exactly one standard date column exists.")
     run_publish_performance.add_argument("--value", help="Value column. Inferred from mode aliases or a single numeric column.")
     run_publish_performance.add_argument("--summary", default="{}", help="strategy.summary values as JSON.")
@@ -593,6 +604,8 @@ def dispatch(args: argparse.Namespace) -> Any:
         return request(args, "GET", f"/api/v1/researches/{args.research_id}")
     if args.group == "research" and args.action == "update":
         return request(args, "PATCH", f"/api/v1/researches/{args.research_id}", json=compact_payload({"title": args.title, "goal": args.goal, "hypothesis": args.hypothesis, "status": args.status, "tags": parse_json(args.tags) if args.tags is not None else None}))
+    if args.group == "research" and args.action == "review":
+        return request(args, "GET", f"/api/v1/researches/{args.research_id}/review-board", params={"metric": args.metric, "direction": args.direction, "stale_days": args.stale_days, "limit": args.limit})
     if args.group == "branch" and args.action == "create":
         payload = {"research_id": args.research_id, "research_key": args.research, "key": args.key, "title": args.title, "source_run_id": args.source_run_id, "parent_branch_id": args.parent_branch_id, "reason_code": args.reason_code, "reason_summary": args.reason_summary}
         payload.update(compact_payload({"created_by_type": args.created_by_type, "created_by_id": args.created_by_id}))
@@ -1006,6 +1019,19 @@ PERCENT_SUMMARY_KEYS = {
     "annualized_volatility",
     "max_drawdown",
 }
+CANONICAL_PERFORMANCE_KEYS = {
+    "annual_return",
+    "annualized_return",
+    "annual_volatility",
+    "annualized_volatility",
+    "max_drawdown",
+    "sharpe",
+    "sortino",
+    "calmar",
+    "periods_per_year",
+    "total_pnl",
+    "annualized_pnl",
+}
 
 
 def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
@@ -1017,6 +1043,22 @@ def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
         value=args.value,
         label="performance curve",
     )
+    try:
+        computed_summary = compute_performance_summary(
+            curve_rows,
+            mode=args.mode,
+            periods_per_year=args.periods_per_year,
+            risk_free_rate=args.risk_free_rate,
+            mar=args.mar,
+            capital_base=args.capital_base,
+        )
+    except ValueError as exc:
+        raise CliError(
+            "VALIDATION_ERROR",
+            str(exc),
+            exit_code=4,
+            details={"issues": [{"code": "PERFORMANCE_CALCULATION_INVALID", "field": "curve-file", "fix": "Correct the curve values or annualization arguments, then retry."}]},
+        ) from exc
     curve_name, namespace = performance_contract(args.mode)
     curve_payload = {
         "name": curve_name,
@@ -1027,7 +1069,15 @@ def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
         "namespace": namespace,
         "kind": "table_csv",
         "filename": f"{curve_name}.csv",
-        "metadata": {},
+        "metadata": {
+            "performance": performance_metadata(
+                mode=args.mode,
+                periods_per_year=args.periods_per_year,
+                risk_free_rate=args.risk_free_rate,
+                mar=args.mar,
+                capital_base=args.capital_base,
+            )
+        },
         "result": {
             "domain": "performance",
             "name": "primary_performance",
@@ -1041,9 +1091,22 @@ def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
     curve_report = validate_series_upload(curve_payload, strict=True)
     enforce_upload_preflight(curve_report, fail_on_warning=args.fail_on_warning)
 
-    summary = parse_structured_object_file(args.summary_file, "summary file") if args.summary_file else parse_json_object_arg(args.summary, "summary")
-    summary, summary_normalizations = normalize_summary_metrics(summary, args.summary_unit)
+    reported_summary = parse_structured_object_file(args.summary_file, "summary file") if args.summary_file else parse_json_object_arg(args.summary, "summary")
+    reported_summary, summary_normalizations = normalize_summary_metrics(reported_summary, args.summary_unit)
     normalizations.extend(summary_normalizations)
+    if reported_summary:
+        curve_payload["metadata"]["reported_summary"] = reported_summary
+    for key in sorted(CANONICAL_PERFORMANCE_KEYS.intersection(reported_summary)):
+        if key in computed_summary and finite_number(reported_summary[key]) != finite_number(computed_summary[key]):
+            normalizations.append({
+                "code": "REPLACE_REPORTED_PERFORMANCE_METRIC",
+                "field": key,
+                "reported": reported_summary[key],
+                "computed": computed_summary[key],
+            })
+    summary = {key: value for key, value in reported_summary.items() if key not in CANONICAL_PERFORMANCE_KEYS}
+    summary.update(computed_summary)
+    normalizations.append({"code": "COMPUTE_PERFORMANCE_SUMMARY", "fields": sorted(computed_summary)})
     summary_report = validate_metric_upload("strategy.summary", summary, strict=True, percent_unit="percentage_point") if summary else empty_validation_report()
     if summary:
         enforce_upload_preflight(summary_report, fail_on_warning=args.fail_on_warning)
@@ -1097,6 +1160,7 @@ def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
             "primary_series": curve_name,
             "rows": len(curve_rows),
             "summary_metrics": len(summary),
+            "computed_summary": computed_summary,
             "normalizations": normalizations,
             "preflight": preflight,
             "finished": False,
@@ -1166,6 +1230,7 @@ def publish_performance(args: argparse.Namespace) -> dict[str, Any]:
         "primary_series": curve_name,
         "rows": len(curve_rows),
         "summary_metrics": len(summary),
+        "computed_summary": computed_summary,
         "normalizations": normalizations,
         "uploaded": uploaded,
         "validation": compact_validation_report(quality_report),
