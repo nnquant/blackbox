@@ -83,10 +83,13 @@ function Panel({ className = '', children }) {
   return <section className={`bento-panel ${className}`}>{children}</section>;
 }
 
-function PanelHeader({ title, action }) {
+function PanelHeader({ title, action, titleMeta }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
-      <h2 className="text-base font-semibold text-ink">{tx(title)}</h2>
+    <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+      <div className="flex min-w-0 items-center gap-2">
+        <h2 className="truncate text-sm font-semibold text-ink">{tx(title)}</h2>
+        {titleMeta}
+      </div>
       {action}
     </div>
   );
@@ -127,14 +130,14 @@ function TopBar({ data, onCreated, onOpenSearch }) {
     };
   }, [menuOpen]);
   return (
-    <header className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur md:px-6">
+    <header className="fixed left-0 right-0 top-0 z-40 flex h-12 items-center justify-between border-b border-line bg-panel/90 px-3 backdrop-blur md:px-4">
       <div className="flex items-center gap-3">
-        <span className="text-lg font-semibold text-ink">Blackbox</span>
+        <span className="text-base font-semibold text-ink">Blackbox</span>
       </div>
       <div className="flex items-center gap-2">
-        <button className="secondary-button hidden w-[180px] justify-between px-3 sm:inline-flex" type="button" onClick={onOpenSearch} aria-label={t('Open search')} title="Ctrl+K">
+        <button className="secondary-button hidden w-[160px] justify-between px-2.5 sm:inline-flex" type="button" onClick={onOpenSearch} aria-label={t('Open search')} title="Ctrl+K">
           <span>{t('Search')}</span>
-          <kbd className="rounded border border-line bg-panel2 px-1.5 py-0.5 text-[11px] font-semibold text-muted">Ctrl K</kbd>
+          <kbd className="text-[11px] font-semibold text-muted/70">Ctrl K</kbd>
         </button>
         <button className="icon-button sm:hidden" type="button" onClick={onOpenSearch} aria-label={t('Open search')} title="Ctrl+K">
           <Search className="h-4 w-4" />
@@ -145,9 +148,9 @@ function TopBar({ data, onCreated, onOpenSearch }) {
             {t('New')}
           </button>
           {menuOpen ? (
-            <div className="absolute right-0 top-11 z-50 w-64 overflow-hidden rounded-md border border-line bg-panel shadow-lg">
+            <div className="absolute right-0 top-10 z-50 w-60 overflow-hidden rounded-md border border-line bg-panel shadow-lg">
               {createActions.map((item) => (
-                <button className="block w-full px-4 py-3 text-left transition hover:bg-white/55" key={item.id} type="button" onClick={() => openCreate(item.id)}>
+                <button className="block w-full px-3 py-2.5 text-left transition hover:bg-white/55" key={item.id} type="button" onClick={() => openCreate(item.id)}>
                   <div className="text-sm font-semibold text-ink">{t(item.label)}</div>
                   <div className="mt-1 text-xs text-muted">{t(item.description)}</div>
                 </button>
@@ -163,11 +166,11 @@ function TopBar({ data, onCreated, onOpenSearch }) {
 
 function Sidebar({ active, onSelect }) {
   return (
-    <aside className="fixed bottom-0 left-0 top-14 z-30 hidden w-64 border-r border-line bg-[#f6f6f2] p-4 md:flex md:flex-col">
-      <nav className="flex flex-1 flex-col gap-1">
+    <aside className="fixed bottom-0 left-0 top-12 z-30 hidden w-56 border-r border-line bg-canvas p-3 md:flex md:flex-col">
+      <nav className="flex flex-1 flex-col gap-0.5">
         {navItems.map(({ id, label, icon: Icon }) => (
           <button
-            className={`flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-semibold transition ${
+            className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm font-semibold transition ${
               isNavItemActive(active, id) ? 'bg-white text-ink' : 'text-muted hover:bg-white/45 hover:text-ink'
             }`}
             key={id}
@@ -188,13 +191,13 @@ function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, lo
       <LoadingRail active={loading} />
       <TopBar data={data} onCreated={onCreated} onOpenSearch={onOpenSearch} />
       <Sidebar active={active} onSelect={onSelect} />
-      <main className="pt-14 md:pl-64">
-        <div className="mx-auto max-w-[1560px] p-4 pb-24 md:p-6 lg:p-8">
+      <main className="pt-12 md:pl-56">
+        <div className="mx-auto max-w-[1880px] p-3 pb-20 md:p-4 lg:p-5">
           {contextNav}
           {children}
         </div>
       </main>
-      <div className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-3 border-t border-line bg-panel/95 p-2 backdrop-blur sm:grid-cols-6 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-line bg-panel/95 p-1.5 backdrop-blur sm:grid-cols-6 md:hidden">
         {navItems.map(({ id, label, icon: Icon }) => (
           <button className={`flex flex-col items-center gap-1 rounded-md py-2 text-[11px] font-semibold ${isNavItemActive(active, id) ? 'bg-white text-ink' : 'text-muted'}`} key={id} onClick={() => onSelect(id)}>
             <Icon className="h-4 w-4" />
@@ -277,7 +280,7 @@ function QuickRunSearchModal({ open, data, onClose, onSelectRun }) {
             const activeResult = index === activeIndex;
             return (
               <button
-                className={`block w-full rounded-md px-3 py-3 text-left transition ${activeResult ? 'bg-infoSoft text-ink' : 'text-ink hover:bg-white/65'}`}
+                className={`block w-full rounded-md px-3 py-3 text-left transition ${activeResult ? 'bg-panel2 text-ink' : 'text-ink hover:bg-white/65'}`}
                 key={run.id}
                 type="button"
                 onMouseEnter={() => setActiveIndex(index)}
@@ -315,8 +318,8 @@ function ContextNav({ items }) {
   const visibleItems = items.filter((item) => item?.value);
   if (!visibleItems.length) return null;
   return (
-    <nav className="-mx-4 mb-5 bg-canvas/95 px-4 pb-3 pt-1 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8" aria-label={t('Page context')}>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
+    <nav className="-mx-3 mb-3 bg-canvas/95 px-3 pb-2 pt-1 md:-mx-4 md:px-4 lg:-mx-5 lg:px-5" aria-label={t('Page context')}>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
         {visibleItems.map((item, index) => (
           <React.Fragment key={`${item.label}-${item.value}`}>
             {index ? <span className="text-muted/60">/</span> : null}
@@ -337,9 +340,9 @@ function ContextNav({ items }) {
 
 function EmptyState({ title, detail }) {
   return (
-    <Panel className="p-8 text-center">
-      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-md bg-white/70 text-muted"><Search className="h-5 w-5" /></div>
-      <h2 className="mt-4 text-lg font-semibold text-ink">{tx(title)}</h2>
+    <Panel className="p-6 text-center">
+      <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-md bg-white/70 text-muted"><Search className="h-5 w-5" /></div>
+      <h2 className="mt-3 text-base font-semibold text-ink">{tx(title)}</h2>
       <p className="mt-2 text-sm text-muted">{tx(detail)}</p>
     </Panel>
   );
@@ -347,9 +350,9 @@ function EmptyState({ title, detail }) {
 
 function StatTile({ label, value, tone = 'neutral' }) {
   return (
-    <Panel className="min-h-[118px] p-5">
+    <Panel className="min-h-[88px] p-3">
       <div className="text-xs font-semibold uppercase text-muted">{tx(label)}</div>
-      <div className={`metric-value mt-5 text-4xl ${tone === 'negative' ? 'text-negative' : tone === 'positive' ? 'text-positive' : 'text-ink'}`}>{value}</div>
+      <div className={`metric-value mt-3 text-2xl ${tone === 'negative' ? 'text-negative' : tone === 'positive' ? 'text-positive' : 'text-ink'}`}>{value}</div>
     </Panel>
   );
 }
@@ -372,7 +375,7 @@ function ManagementPage({ data, selectProject, selectResearch, selectBranch, sel
   useEffect(() => { loadSummary(); }, []);
   const stats = summary?.summary || {};
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero
         eyebrow="Manage"
         title="研究资产管理"
@@ -389,15 +392,15 @@ function ManagementPage({ data, selectProject, selectResearch, selectBranch, sel
         <Panel><ReadOnlyField label="Saved Views" value={`${stats.search_views ?? 0} search / ${stats.compare_sets ?? 0} compare`} /></Panel>
       </div>
       <ManagementProjectPressureTable rows={summary?.projects || []} onSelectProject={selectProject} />
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <ManagementResearchTable title="Run 压力研究线" rows={summary?.top_research_by_runs || []} onSelectResearch={selectResearch} />
         <ManagementResearchTable title="Artifact 压力研究线" rows={summary?.top_research_by_artifacts || []} onSelectResearch={selectResearch} showBytes />
       </div>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <ManagementBranchTable title="Run 压力分支" rows={summary?.top_branches_by_runs || []} onSelectBranch={selectBranch} />
         <ManagementBranchTable title="Artifact 压力分支" rows={summary?.top_branches_by_artifacts || []} onSelectBranch={selectBranch} showBytes />
       </div>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <StaleRunningRunsTable rows={summary?.stale_running_runs || []} onSelectRun={selectRun} onSelectResearch={selectResearch} />
         <ArtifactPressureTable rows={summary?.artifact_names_by_bytes || []} />
       </div>
@@ -545,7 +548,7 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
     .sort((a, b) => Number(metricValue(b, 'strategy.summary', 'sharpe') || -Infinity) - Number(metricValue(a, 'strategy.summary', 'sharpe') || -Infinity))
     .slice(0, 8);
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div className="dashboard-stats-grid">
         <StatTile label="Workspaces" value={summary.workspaces || 0} tone="info" />
         <StatTile label="Projects" value={summary.projects || 0} tone="info" />
@@ -559,18 +562,18 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
       </div>
       <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
       <DashboardActivityHeatmap data={data} />
-      <div className="grid gap-5 xl:grid-cols-12">
-        <div className="space-y-5 xl:col-span-8">
+      <div className="grid gap-4 xl:grid-cols-12">
+        <div className="space-y-4 xl:col-span-8">
           <RecentResultsPanel runs={recentRuns} onSelectRun={selectRun} onSelectBranch={selectBranch} />
           <ActiveResearchPanel rows={activeResearchRows} selectResearch={selectResearch} selectRun={selectRun} />
         </div>
-        <div className="space-y-5 xl:col-span-4">
+        <div className="space-y-4 xl:col-span-4">
           <QualityInboxPanel runs={issueRuns} onSelectRun={selectRun} />
           <DecisionCandidatesPanel runs={decisionRuns} onSelectRun={selectRun} />
         </div>
       </div>
       <DashboardCollapsedSection title="System Overview">
-        <div className="space-y-5 p-4">
+        <div className="space-y-4 p-3">
           <DashboardActivityTimeline data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} />
           <WorkspacePanel workspaces={data?.workspaces || []} projects={data?.projects || []} onChanged={onChanged} />
           <SystemStatusPanel />
@@ -596,7 +599,7 @@ function QualityInboxPanel({ runs, onSelectRun }) {
       <PanelHeader title="Quality Inbox" icon={AlertTriangle} />
       <div className="divide-y divide-line">
         {runs.length ? runs.map((run) => (
-          <button className="block w-full px-5 py-4 text-left transition hover:bg-white/45" key={run.id} onClick={() => onSelectRun(run.id)} type="button">
+          <button className="block w-full px-4 py-3 text-left transition hover:bg-white/45" key={run.id} onClick={() => onSelectRun(run.id)} type="button">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold text-ink">{run.name}</div>
@@ -605,7 +608,7 @@ function QualityInboxPanel({ runs, onSelectRun }) {
               <StatusBadge status={run.status} />
             </div>
           </button>
-        )) : <div className="p-5 text-sm text-muted">{t("No failed or suspicious recent runs.")}</div>}
+        )) : <div className="p-4 text-sm text-muted">{t("No failed or suspicious recent runs.")}</div>}
       </div>
     </Panel>
   );
@@ -663,7 +666,7 @@ function DecisionCandidatesPanel({ runs, onSelectRun }) {
       <PanelHeader title="Decision Candidates" icon={Trophy} />
       <div className="divide-y divide-line">
         {runs.length ? runs.map((run) => (
-          <button className="block w-full px-5 py-4 text-left transition hover:bg-white/45" key={run.id} onClick={() => onSelectRun(run.id)} type="button">
+          <button className="block w-full px-4 py-3 text-left transition hover:bg-white/45" key={run.id} onClick={() => onSelectRun(run.id)} type="button">
             <div className="truncate text-sm font-semibold text-ink">{run.name}</div>
             <div className="mt-1 grid grid-cols-3 gap-2 text-xs text-muted">
               <span>Sharpe {formatMetric(metricValue(run, 'strategy.summary', 'sharpe'))}</span>
@@ -671,7 +674,7 @@ function DecisionCandidatesPanel({ runs, onSelectRun }) {
               <span>{runRuntime(run)}</span>
             </div>
           </button>
-        )) : <div className="p-5 text-sm text-muted">{t("No completed candidates yet.")}</div>}
+        )) : <div className="p-4 text-sm text-muted">{t("No completed candidates yet.")}</div>}
       </div>
     </Panel>
   );
@@ -696,7 +699,7 @@ function DecisionRunsTable({ runs, onSelectRun, onSelectBranch, emptyText }) {
               <td className="table-cell text-right text-muted">{runRuntime(run)}</td>
               <td className="table-cell text-right text-muted">{formatDate(run.updated_at || run.ended_at || run.started_at || run.created_at)}</td>
             </tr>
-          )) : <tr><td className="table-cell text-muted" colSpan="7">{emptyText}</td></tr>}
+          )) : <tr><td className="table-cell text-muted" colSpan="7">{t(emptyText)}</td></tr>}
         </tbody>
       </table>
     </div>
@@ -719,7 +722,7 @@ function runQualityHint(run) {
 function DashboardCollapsedSection({ title, children }) {
   return (
     <details className="group rounded-bento border border-line bg-panel">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-semibold text-ink marker:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-ink marker:hidden">
         <span>{title}</span>
         <CollapseToggleIcon native />
       </summary>
@@ -733,7 +736,7 @@ function CollapseToggleIcon({ open = false, native = false }) {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/70 hover:text-ink"
+      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/70 hover:text-ink"
     >
       <ChevronDown className={`h-4 w-4 transition ${rotateClass}`} strokeWidth={2.2} />
     </span>
@@ -762,7 +765,7 @@ function DashboardActivityHeatmap({ data }) {
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="活动历史" icon={Activity} />
-      <div className="overflow-hidden p-4" ref={containerRef}>
+      <div className="overflow-hidden p-3" ref={containerRef}>
         <div className="inline-block">
           <div className="mb-1 grid gap-[3px]" style={{ gridTemplateColumns: heatmapColumns }}>
             <div style={{ gridColumn: 1, gridRow: 1 }} />
@@ -809,17 +812,17 @@ function DashboardActivityTimeline({ data, selectProject, selectResearch, select
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="Recent Activity" icon={Activity} />
-      <div className="p-5">
+      <div className="p-4">
         {groups.length ? (
-          <div className="space-y-7">
+          <div className="space-y-5">
             {groups.map((group) => (
               <div className="relative pl-8" key={group.type}>
                 <div className="absolute bottom-0 left-[10px] top-8 w-px bg-line" />
                 <div className="absolute left-0 top-[2px] flex h-5 w-5 items-center justify-center text-muted">
                   <group.icon className="h-5 w-5" />
                 </div>
-                <div className="mb-3 flex items-center gap-3">
-                  <h3 className="text-base font-semibold text-ink">{group.title}</h3>
+                <div className="mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-ink">{group.title}</h3>
                   <div className="h-px flex-1 bg-line" />
                 </div>
                 <div className="space-y-2">
@@ -918,7 +921,7 @@ function SystemStatusPanel() {
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="System Status" icon={Activity} />
-      <div className="grid gap-4 p-4 md:grid-cols-4 xl:grid-cols-8">
+      <div className="grid gap-3 p-3 md:grid-cols-4 xl:grid-cols-8">
         <ReadOnlyField label="API" value={status.health?.status || (status.error ? 'unavailable' : 'checking')} />
         <ReadOnlyField label="Auth" value={status.auth ? (status.auth.auth_enabled ? 'enabled' : 'disabled') : '--'} />
         <ReadOnlyField label="Token" value={status.auth ? (status.auth.token_configured ? 'configured' : 'not configured') : '--'} />
@@ -972,7 +975,7 @@ function CreateModal({ kind, data, onClose, onCreated }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-lg overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div>
             <div className="text-xs font-semibold uppercase text-muted">{t("New")}</div>
             <h2 className="text-lg font-semibold text-ink">{action?.label || 'Item'}</h2>
@@ -998,9 +1001,9 @@ function CreateModal({ kind, data, onClose, onCreated }) {
 
 function FormCard({ title, children }) {
   return (
-    <div className="rounded-md border border-line bg-white/55 p-4">
+    <div className="rounded-md border border-line bg-white/55 p-3">
       <h3 className="text-sm font-semibold text-ink">{tx(title)}</h3>
-      <div className="mt-3 space-y-2">{children}</div>
+      <div className="mt-2 space-y-2">{children}</div>
     </div>
   );
 }
@@ -1051,6 +1054,11 @@ function InlineError({ message }) {
   return <div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{message}</div>;
 }
 
+function HeaderError({ message }) {
+  if (!message) return null;
+  return <span className="min-w-0 max-w-[42rem] truncate text-xs font-semibold text-negative" title={message}>{message}</span>;
+}
+
 function EditPanelAction({ editing, onEdit, label = 'Edit metadata' }) {
   const visibleLabel = t(label);
   return (
@@ -1089,8 +1097,8 @@ function ReadOnlyField({ label, value, multiline = false, code = false }) {
   }, [displayValue]);
   return (
     <div>
-      <div className="mb-1 text-xs font-semibold text-muted">{tx(label)}</div>
-      <div className={`flex min-h-6 items-start gap-2 text-sm text-ink ${code ? 'font-mono text-xs' : 'font-medium'}`} title={displayValue}>
+      <div className="mb-0.5 text-xs font-semibold text-muted">{tx(label)}</div>
+      <div className={`flex min-h-5 items-start gap-2 text-sm text-ink ${code ? 'font-mono text-xs' : 'font-medium'}`} title={displayValue}>
         {empty ? (
           <span className="text-muted">--</span>
         ) : (
@@ -1185,7 +1193,7 @@ function WorkspaceEditModal({ workspace, onClose, onChanged }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-lg overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="truncate text-lg font-semibold text-ink">{workspace.key}</h2>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close workspace editor">
             <XCircle className="h-4 w-4" />
@@ -1719,7 +1727,7 @@ function SweepTable({ sweeps, onSelect = () => {} }) {
                 <td className="table-cell text-right text-muted">{formatDate(sweep.updated_at)}</td>
               </tr>
             )) : (
-              <tr><td className="table-cell text-muted" colSpan="5">{sweeps.length ? 'No sweeps match the current filters.' : 'No sweeps yet.'}</td></tr>
+              <tr><td className="table-cell text-muted" colSpan="5">{sweeps.length ? t('No sweeps match the current filters.') : t('No sweeps yet.')}</td></tr>
             )}
           </tbody>
         </table>
@@ -1736,7 +1744,7 @@ function RecentActivityPanel({ data, selectBranch, selectRun }) {
       <div className="divide-y divide-line">
         {activities.length ? activities.map((item) => (
           <button
-            className="block w-full px-5 py-4 text-left transition hover:bg-white/45"
+            className="block w-full px-4 py-3 text-left transition hover:bg-white/45"
             key={item.id}
             onClick={() => {
               if (item.run_id) selectRun(item.run_id);
@@ -1751,7 +1759,7 @@ function RecentActivityPanel({ data, selectBranch, selectRun }) {
               <div className="shrink-0 text-xs text-muted">{formatDate(item.at)}</div>
             </div>
           </button>
-        )) : <div className="p-5 text-sm text-muted">{t("No recent activity yet.")}</div>}
+        )) : <div className="p-4 text-sm text-muted">{t("No recent activity yet.")}</div>}
       </div>
     </Panel>
   );
@@ -1894,9 +1902,9 @@ function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, se
   const searchViews = projectDetail?.search_views || (data?.search_views || []).filter((item) => item.project_id === project.id);
   const running = project.running_run_count ?? runs.filter((run) => run.status === 'running').length;
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow="Project" title={project.title || project.key} description={project.description || null} />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Workspace" value={project.workspace_id || 'local'} tone="info" />
         <StatTile label="Researches" value={project.research_count ?? researches.length} tone="info" />
         <StatTile label="Runs" value={project.run_count ?? runs.length} tone="positive" />
@@ -1912,7 +1920,7 @@ function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, se
         onSelectRun={selectRun}
       />
       <ResearchTable rows={researches} branches={branches} runs={runs} onSelect={selectResearch} onSelectRun={selectRun} />
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <ProjectSavedItems title="Compare Sets" icon={Layers3} items={compareSets} renderDetail={(item) => `${item.run_ids_json?.length || 0} runs`} actionLabel="Open" onSelect={selectCompareSet} />
         <ProjectSavedItems title="Search Views" icon={Search} items={searchViews} renderDetail={(item) => item.description || formatFilterSummary(item.filters_json)} actionLabel="Run" onSelect={selectSearchView} />
       </div>
@@ -2038,14 +2046,14 @@ function ProjectSavedItems({ title, icon: Icon, items, renderDetail, actionLabel
       </div>
       <div className="divide-y divide-line">
         {filteredItems.length ? filteredItems.map((item) => (
-          <div className="flex items-center justify-between gap-3 px-5 py-4" key={item.id}>
+          <div className="flex items-center justify-between gap-3 px-4 py-3" key={item.id}>
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-ink">{item.name}</div>
               <div className="mt-1 truncate text-xs text-muted">{renderDetail(item)}</div>
             </div>
             {onSelect ? <button className="secondary-button shrink-0" onClick={() => onSelect(item.id)}>{t(actionLabel || 'Open')}</button> : null}
           </div>
-        )) : <div className="p-5 text-sm text-muted">{items.length ? t('No saved items match the current search.') : t('No saved items.')}</div>}
+        )) : <div className="p-4 text-sm text-muted">{items.length ? t('No saved items match the current search.') : t('No saved items.')}</div>}
       </div>
     </Panel>
   );
@@ -2254,7 +2262,7 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow="Runs" title="Run Explorer" />
       <RunsBoardSummary runs={runs} filteredRuns={filteredRuns} />
       <Panel className="overflow-hidden">
@@ -2361,7 +2369,7 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
             </thead>
             <tbody>
               {pageRuns.length ? pageRuns.map((run) => (
-                <tr className={`transition hover:bg-white/45 ${selectedRunSet.has(run.id) ? 'bg-infoSoft/35' : ''}`} key={run.id}>
+                <tr className={`transition hover:bg-white/45 ${selectedRunSet.has(run.id) ? 'bg-panel2/70' : ''}`} key={run.id}>
                   <td className="table-cell">
                     <input
                       aria-label={`选择 run ${run.name}`}
@@ -2419,7 +2427,7 @@ function RunCompareSelectionBar({ selectedRuns, loading, error, onCreate, onClea
   const canCreate = selectedRuns.length >= 2 && projectKeys.length <= 1;
   if (!selectedRuns.length && !error) return null;
   return (
-    <div className="border-b border-line bg-infoSoft/35 px-4 py-3">
+    <div className="border-b border-line bg-panel2/70 px-4 py-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-semibold text-ink">已选择 {selectedRuns.length} 个 Run</div>
@@ -2543,7 +2551,7 @@ function ResearchCompareSetsPanel({ compareSets, error, onSelectCompareSet }) {
         title="Compare Sets"
         action={<div className="text-xs font-semibold text-muted">{rows.length} sets</div>}
       />
-      {error ? <div className="px-5 pt-4"><InlineError message={error} /></div> : null}
+      {error ? <div className="px-4 pt-3"><InlineError message={error} /></div> : null}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse">
           <thead className="table-head">
@@ -2692,7 +2700,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
   const recentRuns = [...lineageRuns].sort((a, b) => dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at) - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at));
   const compareSets = researchCompareSets || (data?.compare_sets || []).filter((item) => item.research_id === research.id);
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
       <ResearchWorkspaceSummary research={research} branches={lineageBranches} runs={lineageRuns} />
       <ResearchReviewPanel
@@ -2703,13 +2711,10 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
         onSelectCompareSet={selectCompareSet}
         onChanged={onChanged}
       />
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className="space-y-4 xl:col-span-8">
-          <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
-          <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
-          <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} />
-        </div>
-        <ResearchChampionPanel research={research} branches={lineageBranches} runs={lineageRuns} onSelectRun={selectRun} />
+      <div className="space-y-4">
+        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} />
+        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+        <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
       </div>
       {lineageExpanded ? <LineageChartModal option={lineageChartOption} onClose={() => setLineageExpanded(false)} /> : null}
       <QuickCompareCard
@@ -2719,7 +2724,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
         onSelectRun={selectRun}
       />
       <DashboardCollapsedSection title="Lineage and Activity">
-        <div className="space-y-5 p-4">
+        <div className="space-y-4 p-3">
           <ResearchEditPanel research={research} onChanged={onChanged} />
           <Panel className="overflow-hidden">
             <PanelHeader
@@ -2731,7 +2736,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
                 </button>
               )}
             />
-            {lineageError ? <div className="px-5 pt-4"><InlineError message={lineageError} /></div> : null}
+            {lineageError ? <div className="px-4 pt-3"><InlineError message={lineageError} /></div> : null}
             <div className="h-[360px] cursor-grab p-3 active:cursor-grabbing"><ReactECharts option={lineageChartOption} style={{ height: '100%', width: '100%' }} /></div>
           </Panel>
           <ResearchTimelinePanel research={research} branches={lineageBranches} runs={lineageRuns} notes={data?.notes || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
@@ -2979,37 +2984,6 @@ function ResearchLineageEdgesPanel({ edges, branches, runs, onSelectBranch, onSe
           </tbody>
         </table>
       </div>
-    </Panel>
-  );
-}
-
-function ResearchChampionPanel({ research, branches, runs, onSelectRun }) {
-  const champion = researchChampionRun(research, branches, runs);
-  const branch = champion ? (branches || []).find((item) => item.id === champion.branch_id) : null;
-  return (
-    <Panel className="overflow-hidden xl:col-span-4">
-      <PanelHeader title="Champion" />
-      {champion ? (
-        <div className="space-y-4 p-4">
-          <button className="text-left text-xl font-semibold text-ink hover:underline" onClick={() => onSelectRun(champion.id)} type="button">
-            {champion.name}
-          </button>
-          <div className="grid grid-cols-2 gap-3">
-            <ReadOnlyField label="Branch" value={branch?.key || champion.branch_key || champion.branch_id} />
-            <ReadOnlyField label="Status" value={tStatus(champion.status)} />
-            <ReadOnlyField label="Sharpe" value={formatMetric(metricValue(champion, 'strategy.summary', 'sharpe'))} />
-            <ReadOnlyField label="Max DD" value={formatMetric(metricValue(champion, 'strategy.summary', 'max_drawdown'))} />
-            <ReadOnlyField label="IC Mean" value={formatMetric(metricValue(champion, 'strategy.summary', 'ic_mean'))} />
-            <ReadOnlyField label="Turnover" value={formatMetric(metricValue(champion, 'strategy.summary', 'turnover'))} />
-          </div>
-          <div>
-            <div className="mb-1 text-xs font-semibold text-muted">{t("Config")}</div>
-            <div className="truncate text-sm text-muted" title={configSummary(champion.config_json)}>{configSummary(champion.config_json)}</div>
-          </div>
-        </div>
-      ) : (
-        <div className="p-5 text-sm text-muted">{t("No completed run with comparable metrics yet.")}</div>
-      )}
     </Panel>
   );
 }
@@ -3269,7 +3243,7 @@ function BranchPage({ data, selectedBranchId, selectBranch, selectRun, onChanged
     }
   };
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow={`Research / ${branch.research_key || '--'}`} title={branch.title || branch.key} description={branch.hypothesis || branch.reason_summary || null} />
       <BranchWorkspaceSummary branch={branch} runs={branchRuns} sweeps={sweeps} />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
@@ -3286,10 +3260,10 @@ function BranchPage({ data, selectedBranchId, selectBranch, selectRun, onChanged
         onSelectRun={selectRun}
       />
       <DashboardCollapsedSection title="Branch Context">
-        <div className="space-y-5 p-4">
+        <div className="space-y-4 p-3">
           <BranchEditPanel branch={branch} onChanged={onChanged} />
           <BranchLineagePanel lineage={lineage} error={lineageError} fallbackBranch={branch} fallbackBranches={data?.branches || []} fallbackRuns={data?.runs || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
             <BranchMetricEvolution runs={orderedRuns} onSelectRun={selectRun} />
             <BranchConfigEvolution runs={orderedRuns} onSelectRun={selectRun} />
           </div>
@@ -3336,7 +3310,7 @@ function BranchChampionPanel({ runs, onSelectRun }) {
             <ReadOnlyField label="Updated" value={formatDate(champion.updated_at || champion.ended_at)} />
           </div>
         </div>
-      ) : <div className="p-5 text-sm text-muted">{t("No completed candidate yet.")}</div>}
+      ) : <div className="p-4 text-sm text-muted">{t("No completed candidate yet.")}</div>}
     </Panel>
   );
 }
@@ -3362,7 +3336,7 @@ function LineageChartModal({ option, onClose }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/25 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="flex h-[min(86vh,860px)] w-full max-w-6xl flex-col overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="text-lg font-semibold text-ink">{t("Branch Lineage")}</h2>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close branch lineage">
             <XCircle className="h-4 w-4" />
@@ -3391,7 +3365,7 @@ function BranchLineagePanel({ lineage, error, fallbackBranch, fallbackBranches, 
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="Lineage Context" icon={GitBranch} />
-      {error ? <div className="px-5 pt-4"><InlineError message={error} /></div> : null}
+      {error ? <div className="px-4 pt-3"><InlineError message={error} /></div> : null}
       <div className="grid gap-4 p-4 xl:grid-cols-3">
         <LineageBranchList title="Ancestors" ids={ancestorIds} branchById={branchById} empty="No ancestor branches." onSelectBranch={onSelectBranch} />
         <LineageBranchList title="Descendants" ids={descendantIds} branchById={branchById} empty="No descendant branches." onSelectBranch={onSelectBranch} />
@@ -3581,9 +3555,9 @@ function QuickCompareCard({ title = 'Compare', targets, emptyText = 'No targets 
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title={title} icon={LineChart} />
-      {error ? <div className="px-5 pt-4"><InlineError message={error} /></div> : null}
+      {error ? <div className="px-4 pt-3"><InlineError message={error} /></div> : null}
       {normalizedTargets.length ? (
-        <div className="space-y-5 p-5">
+        <div className="space-y-4 p-4">
           <div>
             {selectedSeriesEntry ? (
               <ReactECharts
@@ -3643,7 +3617,7 @@ function QuickCompareCard({ title = 'Compare', targets, emptyText = 'No targets 
             </table>
           </div>
         </div>
-      ) : <div className="p-5 text-sm text-muted">{emptyText}</div>}
+      ) : <div className="p-4 text-sm text-muted">{t(emptyText)}</div>}
     </Panel>
   );
 }
@@ -3713,7 +3687,7 @@ function BranchMetricEvolution({ runs, onSelectRun }) {
             ))}
           </div>
         </div>
-      ) : <div className="p-5 text-sm text-muted">{t("No runs on this branch.")}</div>}
+      ) : <div className="p-4 text-sm text-muted">{t("No runs on this branch.")}</div>}
     </Panel>
   );
 }
@@ -3811,7 +3785,7 @@ function BranchSweepPanel({ branch, runs, sweeps, error, onChanged, onSelectRun 
           <thead className="table-head"><tr><th className="px-4 py-3">{t("Sweep")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3">{t("Search Space")}</th><th className="px-4 py-3">{t("Objective")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th></tr></thead>
           <tbody>
             {sweeps.length ? sweeps.map((sweep) => (
-              <tr className={`hover:bg-white/45 ${selectedSweepId === sweep.id ? 'bg-infoSoft/60' : ''}`} key={sweep.id}>
+              <tr className={`hover:bg-white/45 ${selectedSweepId === sweep.id ? 'bg-panel2/70' : ''}`} key={sweep.id}>
                 <td className="table-cell">
                   <button className="font-semibold text-ink hover:text-info" onClick={() => setSelectedSweepId(sweep.id)}>{sweep.name}</button>
                 </td>
@@ -3891,8 +3865,8 @@ function SweepHeatmap({ heatmap }) {
                 <div
                   className="min-h-12 rounded-md border border-line px-2 py-2 text-center text-xs font-semibold text-ink"
                   key={`${JSON.stringify(xValue)}-${JSON.stringify(yValue)}`}
-                  style={{ backgroundColor: cell ? `rgba(20, 184, 166, ${intensity})` : 'rgba(255,255,255,0.45)' }}
-                  title={cell ? `${cell.run_name || cell.run_id}: ${formatMetric(cell.value)}` : 'No run'}
+                  style={{ backgroundColor: cell ? `rgba(17, 17, 17, ${intensity})` : 'rgba(255,255,255,0.45)' }}
+                  title={cell ? `${cell.run_name || cell.run_id}: ${formatMetric(cell.value)}` : t('No run')}
                 >
                   {cell ? formatMetric(cell.value) : '--'}
                 </div>
@@ -4008,7 +3982,7 @@ function SweepAttachForm({ runs, sweeps, onChanged }) {
         ) : <div className="rounded-md border border-line bg-white/45 p-3 text-xs text-muted">{t("No run selected.")}</div>}
         <Field label="Coord JSON"><TextInput required value={form.coord} onChange={(event) => update('coord', event.target.value)} /></Field>
         <Field label="Rank"><TextInput value={form.rank} onChange={(event) => update('rank', event.target.value)} type="number" min="1" /></Field>
-        <InlineError message={error || (!sweeps.length ? 'Create a sweep before attaching runs.' : null) || (runQuery && !filteredRuns.length ? 'No runs match the current search.' : null)} />
+        <InlineError message={error || (!sweeps.length ? t('Create a sweep before attaching runs.') : null) || (runQuery && !filteredRuns.length ? t('No runs match the current search.') : null)} />
         <SubmitButton loading={loading}>{t("Attach run")}</SubmitButton>
       </form>
     </FormCard>
@@ -4090,9 +4064,9 @@ function SweepPage({ data, selectedSweepId, selectSweep, selectRun, onChanged })
     return matchesStatus && matchesQuery;
   });
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow="Sweep" title={selectedSweep?.name || 'Parameter Sweeps'} description={selectedSweep ? formatSweepObjective(selectedSweep.objective_json) : null} />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Sweeps" value={sweeps.length} tone="warning" />
         <StatTile label="Selected Runs" value={summary?.rows?.length || selectedSweep?.run_count || 0} tone="positive" />
         <StatTile label="Coord Keys" value={summary?.coord_keys?.length || 0} tone="info" />
@@ -4141,13 +4115,13 @@ function SweepPage({ data, selectedSweepId, selectSweep, selectRun, onChanged })
               <thead className="table-head"><tr><th className="px-4 py-3">{t("Sweep")}</th><th className="px-4 py-3">{t("Branch")}</th><th className="px-4 py-3">{t("Objective")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th></tr></thead>
               <tbody>
                 {filteredSweeps.length ? filteredSweeps.map((sweep) => (
-                  <tr className={`hover:bg-white/45 ${selectedSweep?.id === sweep.id ? 'bg-infoSoft/60' : ''}`} key={sweep.id}>
+                  <tr className={`hover:bg-white/45 ${selectedSweep?.id === sweep.id ? 'bg-panel2/70' : ''}`} key={sweep.id}>
                     <td className="table-cell"><button className="font-semibold text-ink hover:text-info" onClick={() => selectSweep(sweep.id)}>{sweep.name}</button></td>
                     <td className="table-cell text-muted">{branchById[sweep.branch_id]?.key || sweep.branch_id}</td>
                     <td className="table-cell text-muted">{formatSweepObjective(sweep.objective_json)}</td>
                     <td className="table-cell text-right">{sweep.run_count || 0}</td>
                   </tr>
-                )) : <tr><td className="table-cell text-muted" colSpan="4">{sweeps.length ? 'No sweeps match the current filters.' : 'No sweeps yet.'}</td></tr>}
+                )) : <tr><td className="table-cell text-muted" colSpan="4">{sweeps.length ? t('No sweeps match the current filters.') : t('No sweeps yet.')}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -4287,7 +4261,7 @@ function RunPage({ runDetail, data, onRunChanged }) {
   const keyMetrics = runKeyMetricTiles(runDetail, equityChart);
   const diagnostics = runQualityDiagnostics(runDetail, { seriesArtifacts, equityChart, resultItems });
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero
         eyebrow={`Run / ${tStatus(runDetail.status)}`}
         title={runDetail.title || runDetail.name}
@@ -4364,7 +4338,7 @@ function runResultSummary(run, { diagnostics, resultItems, keyMetrics, equityCha
   return {
     errorCount: diagnostics?.errorCount || 0,
     warningCount: diagnostics?.warningCount || 0,
-    primaryCurve: primaryName ? `${primaryName}${mode ? ` (${mode})` : ''}` : 'No Series Data Available',
+    primaryCurve: primaryName ? `${primaryName}${mode ? ` (${mode})` : ''}` : t('No Series Data Available'),
     seriesRange: runSeriesRange(primary),
     domains: domains || 'none',
     keyMetricCoverage: `${populatedMetrics}/${(keyMetrics || []).length || 0}`,
@@ -4641,8 +4615,8 @@ function RunResultsPanel({ chart, resultItems, keyMetrics = [] }) {
           onOpenDataMetric={setSelectedDataMetric}
         />
       )) : (
-        <div className="rounded-md border border-line bg-white/35 p-5 text-sm text-muted">
-          No typed non-performance results yet. Use result metadata for factor, factor batch, diagnostic, or custom artifacts.
+        <div className="rounded-md border border-line bg-white/35 p-4 text-sm text-muted">
+          {t('No typed non-performance results yet. Use result metadata for factor, factor batch, diagnostic, or custom artifacts.')}
         </div>
       )}
       {selectedArtifact ? <ArtifactDetailModal artifact={selectedArtifact} onClose={() => setSelectedArtifact(null)} /> : null}
@@ -5011,7 +4985,7 @@ function resultSeriesChartOption(item) {
   };
   return {
     animation: false,
-    color: ['#111111', '#2563eb', '#16a34a', '#f97316', '#7c3aed', '#dc2626'],
+    color: ['#111827', '#374151', '#6b7280', '#9ca3af', '#4b5563', '#d1d5db'],
     tooltip: { trigger: 'axis' },
     legend: { top: 0, left: 0, right: 8, type: 'scroll', textStyle: { color: '#6b7280' } },
     grid: { top: 42, left: 44, right: 12, bottom: 34 },
@@ -5139,10 +5113,10 @@ function RunConfigPanel({ run }) {
 function SourceConfigDiffPanel({ sourceRun, rows }) {
   return (
     <div className="border-t border-line">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div>
           <div className="text-xs font-semibold uppercase text-muted">{t('Source run diff')}</div>
-          <div className="mt-1 text-sm text-ink">{sourceRun ? `${sourceRun.name} (${sourceRun.id})` : 'No source run'}</div>
+          <div className="mt-1 text-sm text-ink">{sourceRun ? `${sourceRun.name} (${sourceRun.id})` : t('No source run')}</div>
         </div>
       </div>
       {sourceRun ? (
@@ -6220,7 +6194,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
       .catch(() => setResearchResults([]));
   }, [quickSearch?.nonce]);
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow="Search" title="Saved Run Search" description={null} />
       <Panel className="overflow-hidden">
         <PanelHeader title="Search Controls" icon={Search} />
@@ -6375,7 +6349,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
           </FormCard></div> : null}
         </div>
       </Panel>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <Panel className="overflow-hidden">
           <PanelHeader title="Saved Views" icon={ListTree} />
           <div className="grid gap-3 border-b border-line p-4 md:grid-cols-[1fr_auto]">
@@ -6384,14 +6358,14 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
           </div>
           <div className="divide-y divide-line">
             {filteredViews.length ? filteredViews.map((view) => (
-              <div className={`flex items-center justify-between gap-3 px-5 py-4 ${selectedView?.id === view.id ? 'bg-infoSoft/60' : ''}`} key={view.id}>
+              <div className={`flex items-center justify-between gap-3 px-4 py-3 ${selectedView?.id === view.id ? 'bg-panel2/70' : ''}`} key={view.id}>
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold text-ink">{view.name}</div>
                   <div className="mt-1 truncate text-xs text-muted">{view.description || formatFilterSummary(view.filters_json)}</div>
                 </div>
                 <button className="secondary-button shrink-0" onClick={() => runView(view)}><Search className="h-4 w-4" />{t("Run")}</button>
               </div>
-            )) : <div className="p-5 text-sm text-muted">{views.length ? 'No saved views match the current search.' : 'No saved search views.'}</div>}
+            )) : <div className="p-4 text-sm text-muted">{views.length ? t('No saved views match the current search.') : t('No saved search views.')}</div>}
           </div>
         </Panel>
         <RunsTable title="Search Results" runs={results} onSelectRun={selectRun} onSelectBranch={selectBranch} />
@@ -6568,7 +6542,7 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero
         eyebrow="Compare"
         title="策略结果对比"
@@ -6584,11 +6558,9 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
         error={compareError}
       />
       <CompareDiagnosticsPanel diagnostics={compareDiagnostics(sortedRuns, result?.series || {}, result?.metrics || {}, metrics)} />
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="space-y-3">
         <ComparePrimarySeriesPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
         <CompareDrawdownPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
-      </div>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <MetricMatrixPanel metrics={result?.metrics || {}} runs={sortedRuns} baselineRunId={baselineRun?.id || sortedRuns[0]?.id} error={compareError} />
         <ParetoPanel metrics={result?.metrics || {}} runs={sortedRuns} metricNames={metrics} onSelectRun={selectRun} />
       </div>
@@ -6621,7 +6593,7 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
       <DashboardCollapsedSection title="高级诊断与原始明细">
         <div className="space-y-4 p-4">
           <SeriesPreviewPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="space-y-3">
             <CompareConfigDiffPanel diff={result?.config_diff || {}} runs={sortedRuns} />
             <ArtifactComparisonPanel artifacts={result?.artifacts || {}} runs={sortedRuns} />
           </div>
@@ -6659,7 +6631,7 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
   }, [projectId, researchId, uniqueResearches]);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Hero eyebrow="Compare" title="对比工作台" description="按项目和研究阶段管理保存的对比集合，再进入具体对比结果。" />
       <div className="dashboard-stats-grid">
         <Panel><ReadOnlyField label="Compare Sets" value={String(rows.length)} /></Panel>
@@ -6783,7 +6755,7 @@ function CompareDecisionSummaryPanel({ metrics, metricNames, runs, baselineRun, 
         <ReadOnlyField label="领先候选" value={bestMetricRun ? `${bestMetricRun.run.name} / ${formatMetric(bestMetricRun.value)}` : '--'} />
         <ReadOnlyField label="主指标" value={shortMetricName(primaryMetric) || '--'} />
         <ReadOnlyField label="回撤最优" value={bestDrawdownRun ? `${bestDrawdownRun.run.name} / ${formatMetric(bestDrawdownRun.value)}` : '--'} />
-        <ReadOnlyField label="Series" value={seriesEntries.length ? `${seriesEntries.length} 组 / ${seriesRunCount} runs` : 'No Series Data Available'} />
+        <ReadOnlyField label="Series" value={seriesEntries.length ? `${seriesEntries.length} 组 / ${seriesRunCount} runs` : t('No Series Data Available')} />
         <ReadOnlyField label="指标覆盖" value={coverage} />
       </div>
       <div className="mt-4 rounded-md border border-line bg-white/55 p-3">
@@ -6995,7 +6967,7 @@ function CompareSetListPanel({ compareSets, selectedCompareSet, onRun }) {
           const metrics = listOrCsv(layout.metrics || []);
           const series = listOrCsv(layout.series || []);
           return (
-            <div className={`flex items-center justify-between gap-3 px-5 py-4 ${selectedCompareSet?.id === compareSet.id ? 'bg-infoSoft/60' : ''}`} key={compareSet.id}>
+            <div className={`flex items-center justify-between gap-3 px-4 py-3 ${selectedCompareSet?.id === compareSet.id ? 'bg-panel2/70' : ''}`} key={compareSet.id}>
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold text-ink">{compareSet.name}</div>
                 <div className="mt-1 truncate text-xs text-muted">
@@ -7008,7 +6980,7 @@ function CompareSetListPanel({ compareSets, selectedCompareSet, onRun }) {
               </button>
             </div>
           );
-        }) : <div className="p-5 text-sm text-muted">{compareSets.length ? 'No compare sets match the current search.' : 'No saved compare sets.'}</div>}
+        }) : <div className="p-4 text-sm text-muted">{compareSets.length ? t('No compare sets match the current search.') : t('No saved compare sets.')}</div>}
       </div>
     </Panel>
   );
@@ -7189,8 +7161,7 @@ function MetricMatrixPanel({ metrics, runs, baselineRunId, error }) {
   const runById = Object.fromEntries((runs || []).map((run) => [run.id, run]));
   return (
     <Panel className="overflow-hidden">
-      <PanelHeader title="关键指标表" icon={TableProperties} />
-      <InlineError message={error} />
+      <PanelHeader title="关键指标表" icon={TableProperties} titleMeta={<HeaderError message={error} />} />
       <div className="overflow-x-auto">
         <table className="w-full min-w-[940px] border-collapse">
           <thead className="table-head">
@@ -7232,7 +7203,7 @@ function MetricMatrixPanel({ metrics, runs, baselineRunId, error }) {
           </tbody>
         </table>
       </div>
-      {Object.keys(runById).length ? null : <div className="p-5 text-sm text-muted">{t("Select runs to compare metrics.")}</div>}
+      {Object.keys(runById).length ? null : <div className="p-4 text-sm text-muted">{t("Select runs to compare metrics.")}</div>}
     </Panel>
   );
 }
@@ -7243,7 +7214,7 @@ function ParetoPanel({ metrics, runs, metricNames, onSelectRun }) {
     return (
       <Panel className="overflow-hidden">
         <PanelHeader title="收益风险散点" icon={Activity} />
-        <div className="p-5 text-sm text-muted">{t("Select at least two metrics and one run to show Pareto scatter.")}</div>
+        <div className="p-4 text-sm text-muted">{t("Select at least two metrics and one run to show Pareto scatter.")}</div>
       </Panel>
     );
   }
@@ -7274,7 +7245,7 @@ function ParetoPanel({ metrics, runs, metricNames, onSelectRun }) {
             ))}
           </div>
         </div>
-      ) : <div className="p-5 text-sm text-muted">Selected runs do not have numeric values for {xMetric} and {yMetric}.</div>}
+      ) : <div className="p-4 text-sm text-muted">Selected runs do not have numeric values for {xMetric} and {yMetric}.</div>}
     </Panel>
   );
 }
@@ -7310,7 +7281,7 @@ function CompareConfigDiffPanel({ diff, runs }) {
           </tbody>
         </table>
       </div>
-      {Object.keys(runById).length ? null : <div className="p-5 text-sm text-muted">{t("Select runs to compare config values.")}</div>}
+      {Object.keys(runById).length ? null : <div className="p-4 text-sm text-muted">{t("Select runs to compare config values.")}</div>}
     </Panel>
   );
 }
@@ -7374,7 +7345,7 @@ function ComparePrimarySeriesPanel({ series, runs, onSelectRun }) {
   const runById = Object.fromEntries((runs || []).map((run) => [run.id, run]));
   return (
     <Panel className="overflow-hidden">
-      <PanelHeader title="主曲线重叠" icon={LineChart} />
+      <PanelHeader title="曲线对比" icon={LineChart} />
       {entry ? (
         <div className="space-y-4 p-5">
           <ReactECharts option={seriesChartOption(entry.name, entry.byRun, runById)} style={{ height: 340 }} />
@@ -7405,7 +7376,7 @@ function CompareDrawdownPanel({ series, runs, onSelectRun }) {
   const runById = Object.fromEntries((runs || []).map((run) => [run.id, run]));
   return (
     <Panel className="overflow-hidden">
-      <PanelHeader title="回撤重叠" icon={Activity} />
+      <PanelHeader title="回撤对比" icon={Activity} />
       {entry ? (
         <div className="space-y-4 p-5">
           <ReactECharts option={seriesChartOption(entry.name, entry.byRun, runById)} style={{ height: 340 }} />
@@ -7425,7 +7396,7 @@ function CompareDrawdownPanel({ series, runs, onSelectRun }) {
             </table>
           </div>
         </div>
-      ) : <div className="p-8 text-center text-sm font-semibold text-muted">No Drawdown Series Available</div>}
+      ) : <div className="p-8 text-center text-sm font-semibold text-muted">{t('No Drawdown Series Available')}</div>}
     </Panel>
   );
 }
@@ -7493,7 +7464,7 @@ function SeriesPreviewPanel({ series, runs, onSelectRun }) {
     return (
       <Panel className="overflow-hidden">
         <PanelHeader title="全部序列明细" icon={LineChart} />
-        <div className="p-5 text-sm text-muted">{t("No series artifacts found for the selected runs.")}</div>
+        <div className="p-4 text-sm text-muted">{t("No series artifacts found for the selected runs.")}</div>
       </Panel>
     );
   }
@@ -7501,7 +7472,7 @@ function SeriesPreviewPanel({ series, runs, onSelectRun }) {
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="全部序列明细" icon={LineChart} />
-      <div className="space-y-5 p-5">
+      <div className="space-y-4 p-4">
         {entries.map(([name, byRun]) => (
           <div className="rounded-md border border-line bg-white/45 p-4" key={name}>
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -7762,7 +7733,7 @@ function paretoChartOption(points, frontierIds, xMetric, yMetric) {
     yAxis: { type: 'value', name: yMetric, scale: true },
     series: [
       { name: 'Runs', type: 'scatter', symbolSize: 10, data: toScatterData(other) },
-      { name: 'Frontier', type: 'scatter', symbolSize: 14, data: toScatterData(frontier), itemStyle: { color: '#16803d' } },
+      { name: 'Frontier', type: 'scatter', symbolSize: 14, data: toScatterData(frontier), itemStyle: { color: '#111827' } },
     ],
   };
 }
@@ -7978,12 +7949,12 @@ function savedItemSearchText(item, detail = '') {
 
 function Hero({ eyebrow, title, description, action }) {
   return (
-    <Panel className="p-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <Panel className="p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          {eyebrow ? <div className="mb-2 text-xs font-semibold uppercase text-muted">{tx(eyebrow)}</div> : null}
-          <h1 className="break-words text-3xl font-semibold text-ink md:text-4xl">{tx(title)}</h1>
-          {description ? <p className="mt-3 max-w-5xl text-sm leading-6 text-muted">{tx(description)}</p> : null}
+          {eyebrow ? <div className="mb-1 text-xs font-semibold uppercase text-muted">{tx(eyebrow)}</div> : null}
+          <h1 className="break-words text-2xl font-semibold text-ink md:text-3xl">{tx(title)}</h1>
+          {description ? <p className="mt-2 max-w-5xl text-sm leading-5 text-muted">{tx(description)}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
@@ -7993,7 +7964,7 @@ function Hero({ eyebrow, title, description, action }) {
 
 function MetricsTable({ rows, onOpenDataMetric }) {
   const groups = groupMetricRowsByNamespace(rows);
-  if (!rows.length) return <div className="p-5 text-sm text-muted">{t("No metrics yet.")}</div>;
+  if (!rows.length) return <div className="p-4 text-sm text-muted">{t("No metrics yet.")}</div>;
   return (
     <div className="divide-y divide-line">
       {groups.map((group) => (
@@ -8185,7 +8156,7 @@ function MetricDataModal({ item, onClose }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-5xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold text-ink">{item.namespace}.{item.key}</h2>
             <div className="mt-1 truncate text-xs text-muted">{artifactDataSubtitle(detail, rows)}</div>
@@ -8198,7 +8169,7 @@ function MetricDataModal({ item, onClose }) {
           <div className="flex gap-1 border-b border-line px-4 py-3">
             {availableViews.map((view) => (
               <button
-                className={`rounded-md px-3 py-2 text-sm font-semibold transition ${activeView === view ? 'bg-[#e8ebe7] text-ink' : 'text-muted hover:bg-[#f3f4f1] hover:text-ink'}`}
+                className={`rounded-md px-3 py-2 text-sm font-semibold transition ${activeView === view ? 'bg-panel2 text-ink' : 'text-muted hover:bg-panel2/70 hover:text-ink'}`}
                 key={view}
                 type="button"
                 onClick={() => setActiveView(view)}
@@ -8485,7 +8456,7 @@ function MetricDataPlot({ item, rows, columns }) {
   const yKeys = (requestedYKeys.length ? requestedYKeys : numericColumns).filter((column) => numericColumns.includes(column)).slice(0, 6);
   if (!rows.length || !xKey || !yKeys.length) return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">{t("No plottable numeric data.")}</div>;
   const option = {
-    color: ['#2563eb', '#16a34a', '#f97316', '#7c3aed', '#0891b2', '#dc2626'],
+    color: ['#111827', '#374151', '#6b7280', '#9ca3af', '#4b5563', '#d1d5db'],
     tooltip: { trigger: 'axis' },
     legend: { top: 0, textStyle: { color: '#6b7280' } },
     grid: { left: 54, right: 22, top: 48, bottom: 54 },
@@ -8519,7 +8490,7 @@ function ArtifactList({ artifacts }) {
     if (!normalizedQuery) return true;
     return artifactSearchText(artifact).includes(normalizedQuery);
   });
-  if (!artifacts.length) return <div className="p-5 text-sm text-muted">{t("No artifacts.")}</div>;
+  if (!artifacts.length) return <div className="p-4 text-sm text-muted">{t("No artifacts.")}</div>;
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line p-4">
@@ -8538,7 +8509,7 @@ function ArtifactList({ artifacts }) {
       </div>
       <div className="divide-y divide-line">
         {filtered.length ? filtered.map((artifact) => (
-          <div className="flex items-start justify-between gap-3 px-5 py-4" key={artifact.id}>
+          <div className="flex items-start justify-between gap-3 px-4 py-3" key={artifact.id}>
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-semibold text-ink">{artifact.name}</div>
               <div className="mt-1 truncate text-xs text-muted">{artifact.kind} · {artifact.filename} · {artifact.size_bytes} bytes</div>
@@ -8567,7 +8538,7 @@ function ArtifactList({ artifacts }) {
               </a>
             </div>
           </div>
-        )) : <div className="p-5 text-sm text-muted">{t("No artifacts match the current filters.")}</div>}
+        )) : <div className="p-4 text-sm text-muted">{t("No artifacts match the current filters.")}</div>}
         {selectedArtifact ? <ArtifactDetailModal artifact={selectedArtifact} onClose={() => setSelectedArtifact(null)} /> : null}
       </div>
     </div>
@@ -8615,7 +8586,7 @@ function ArtifactDetailModal({ artifact, onClose }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-3xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="truncate text-lg font-semibold text-ink">{detail.name}</h2>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close artifact details">
             <XCircle className="h-4 w-4" />
@@ -8783,12 +8754,12 @@ function EventsPanel({ events }) {
           {filtered.length} shown · {ordered.length} total
         </div>
       </div>
-      <div className="p-5">
+      <div className="p-4">
         {filtered.length ? (
           <div className="relative space-y-5 before:absolute before:bottom-0 before:left-[18px] before:top-1 before:w-px before:bg-line">
             {filtered.map((event) => <EventTimelineItem event={event} key={event.id} />)}
           </div>
-        ) : <div className="text-sm text-muted">{ordered.length ? 'No events match the current filters.' : 'No events.'}</div>}
+        ) : <div className="text-sm text-muted">{ordered.length ? t('No events match the current filters.') : t('No events.')}</div>}
       </div>
     </div>
   );
@@ -8885,7 +8856,7 @@ function SnapshotsDetailPanel({ snapshots }) {
               <div className="text-xs font-semibold text-muted">{group.rows.length} / {baseGroups.find((item) => item.id === group.id)?.rows.length || 0}</div>
             </div>
             <div className="divide-y divide-line">
-              {group.rows.length ? group.rows.map((row) => <SnapshotCard kind={group.id} row={row} key={row.id} />) : <div className="p-4 text-sm text-muted">{baseGroups.find((item) => item.id === group.id)?.rows.length ? 'No snapshots match the current filters.' : `No ${group.title.toLowerCase()} snapshots.`}</div>}
+              {group.rows.length ? group.rows.map((row) => <SnapshotCard kind={group.id} row={row} key={row.id} />) : <div className="p-4 text-sm text-muted">{baseGroups.find((item) => item.id === group.id)?.rows.length ? t('No snapshots match the current filters.') : t(`No ${group.title.toLowerCase()} snapshots.`)}</div>}
             </div>
           </div>
         ))}
@@ -8901,7 +8872,7 @@ function SnapshotCard({ kind, row }) {
   return (
     <div className="p-4">
       <div className="text-xs text-muted">{formatDate(row.created_at)}</div>
-      <div className="mt-3 space-y-2">
+      <div className="mt-2 space-y-2">
         {fields.map(([label, value]) => (
           <div className="flex items-start justify-between gap-3 rounded-md border border-line bg-white/45 px-3 py-2" key={label}>
             <span className="text-xs font-semibold uppercase text-muted">{label}</span>
@@ -9001,7 +8972,7 @@ function NotesPanel({ notes }) {
       </div>
       <div className="divide-y divide-line">
         {filtered.length ? filtered.map((note) => (
-          <div className="px-5 py-4" key={note.id}>
+          <div className="px-4 py-3" key={note.id}>
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-ink">{note.summary}</div>
@@ -9016,7 +8987,7 @@ function NotesPanel({ notes }) {
             {note.content_md ? <MarkdownView text={note.content_md} /> : null}
             {Object.keys(note.structured_json || {}).length ? <div className="mt-3"><ReadOnlyField label="Structured" value={compactKeyValueSummary(note.structured_json)} code /></div> : null}
           </div>
-        )) : <div className="p-5 text-sm text-muted">{ordered.length ? 'No notes match the current filters.' : 'No notes yet.'}</div>}
+        )) : <div className="p-4 text-sm text-muted">{ordered.length ? t('No notes match the current filters.') : t('No notes yet.')}</div>}
       </div>
     </div>
   );
@@ -9025,7 +8996,7 @@ function NotesPanel({ notes }) {
 function MarkdownView({ text }) {
   const blocks = markdownBlocks(text);
   return (
-    <div className="mt-3 space-y-2 text-sm leading-6 text-muted">
+    <div className="mt-2 space-y-2 text-sm leading-6 text-muted">
       {blocks.map((block, index) => renderMarkdownBlock(block, index))}
     </div>
   );
@@ -9174,9 +9145,9 @@ function lineageOption(branches, runs = []) {
       orient: 'LR',
       roam: true,
       symbolSize: 12,
-      lineStyle: { color: '#b8bbb5', width: 2 },
-      label: { color: '#202326', fontWeight: 700, lineHeight: 18 },
-      leaves: { label: { position: 'right', color: '#202326', fontWeight: 700, lineHeight: 18 } },
+      lineStyle: { color: '#9ca3af', width: 2 },
+      label: { color: '#111827', fontWeight: 700, lineHeight: 18 },
+      leaves: { label: { position: 'right', color: '#111827', fontWeight: 700, lineHeight: 18 } },
     }],
   };
 }
@@ -9361,9 +9332,9 @@ function dashboardTimelineGroups(data) {
 }
 
 function heatmapRed(value, max) {
-  if (!value) return '#f3f4f1';
+  if (!value) return '#f3f4f6';
   const level = Math.min(4, Math.max(1, Math.ceil((Number(value) / Math.max(1, max)) * 4)));
-  return ['#f3f4f1', '#fee2e2', '#fca5a5', '#ef4444', '#991b1b'][level];
+  return ['#f3f4f6', '#fee2e2', '#fca5a5', '#ef4444', '#991b1b'][level];
 }
 
 function startOfLocalDay(date) {
@@ -10518,7 +10489,7 @@ function runEquityChartOption(chart) {
   };
   return {
     animation: false,
-    color: ['#111111', '#dc2626'],
+    color: ['#111827', '#6b7280'],
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'cross' },
@@ -10536,9 +10507,9 @@ function runEquityChartOption(chart) {
       type: chart.xAxisType || 'category',
       boundaryGap: false,
       ...(chart.xAxisType === 'time' ? {} : { data: chart.xValues || [] }),
-      axisLine: { lineStyle: { color: '#d7dce2' } },
+      axisLine: { lineStyle: { color: '#d1d5db' } },
       axisTick: { show: false },
-      axisLabel: { color: '#5f6b7a', hideOverlap: true },
+      axisLabel: { color: '#4b5563', hideOverlap: true },
     },
     yAxis: [
       {
@@ -10546,8 +10517,8 @@ function runEquityChartOption(chart) {
         scale: true,
         axisLine: { show: false },
         axisTick: { show: false },
-        splitLine: { lineStyle: { color: '#edf0f3' } },
-        axisLabel: { color: '#5f6b7a', formatter: chart.valueAsPercent ? percentLabel : undefined },
+        splitLine: { lineStyle: { color: '#e5e7eb' } },
+        axisLabel: { color: '#4b5563', formatter: chart.valueAsPercent ? percentLabel : undefined },
       },
       {
         type: 'value',
@@ -10567,7 +10538,7 @@ function runEquityChartOption(chart) {
         data: chart.equityData,
         showSymbol: false,
         smooth: false,
-        lineStyle: { color: '#111111', width: 2 },
+        lineStyle: { color: '#111827', width: 2 },
         z: 3,
       },
       {
@@ -10577,8 +10548,8 @@ function runEquityChartOption(chart) {
         data: chart.drawdownData,
         showSymbol: false,
         smooth: false,
-        lineStyle: { width: 0, color: 'rgba(220, 38, 38, 0)' },
-        areaStyle: { color: 'rgba(220, 38, 38, 0.24)', origin: 'end' },
+        lineStyle: { width: 0, color: 'rgba(75, 85, 99, 0)' },
+        areaStyle: { color: 'rgba(75, 85, 99, 0.20)', origin: 'end' },
         z: 1,
       },
     ],
@@ -10595,7 +10566,7 @@ function runSummaryChartOption(rows) {
     series: [{
       type: 'bar',
       data: rows.map((row) => row.value),
-      itemStyle: { color: '#16803d' },
+      itemStyle: { color: '#111827' },
     }],
   };
 }

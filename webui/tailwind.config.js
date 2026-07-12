@@ -4,14 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#202326',
-        muted: '#60666c',
-        subtle: '#858a8f',
-        canvas: '#f6f6f2',
-        panel: '#fbfbf8',
-        panel2: '#edeeea',
-        line: '#e1e2dd',
-        lineStrong: '#cfd1cc',
+        ink: '#111827',
+        muted: '#4b5563',
+        subtle: '#6b7280',
+        canvas: '#f3f4f6',
+        panel: '#ffffff',
+        panel2: '#e5e7eb',
+        line: '#d1d5db',
+        lineStrong: '#9ca3af',
         positive: '#15803d',
         positiveSoft: '#e7f3ea',
         negative: '#dc2626',
@@ -20,11 +20,11 @@ export default {
         warningSoft: '#f6ecd4',
         info: '#2563eb',
         infoSoft: '#e1e8f4',
-        charcoal: '#1c1f22',
+        charcoal: '#111827',
       },
       boxShadow: {
-        bento: '0 16px 40px rgba(28,31,34,0.08)',
-        insetLine: 'inset 0 0 0 1px rgba(207,209,204,0.9)',
+        bento: '0 16px 40px rgba(17,24,39,0.08)',
+        insetLine: 'inset 0 0 0 1px rgba(156,163,175,0.9)',
       },
       borderRadius: {
         bento: '8px',
