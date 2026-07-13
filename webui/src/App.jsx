@@ -37,6 +37,7 @@ import { apiGet, apiPatch, apiPost, apiUpload, artifactContentUrl, formatMetric,
 import { t, tStatus, tx } from './i18n';
 
 const SHOW_SWEEPS = false;
+const CHART_SERIES_COLORS = ['#2563eb', '#f97316', '#10b981', '#a855f7', '#e11d48', '#06b6d4'];
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Boxes },
@@ -4985,7 +4986,7 @@ function resultSeriesChartOption(item) {
   };
   return {
     animation: false,
-    color: ['#111827', '#374151', '#6b7280', '#9ca3af', '#4b5563', '#d1d5db'],
+    color: CHART_SERIES_COLORS,
     tooltip: { trigger: 'axis' },
     legend: { top: 0, left: 0, right: 8, type: 'scroll', textStyle: { color: '#6b7280' } },
     grid: { top: 42, left: 44, right: 12, bottom: 34 },
@@ -7525,6 +7526,7 @@ function seriesChartOption(name, byRun, runById) {
   const categoryValues = xAxisType === 'category' ? sortedUniqueChartXValues(allPoints.map((point) => point?.[0])) : undefined;
   return {
     animation: false,
+    color: CHART_SERIES_COLORS,
     tooltip: { trigger: 'axis' },
     legend: { top: 0, type: 'scroll' },
     grid: { top: 42, left: 48, right: 24, bottom: 36 },
@@ -8456,7 +8458,7 @@ function MetricDataPlot({ item, rows, columns }) {
   const yKeys = (requestedYKeys.length ? requestedYKeys : numericColumns).filter((column) => numericColumns.includes(column)).slice(0, 6);
   if (!rows.length || !xKey || !yKeys.length) return <div className="rounded-md border border-line bg-white/45 p-8 text-center text-sm font-semibold text-muted">{t("No plottable numeric data.")}</div>;
   const option = {
-    color: ['#111827', '#374151', '#6b7280', '#9ca3af', '#4b5563', '#d1d5db'],
+    color: CHART_SERIES_COLORS,
     tooltip: { trigger: 'axis' },
     legend: { top: 0, textStyle: { color: '#6b7280' } },
     grid: { left: 54, right: 22, top: 48, bottom: 54 },
