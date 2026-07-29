@@ -4676,7 +4676,9 @@ function MonthlyReturnHeatmap({ chart }) {
   return (
     <div className="mt-4">
       <ResultTemplateBlock title={t("Monthly Returns")} detail={t('{{months}} months, {{start}} to {{end}}', { months: heatmap.monthCount, start: heatmap.startDate, end: heatmap.endDate })}>
-        <ReactECharts option={monthlyReturnHeatmapOption(heatmap)} style={{ height: Math.max(220, 92 + heatmap.rows.length * 42) }} />
+        <div className="mx-auto w-full max-w-[1440px]">
+          <ReactECharts option={monthlyReturnHeatmapOption(heatmap)} style={{ height: Math.max(190, 96 + heatmap.rows.length * 44) }} />
+        </div>
       </ResultTemplateBlock>
     </div>
   );
@@ -10399,7 +10401,6 @@ function monthlyReturnHeatmapData(chart) {
     monthCount: monthlyValues.length,
     startDate: points[0].x,
     endDate: points[points.length - 1].x,
-    maxAbs: Math.max(0.001, ...monthlyValues.map((value) => Math.abs(value))),
   };
 }
 
@@ -10409,13 +10410,13 @@ function monthlyReturnHeatmapOption(heatmap) {
   heatmap.rows.forEach((row, rowIndex) => {
     row.cells.forEach((cell, monthIndex) => {
       if (!cell || !Number.isFinite(cell.value)) return;
-      data.push({ value: [monthIndex, rowIndex, cell.value, cell.firstDate, cell.lastDate] });
+      data.push(monthlyReturnHeatmapCell([monthIndex, rowIndex, cell.value, cell.firstDate, cell.lastDate]));
     });
     if (Number.isFinite(row.sum)) {
-      data.push({
-        value: [12, rowIndex, row.sum, row.firstDate, row.lastDate],
-        itemStyle: { borderColor: '#cfd1cc', borderWidth: 2 },
-      });
+      data.push(monthlyReturnHeatmapCell(
+        [12, rowIndex, row.sum, row.firstDate, row.lastDate],
+        { borderColor: '#94a3b8', borderWidth: 2 },
+      ));
     }
   });
   return {
@@ -10433,14 +10434,14 @@ function monthlyReturnHeatmapOption(heatmap) {
         return `${year} ${label}<br/>${formatMonthlyReturnPercent(cellValue)}${range}`;
       },
     },
-    grid: { top: 28, left: 52, right: 16, bottom: 28 },
+    grid: { top: 36, left: 62, right: 18, bottom: 24 },
     xAxis: {
       type: 'category',
       data: xLabels,
       position: 'top',
       axisLine: { lineStyle: { color: '#d7dce2' } },
       axisTick: { show: false },
-      axisLabel: { color: '#5f6b7a', fontSize: 11 },
+      axisLabel: { color: '#475569', fontSize: 13, fontWeight: 600 },
       splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.18)'] } },
     },
     yAxis: {
@@ -10449,14 +10450,22 @@ function monthlyReturnHeatmapOption(heatmap) {
       inverse: true,
       axisLine: { lineStyle: { color: '#d7dce2' } },
       axisTick: { show: false },
-      axisLabel: { color: '#5f6b7a', fontSize: 11, fontWeight: 600 },
+      axisLabel: { color: '#334155', fontSize: 13, fontWeight: 700 },
       splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)'] } },
     },
     visualMap: {
+      type: 'piecewise',
       show: false,
-      min: -heatmap.maxAbs,
-      max: heatmap.maxAbs,
-      inRange: { color: ['#dcfce7', '#ffffff', '#fee2e2'] },
+      dimension: 2,
+      pieces: [
+        { lte: -0.15, color: '#22c55e' },
+        { gt: -0.15, lte: -0.05, color: '#86efac' },
+        { gt: -0.05, lt: 0, color: '#dcfce7' },
+        { value: 0, color: '#f1f5f9' },
+        { gt: 0, lt: 0.05, color: '#fee2e2' },
+        { gte: 0.05, lt: 0.15, color: '#fca5a5' },
+        { gte: 0.15, color: '#ef4444' },
+      ],
     },
     series: [{
       name: t('Monthly Returns'),
@@ -10464,13 +10473,25 @@ function monthlyReturnHeatmapOption(heatmap) {
       data,
       label: {
         show: true,
-        color: '#202326',
-        fontSize: 11,
+        color: '#172033',
+        fontSize: 13,
+        fontWeight: 700,
         formatter: (params) => formatMonthlyReturnPercent(Number(params.value?.[2])),
       },
       itemStyle: { borderColor: '#fbfbf8', borderWidth: 2 },
       emphasis: { itemStyle: { borderColor: '#202326', borderWidth: 1 } },
     }],
+  };
+}
+
+function monthlyReturnHeatmapCell(value, itemStyle = {}) {
+  const cellValue = Number(value[2]);
+  let labelColor = '#172033';
+  if (Math.abs(cellValue) >= 0.15) labelColor = '#ffffff';
+  return {
+    value,
+    itemStyle,
+    label: { color: labelColor },
   };
 }
 
