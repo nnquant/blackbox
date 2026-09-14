@@ -13,6 +13,8 @@ decision, or moves the baseline on its own.
 
 from __future__ import annotations
 
+from .representatives import choose_representative, manual_baseline_ids
+
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -257,15 +259,8 @@ def run_evidence(db: Session, run: Run, primary_metric: str, *, with_notes: bool
 
 
 def branch_champion(db: Session, branch: Branch, primary_metric: str) -> Run | None:
-    runs = db.scalars(select(Run).where(Run.branch_id == branch.id, Run.status == "completed")).all()
-    scored = [(metric_value(run.summary_json or {}, primary_metric), run) for run in runs]
-    with_metric = [(value, run) for value, run in scored if value is not None]
-    if with_metric:
-        return max(with_metric, key=lambda item: item[0])[1]
-    if runs:
-        return max(runs, key=lambda run: run.updated_at or run.created_at)
-    latest = db.scalars(select(Run).where(Run.branch_id == branch.id).order_by(Run.updated_at.desc()).limit(1)).all()
-    return latest[0] if latest else None
+    runs = db.scalars(select(Run).where(Run.branch_id == branch.id)).all()
+    return choose_representative(runs, manual_baseline_ids(db), primary_metric)
 
 
 def resolve_binding(db: Session, node: ResearchMapNode, primary_metric: str) -> dict[str, Any] | None:

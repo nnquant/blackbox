@@ -103,6 +103,7 @@ from .models import (
 )
 from .realtime import event_hub, publish_change
 from .research_maps import register_research_map_routes
+from .representatives import choose_representative, manual_baseline_ids
 from .settings import get_settings
 from .storage import get_artifact_content_target, get_storage
 from .workers import get_worker
@@ -300,6 +301,7 @@ def create_app() -> FastAPI:
         since_7d = now - timedelta(days=7)
         branch_run_stats = dashboard_branch_run_stats(db, since_7d)
         champion_by_research = dashboard_champion_runs_by_research(db, branch_by_id, research_by_id, project_by_id)
+        pins = manual_baseline_ids(db)
         return ok(
             {
                 "summary": {
@@ -342,7 +344,7 @@ def create_app() -> FastAPI:
                     }
                     for item in branches
                 ],
-                "runs": [run_summary_for_dashboard(run, branch_by_id, research_by_id, project_by_id, artifact_summary_by_run) for run in runs],
+                "runs": [{**run_summary_for_dashboard(run, branch_by_id, research_by_id, project_by_id, artifact_summary_by_run), "is_manual_baseline": run.id in pins} for run in runs],
                 "run_activity_daily": run_activity_daily(db),
                 "artifacts": [ArtifactRead.model_validate(item).model_dump(mode="json") for item in artifacts],
                 "notes": [note_summary_for_dashboard(item, run_by_id, branch_by_id, research_by_id) for item in notes],
@@ -468,6 +470,7 @@ def create_app() -> FastAPI:
             if branch_ids
             else []
         )
+        pins = manual_baseline_ids(db)
         compare_sets = db.scalars(select(CompareSet).where(CompareSet.project_id == project.id).order_by(CompareSet.created_at.desc())).all()
         search_views = db.scalars(select(SearchView).where(SearchView.project_id == project.id).order_by(SearchView.updated_at.desc())).all()
         return ok(
@@ -479,6 +482,7 @@ def create_app() -> FastAPI:
                         {project.id: project},
                         [branch for branch in branches if branch.research_id == research.id],
                         runs,
+                        manual_ids=pins,
                     )
                     for research in researches
                 ],
@@ -1334,6 +1338,7 @@ def create_app() -> FastAPI:
         researches = search_research_records(db, payload)
         all_branches = db.scalars(select(Branch)).all()
         all_runs = db.scalars(select(Run)).all()
+        pins = manual_baseline_ids(db)
         projects = db.scalars(select(Project)).all()
         return ok(
             [
@@ -1342,6 +1347,7 @@ def create_app() -> FastAPI:
                     {item.id: item for item in projects},
                     [branch for branch in all_branches if branch.research_id == research.id],
                     all_runs,
+                    manual_ids=pins,
                 )
                 for research in researches
             ]
@@ -1719,7 +1725,7 @@ def build_research_review_board(
     )
 
     return {
-        "research": research_summary_for_dashboard(research, {project.id: project}, branches, runs),
+        "research": research_summary_for_dashboard(research, {project.id: project}, branches, runs, manual_ids=manual_baseline_ids(db)),
         "state": {
             "status": research.status,
             "branch_status_counts": dict(branch_status_counts),
@@ -2046,7 +2052,8 @@ def run_summaries(db: Session, runs: list[Run]) -> list[dict[str, Any]]:
     project_ids = {research.project_id for research in researches}
     projects = db.scalars(select(Project).where(Project.id.in_(project_ids))).all() if project_ids else []
     artifacts = db.scalars(select(Artifact).where(Artifact.run_id.in_([run.id for run in runs]))).all()
-    return run_summaries_with_maps(runs, branches, researches, projects, artifact_summary_by_run_id(artifacts))
+    pins = manual_baseline_ids(db)
+    return [{**row, "is_manual_baseline": row["id"] in pins} for row in run_summaries_with_maps(runs, branches, researches, projects, artifact_summary_by_run_id(artifacts))]
 
 
 def run_summaries_with_maps(
@@ -2146,34 +2153,19 @@ def dashboard_champion_runs_by_research(
     research_by_id: dict[str, Research],
     project_by_id: dict[str, Project],
 ) -> dict[str, dict[str, Any]]:
-    rows = db.execute(
-        select(Run.id, Run.branch_id, Run.summary_json)
-        .where(Run.status == RunStatus.completed.value)
-    ).all()
-    best_by_research: dict[str, tuple[float, str]] = {}
+    # Read lightweight rows once; hydrate only the chosen representatives.
+    pins = manual_baseline_ids(db)
+    rows = db.execute(select(Run.id, Run.branch_id, Run.summary_json, Run.status, Run.updated_at, Run.created_at)).all()
+    grouped = {}
     for row in rows:
         branch = branch_by_id.get(row.branch_id)
-        if not branch:
-            continue
-        score = get_metric_value(row.summary_json, "strategy.summary.sharpe")
-        try:
-            numeric_score = float(score)
-        except (TypeError, ValueError):
-            numeric_score = float("-inf")
-        current = best_by_research.get(branch.research_id)
-        if current is None or numeric_score > current[0]:
-            best_by_research[branch.research_id] = (numeric_score, row.id)
-    best_run_ids = [run_id for _, run_id in best_by_research.values()]
-    if not best_run_ids:
-        return {}
-    best_runs = db.scalars(select(Run).where(Run.id.in_(best_run_ids))).all()
-    best_run_by_id = {run.id: run for run in best_runs}
-    result: dict[str, dict[str, Any]] = {}
-    for research_id, (_, run_id) in best_by_research.items():
-        run = best_run_by_id.get(run_id)
-        if run:
-            result[research_id] = run_summary_for_dashboard(run, branch_by_id, research_by_id, project_by_id)
-    return result
+        if branch:
+            grouped.setdefault(branch.research_id, []).append(row)
+    chosen = {key: choose_representative(items, pins).id for key, items in grouped.items()}
+    selected = db.scalars(select(Run).where(Run.id.in_(chosen.values()))).all() if chosen else []
+    by_id = {run.id: run for run in selected}
+    return {key: {**run_summary_for_dashboard(by_id[ident], branch_by_id, research_by_id, project_by_id),
+                  "is_manual_baseline": ident in pins} for key, ident in chosen.items()}
 
 
 def project_summary_for_dashboard_stats(
@@ -2247,6 +2239,7 @@ def research_summary_for_dashboard(
     branches: list[Branch],
     runs: list[Run],
     since_7d: datetime | None = None,
+    manual_ids=(),
 ) -> dict[str, Any]:
     branch_ids = {branch.id for branch in branches}
     research_runs = [run for run in runs if run.branch_id in branch_ids]
@@ -2256,11 +2249,7 @@ def research_summary_for_dashboard(
         run for run in research_runs
         if run.status == RunStatus.failed.value and is_on_or_after(run.updated_at or run.ended_at or run.created_at, seven_day_cutoff)
     ]
-    champion = sorted(
-        [run for run in research_runs if run.status == RunStatus.completed.value],
-        key=lambda run: float(get_metric_value(run.summary_json, "strategy.summary.sharpe") or float("-inf")),
-        reverse=True,
-    )
+    champion = choose_representative(research_runs, manual_ids)
     project = project_by_id.get(research.project_id)
     return {
         **ResearchRead.model_validate(research).model_dump(mode="json"),
@@ -2269,7 +2258,7 @@ def research_summary_for_dashboard(
         "run_count": len(research_runs),
         "run_count_7d": len(research_runs_7d),
         "failed_run_count_7d": len(failed_runs_7d),
-        "champion_run": RunRead.model_validate(champion[0]).model_dump(mode="json") if champion else None,
+        "champion_run": {**RunRead.model_validate(champion).model_dump(mode="json"), "is_manual_baseline": champion.id in manual_ids} if champion else None,
     }
 
 
@@ -2393,16 +2382,7 @@ def representative_run_for_branches(db: Session, branch_ids: list[str]) -> Run |
     runs = db.scalars(select(Run).where(Run.branch_id.in_(branch_ids))).all()
     if not runs:
         return None
-    completed = [run for run in runs if run.status == RunStatus.completed.value]
-    candidates = completed or runs
-    return sorted(
-        candidates,
-        key=lambda run: (
-            sortable_metric_value(run, "strategy.summary.sharpe"),
-            comparable_datetime(run.updated_at or run.ended_at or run.created_at) or datetime.min,
-        ),
-        reverse=True,
-    )[0]
+    return choose_representative(runs, manual_baseline_ids(db))
 
 
 def sortable_metric_value(run: Run, metric: str) -> float:

@@ -1,0 +1,263 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+    - generic: /
+    - button "期权风险溢价研究"
+    - generic: /
+    - button "波动率过滤 · 基准思路"
+    - generic: /
+    - button "零值指标"
+  - generic: Run / 已完成
+  - heading "零值指标" [level=1]
+  - generic: 已完成
+  - generic "运行状态操作 · 已完成"
+  - generic: 项目
+  - generic "page-review":
+    - generic: page-review
+  - generic: 研究线
+  - generic "options":
+    - generic: options
+  - generic: 研究分支
+  - generic "baseline":
+    - generic: baseline
+  - generic: 源 Run
+  - generic: "--"
+  - generic: Started
+  - generic "2026/9/14 14:50:45":
+    - generic: 2026/9/14 14:50:45
+  - generic: 终止
+  - generic "2026/9/14 14:50:45":
+    - generic: 2026/9/14 14:50:45
+  - generic: 耗时
+  - generic "0s":
+    - generic: 0s
+  - generic: 创建者
+  - generic "human":
+    - generic: human
+  - generic: 标签
+  - generic "页面验收":
+    - generic: 页面验收
+  - generic: 结果摘要
+  - generic: 当前 Run 的结果覆盖、主曲线、指标和质量状态。
+  - generic: 证据检查无告警
+  - generic: Primary Curve
+  - generic "returns_series (return)":
+    - generic: returns_series (return)
+  - generic: Series Range
+  - generic "2025-01-01 -> 2025-01-28 · 28/28 rows":
+    - generic: 2025-01-01 -> 2025-01-28 · 28/28 rows
+    - button "展开"
+  - generic: Result Domains
+  - generic "Strategy 1":
+    - generic: Strategy 1
+  - generic: Key Metrics
+  - generic "7/7":
+    - generic: 7/7
+  - generic: 产物
+  - generic "2 total · 1 result":
+    - generic: 2 total · 1 result
+  - generic: 更新时间
+  - generic "2026/9/14 14:56:51":
+    - generic: 2026/9/14 14:56:51
+  - tablist "Run 内容":
+    - tab "Results":
+      - text: Results
+    - tab "指标":
+      - text: 指标
+    - tab "事件":
+      - text: 事件
+    - tab "产物" [selected]:
+      - text: 产物
+    - tab "配置":
+      - text: 配置
+    - tab "上下文":
+      - text: 上下文
+    - tab "笔记":
+      - text: 笔记
+  - tabpanel "产物":
+    - heading "产物" [level=2]
+    - text: 产物类型
+    - combobox "产物类型":
+      - option "全部产物" [selected]
+      - option "table_csv"
+    - text: 搜索产物
+    - textbox "搜索产物":
+      - /placeholder: name, filename, preview, metadata
+    - generic: 2 shown · 2 total
+    - generic: equity
+    - generic: table_csv · equity.csv · 515 bytes
+    - generic: "csv · 28 rows · columns: date, equity"
+    - button "View artifact equity":
+    - link "Open artifact":
+      - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0vw2w3_32bc096b0b/content
+    - link "Download artifact":
+      - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0vw2w3_32bc096b0b/content
+    - generic: returns_series
+    - generic: table_csv · returns_series.csv · 510 bytes
+    - generic: "csv · 28 rows · columns: date, series_values"
+    - button "View artifact returns_series" [active]:
+    - link "Open artifact":
+      - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0w3xzl_94c2c04741/content
+    - link "Download artifact":
+      - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0w3xzl_94c2c04741/content
+    - dialog:
+      - heading "returns_series" [level=2]
+      - button "Close artifact details":
+      - generic: ID
+      - generic "art_mu0w3xzl_94c2c04741":
+        - generic: art_mu0w3xzl_94c2c04741
+      - generic: 类型
+      - generic "table_csv":
+        - generic: table_csv
+      - generic: 文件名
+      - generic "returns_series.csv":
+        - generic: returns_series.csv
+      - generic: MIME type
+      - generic "application/vnd.ms-excel":
+        - generic: application/vnd.ms-excel
+      - generic: 大小
+      - generic "510 B":
+        - generic: 510 B
+      - generic: SHA256
+      - generic "862c04b11f1315871f0f2becfad10113fa60dc54b644357175283fdb66c35571":
+        - generic: 862c04b11f1315871f0f2becfad10113fa60dc54b644357175283fdb66c35571
+        - button "展开"
+      - generic: Storage URI
+      - generic "file:///D:/project/blackbox/work/page-review/ui-data/artifacts/run/run_mu0vw2vl_1a697c5bd0/artifacts/art_mu0w3xzk_29bafcd89d/returns_series.csv":
+        - generic: file:///D:/project/blackbox/work/page-review/ui-data/artifacts/run/run_mu0vw2vl_1a697c5bd0/artifacts/art_mu0w3xzk_29bafcd89d/returns_series.csv
+        - button "展开"
+      - generic: 创建时间
+      - generic "2026/9/14 14:56:51":
+        - generic: 2026/9/14 14:56:51
+      - generic: 预览
+      - table:
+        - rowgroup:
+          - row "DATE SERIES_VALUES":
+            - columnheader "DATE"
+            - columnheader "SERIES_VALUES"
+        - rowgroup:
+          - row "2025-01-01 0.01":
+            - cell "2025-01-01"
+            - cell "0.01"
+          - row "2025-01-02 -0.01":
+            - cell "2025-01-02"
+            - cell "-0.01"
+          - row "2025-01-03 0.01":
+            - cell "2025-01-03"
+            - cell "0.01"
+          - row "2025-01-04 -0.01":
+            - cell "2025-01-04"
+            - cell "-0.01"
+          - row "2025-01-05 0.01":
+            - cell "2025-01-05"
+            - cell "0.01"
+          - row "2025-01-06 -0.01":
+            - cell "2025-01-06"
+            - cell "-0.01"
+          - row "2025-01-07 0.01":
+            - cell "2025-01-07"
+            - cell "0.01"
+          - row "2025-01-08 -0.01":
+            - cell "2025-01-08"
+            - cell "-0.01"
+          - row "2025-01-09 0.01":
+            - cell "2025-01-09"
+            - cell "0.01"
+          - row "2025-01-10 -0.01":
+            - cell "2025-01-10"
+            - cell "-0.01"
+          - row "2025-01-11 0.01":
+            - cell "2025-01-11"
+            - cell "0.01"
+          - row "2025-01-12 -0.01":
+            - cell "2025-01-12"
+            - cell "-0.01"
+          - row "2025-01-13 0.01":
+            - cell "2025-01-13"
+            - cell "0.01"
+          - row "2025-01-14 -0.01":
+            - cell "2025-01-14"
+            - cell "-0.01"
+          - row "2025-01-15 0.01":
+            - cell "2025-01-15"
+            - cell "0.01"
+          - row "2025-01-16 -0.01":
+            - cell "2025-01-16"
+            - cell "-0.01"
+          - row "2025-01-17 0.01":
+            - cell "2025-01-17"
+            - cell "0.01"
+          - row "2025-01-18 -0.01":
+            - cell "2025-01-18"
+            - cell "-0.01"
+          - row "2025-01-19 0.01":
+            - cell "2025-01-19"
+            - cell "0.01"
+          - row "2025-01-20 -0.01":
+            - cell "2025-01-20"
+            - cell "-0.01"
+      - generic: 元数据
+      - 'generic "series={5}, result={4}"':
+        - generic: "series={5}, result={4}"
+      - link "Open artifact":
+        - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0w3xzl_94c2c04741/content
+        - text: Open artifact
+      - link "Download":
+        - /url: http://127.0.0.1:8021/api/v1/artifacts/art_mu0w3xzl_94c2c04741/content
+        - text: Download
+  - generic "Actions":
+    - generic: Actions

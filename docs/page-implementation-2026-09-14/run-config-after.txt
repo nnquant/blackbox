@@ -1,0 +1,144 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+    - generic: /
+    - button "期权风险溢价研究"
+    - generic: /
+    - button "波动率过滤 · 基准思路"
+    - generic: /
+    - button "零值指标"
+  - generic: Run / 已完成
+  - heading "零值指标" [level=1]
+  - generic: 已完成
+  - generic "运行状态操作 · 已完成"
+  - generic: 项目
+  - generic "page-review":
+    - generic: page-review
+  - generic: 研究线
+  - generic "options":
+    - generic: options
+  - generic: 研究分支
+  - generic "baseline":
+    - generic: baseline
+  - generic: 源 Run
+  - generic: "--"
+  - generic: Started
+  - generic "2026/9/14 14:50:45":
+    - generic: 2026/9/14 14:50:45
+  - generic: 终止
+  - generic "2026/9/14 14:50:45":
+    - generic: 2026/9/14 14:50:45
+  - generic: 耗时
+  - generic "0s":
+    - generic: 0s
+  - generic: 创建者
+  - generic "human":
+    - generic: human
+  - generic: 标签
+  - generic "页面验收":
+    - generic: 页面验收
+  - generic: 结果摘要
+  - generic: 当前 Run 的结果覆盖、主曲线、指标和质量状态。
+  - generic: 证据检查无告警
+  - generic: Primary Curve
+  - generic "returns_series (return)":
+    - generic: returns_series (return)
+  - generic: Series Range
+  - generic "2025-01-01 -> 2025-01-28 · 28/28 rows":
+    - generic: 2025-01-01 -> 2025-01-28 · 28/28 rows
+    - button "展开"
+  - generic: Result Domains
+  - generic "Strategy 1":
+    - generic: Strategy 1
+  - generic: Key Metrics
+  - generic "7/7":
+    - generic: 7/7
+  - generic: 产物
+  - generic "2 total · 1 result":
+    - generic: 2 total · 1 result
+  - generic: 更新时间
+  - generic "2026/9/14 14:56:51":
+    - generic: 2026/9/14 14:56:51
+  - tablist "Run 内容":
+    - tab "Results":
+      - text: Results
+    - tab "指标":
+      - text: 指标
+    - tab "事件":
+      - text: 事件
+    - tab "产物":
+      - text: 产物
+    - tab "配置" [selected]:
+      - text: 配置
+    - tab "上下文":
+      - text: 上下文
+    - tab "笔记":
+      - text: 笔记
+  - tabpanel "配置":
+    - heading "配置" [level=2]
+    - generic: 当前配置
+    - 'generic "{ \"start_date\": \"2023-01-01\", \"end_date\": \"2025-12-31\", \"fee_bps\": 10, \"lookback\": 22, \"enabled\": true, \"nullable\": null, \"universe\": \"CN_OPTIONS\" }"':
+      - generic: "{ \"start_date\": \"2023-01-01\", \"end_date\": \"2025-12-31\", \"fee_bps\": 10, \"lookback\": 22, \"enabled\": true, \"nullable\": null, \"universe\": \"CN_OPTIONS\" }"
+      - button "展开"
+    - generic: 上下文
+    - 'generic "{ \"sample\": \"train\", \"currency\": \"CNY\" }"':
+      - generic: "{ \"sample\": \"train\", \"currency\": \"CNY\" }"
+    - generic: 源 Run 差异
+    - generic: 无源 Run
+    - generic: 该 Run 不是从其他 Run 克隆而来。
+  - generic "Actions":
+    - generic: Actions

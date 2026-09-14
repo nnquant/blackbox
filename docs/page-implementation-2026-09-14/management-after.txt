@@ -1,0 +1,345 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "研究管理"
+  - generic: 管理
+  - heading "研究资产管理" [level=1]
+  - paragraph: 巡检口径：超过 14 天无活动的运行与活跃研究线需复核。记录状态不等于远程执行器状态。
+  - button "刷新":
+    - text: 刷新
+  - generic: 研究线
+  - generic "4 / active 4":
+    - generic: 4 / active 4
+  - generic: Stale Active
+  - generic "3":
+    - generic: "3"
+  - generic: Run
+  - generic "8":
+    - generic: "8"
+  - generic: 运行中
+  - generic "4 / stale 0":
+    - generic: 4 / stale 0
+  - generic: 产物
+  - generic "10 · 5.63 KB":
+    - generic: 10 · 5.63 KB
+  - generic: 已保存视图
+  - generic "0 search / 1 compare":
+    - generic: 0 search / 1 compare
+  - heading "陈旧 Running Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run Research Branch Updated":
+        - columnheader "Run"
+        - columnheader "Research"
+        - columnheader "Branch"
+        - columnheader "Updated"
+    - rowgroup:
+      - row "暂无陈旧 running run。":
+        - cell "暂无陈旧 running run。"
+  - heading "陈旧活跃研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Size Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "备选线索 · 流动性 lead-0 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 流动性 lead-0":
+          - button "备选线索 · 流动性"
+          - generic: lead-0
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 尾部风险 lead-1 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 尾部风险 lead-1":
+          - button "备选线索 · 尾部风险"
+          - generic: lead-1
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 稳健性 lead-2 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 稳健性 lead-2":
+          - button "备选线索 · 稳健性"
+          - generic: lead-2
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+  - heading "项目压力" [level=2]
+  - table:
+    - rowgroup:
+      - row "Project Research Branches Runs Artifacts Size Latest":
+        - columnheader "Project"
+        - columnheader "Research"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "页面验收 · 量化研究 page-review 4 1 8 10 5.63 KB 2026/9/14 14:56:51":
+        - cell "页面验收 · 量化研究 page-review":
+          - button "页面验收 · 量化研究"
+          - generic: page-review
+        - cell "4"
+        - cell "1"
+        - cell "8"
+        - cell "10"
+        - cell "5.63 KB"
+        - cell "2026/9/14 14:56:51"
+  - heading "Run 数量研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "期权风险溢价研究 options page-review 活跃 1 8 10 2026/9/14 14:56:51":
+        - cell "期权风险溢价研究 options":
+          - button "期权风险溢价研究"
+          - generic: options
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "8"
+        - cell "10"
+        - cell "2026/9/14 14:56:51"
+      - row "备选线索 · 流动性 lead-0 page-review 活跃 0 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 流动性 lead-0":
+          - button "备选线索 · 流动性"
+          - generic: lead-0
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 尾部风险 lead-1 page-review 活跃 0 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 尾部风险 lead-1":
+          - button "备选线索 · 尾部风险"
+          - generic: lead-1
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 稳健性 lead-2 page-review 活跃 0 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 稳健性 lead-2":
+          - button "备选线索 · 稳健性"
+          - generic: lead-2
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+  - heading "Artifact 数量研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Size Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "期权风险溢价研究 options page-review 活跃 1 8 10 5.63 KB 2026/9/14 14:56:51":
+        - cell "期权风险溢价研究 options":
+          - button "期权风险溢价研究"
+          - generic: options
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "8"
+        - cell "10"
+        - cell "5.63 KB"
+        - cell "2026/9/14 14:56:51"
+      - row "备选线索 · 流动性 lead-0 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 流动性 lead-0":
+          - button "备选线索 · 流动性"
+          - generic: lead-0
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 尾部风险 lead-1 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 尾部风险 lead-1":
+          - button "备选线索 · 尾部风险"
+          - generic: lead-1
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 稳健性 lead-2 page-review 活跃 0 0 0 0 B 2026/9/14 14:50:45":
+        - cell "备选线索 · 稳健性 lead-2":
+          - button "备选线索 · 稳健性"
+          - generic: lead-2
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "0"
+        - cell "0"
+        - cell "0"
+        - cell "0 B"
+        - cell "2026/9/14 14:50:45"
+  - heading "Run 数量分支" [level=2]
+  - table:
+    - rowgroup:
+      - row "Branch Research Status Runs Artifacts Latest":
+        - columnheader "Branch"
+        - columnheader "Research"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "波动率过滤 · 基准思路 baseline options 活跃 8 10 2026/9/14 14:56:51":
+        - cell "波动率过滤 · 基准思路 baseline":
+          - button "波动率过滤 · 基准思路"
+          - generic: baseline
+        - cell "options"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "8"
+        - cell "10"
+        - cell "2026/9/14 14:56:51"
+  - heading "Artifact 数量分支" [level=2]
+  - table:
+    - rowgroup:
+      - row "Branch Research Status Runs Artifacts Size Latest":
+        - columnheader "Branch"
+        - columnheader "Research"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "波动率过滤 · 基准思路 baseline options 活跃 8 10 5.63 KB 2026/9/14 14:56:51":
+        - cell "波动率过滤 · 基准思路 baseline":
+          - button "波动率过滤 · 基准思路"
+          - generic: baseline
+        - cell "options"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "8"
+        - cell "10"
+        - cell "5.63 KB"
+        - cell "2026/9/14 14:56:51"
+  - heading "Artifact 体积排行" [level=2]
+  - table:
+    - rowgroup:
+      - row "Name Kind Count Size Max":
+        - columnheader "Name"
+        - columnheader "Kind"
+        - columnheader "Count"
+        - columnheader "Size"
+        - columnheader "Max"
+    - rowgroup:
+      - row "returns_series table_csv 5 3.08 KB 762 B":
+        - cell "returns_series"
+        - cell "table_csv"
+        - cell "5"
+        - cell "3.08 KB"
+        - cell "762 B"
+      - row "equity table_csv 5 2.56 KB 564 B":
+        - cell "equity"
+        - cell "table_csv"
+        - cell "5"
+        - cell "2.56 KB"
+        - cell "564 B"

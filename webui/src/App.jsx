@@ -36,6 +36,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import './index.css';
+import { savedPageQuery, usePageQuery } from './pageState';
+import { representativeRun, representativeReason } from './representative';
+import { compareScope } from './comparisonScope';
 import { apiGet, apiPatch, apiPost, apiUpload, artifactContentUrl, formatMetric, metricValue, websocketUrl } from './api';
 import { t, tStatus, tx } from './i18n';
 import { MapNodeCell, ResearchMapEmbed, ResearchMapsPage, ScopedResearchMapsPanel } from './ResearchMap';
@@ -212,9 +215,10 @@ function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId,
   const runs = data?.runs || [];
   const [open, setOpen] = useState(() => new Set());
   const [maps, setMaps] = useState([]);
+  const [mapError, setMapError] = useState(null);
   useEffect(() => {
     let cancelled = false;
-    apiGet('/api/v1/research-maps').then((rows) => { if (!cancelled) setMaps(rows || []); }).catch(() => {});
+    apiGet('/api/v1/research-maps').then((rows) => { if (!cancelled) { setMaps(rows || []); setMapError(null); } }).catch(err => { if (!cancelled) setMapError(err.message); });
     return () => { cancelled = true; };
   }, [data?.summary?.runs, data?.researches?.length]);
   const currentProjectId = selectedProjectId || researches.find((r) => r.id === selectedResearchId)?.project_id || null;
@@ -274,7 +278,7 @@ function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId,
             </button>
           </li>
         ))}
-        {!maps.length ? <li className="empty">{t('No research maps yet')}</li> : null}
+        {mapError ? <li className="empty"><button type="button" onClick={() => selectMap(null)}>地图加载失败 · 打开重试</button></li> : !maps.length ? <li className="empty">{t('No research maps yet')}</li> : null}
       </ul>
     </>
   );
@@ -474,7 +478,7 @@ function ManagementPage({ data, selectProject, selectResearch, selectBranch, sel
       <Hero
         eyebrow="Manage"
         title="研究资产管理"
-        description="活跃研究、重产物、陈旧运行和批量实验压力"
+        description="巡检口径：超过 14 天无活动的运行与活跃研究线需复核。记录状态不等于远程执行器状态。"
         action={<button className="secondary-button" onClick={loadSummary} type="button"><RefreshCw className="h-4 w-4" />{loading ? '刷新中' : '刷新'}</button>}
       />
       {error ? <EmptyState title="Management API unavailable" detail={error} /> : null}
@@ -486,20 +490,20 @@ function ManagementPage({ data, selectProject, selectResearch, selectBranch, sel
         <Panel><ReadOnlyField label="Artifacts" value={`${stats.artifacts ?? 0} · ${formatBytes(stats.artifact_bytes)}`} /></Panel>
         <Panel><ReadOnlyField label="Saved Views" value={`${stats.search_views ?? 0} search / ${stats.compare_sets ?? 0} compare`} /></Panel>
       </div>
+        <StaleRunningRunsTable rows={summary?.stale_running_runs || []} onSelectRun={selectRun} onSelectResearch={selectResearch} />
+      <ManagementResearchTable title="陈旧活跃研究线" rows={summary?.stale_active_researches || []} onSelectResearch={selectResearch} showBytes />
       <ManagementProjectPressureTable rows={summary?.projects || []} onSelectProject={selectProject} />
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <ManagementResearchTable title="Run 压力研究线" rows={summary?.top_research_by_runs || []} onSelectResearch={selectResearch} />
-        <ManagementResearchTable title="Artifact 压力研究线" rows={summary?.top_research_by_artifacts || []} onSelectResearch={selectResearch} showBytes />
+        <ManagementResearchTable title="Run 数量研究线" rows={summary?.top_research_by_runs || []} onSelectResearch={selectResearch} />
+        <ManagementResearchTable title="Artifact 数量研究线" rows={summary?.top_research_by_artifacts || []} onSelectResearch={selectResearch} showBytes />
       </div>
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <ManagementBranchTable title="Run 压力分支" rows={summary?.top_branches_by_runs || []} onSelectBranch={selectBranch} />
-        <ManagementBranchTable title="Artifact 压力分支" rows={summary?.top_branches_by_artifacts || []} onSelectBranch={selectBranch} showBytes />
+        <ManagementBranchTable title="Run 数量分支" rows={summary?.top_branches_by_runs || []} onSelectBranch={selectBranch} />
+        <ManagementBranchTable title="Artifact 数量分支" rows={summary?.top_branches_by_artifacts || []} onSelectBranch={selectBranch} showBytes />
       </div>
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <StaleRunningRunsTable rows={summary?.stale_running_runs || []} onSelectRun={selectRun} onSelectResearch={selectResearch} />
         <ArtifactPressureTable rows={summary?.artifact_names_by_bytes || []} />
       </div>
-      <ManagementResearchTable title="陈旧活跃研究线" rows={summary?.stale_active_researches || []} onSelectResearch={selectResearch} showBytes />
     </div>
   );
 }
@@ -638,25 +642,16 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
   const recentRuns = [...runs].sort((a, b) => dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at) - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at)).slice(0, 10);
   const issueRuns = dashboardIssueRuns(runs).slice(0, 8);
   const activeResearchRows = projectResearchActivityRows(researches, branches, runs).slice(0, 8);
-  const decisionRuns = [...runs]
-    .filter((run) => run.status === 'completed')
-    .sort((a, b) => Number(metricValue(b, 'strategy.summary', 'sharpe') || -Infinity) - Number(metricValue(a, 'strategy.summary', 'sharpe') || -Infinity))
-    .slice(0, 8);
+  const decisionRuns = researches.map(research => researchChampionRun(research, branches, runs)).filter(Boolean).slice(0, 8);
   return (
     <div className="space-y-4">
+      <Hero eyebrow="Workspace" title="研究总览" description="全工作区 · 先查看运行异常与近期证据，再进入研究线。质量提示不代表研究评审通过。" />
       <div className="dashboard-stats-grid">
-        <StatTile label="Workspaces" value={summary.workspaces || 0} tone="info" />
-        <StatTile label="Projects" value={summary.projects || 0} tone="info" />
         <StatTile label="Runs Today" value={summary.today_runs ?? windowStats.runsToday} tone="positive" />
         <StatTile label="Running" value={summary.running_runs || 0} tone="warning" />
         <StatTile label="Failed 24h" value={summary.failed_runs_24h ?? windowStats.failed24h} tone={(summary.failed_runs_24h ?? windowStats.failed24h) ? 'negative' : 'neutral'} />
         <StatTile label="New Branches" value={summary.new_branches_24h ?? windowStats.branches24h} tone="info" />
-        <StatTile label="Runs" value={summary.runs || 0} tone="positive" />
-        <StatTile label="Compare Sets" value={summary.compare_sets || 0} tone="info" />
-        <StatTile label="Search Views" value={summary.search_views || 0} tone="info" />
       </div>
-      <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
-      <DashboardActivityHeatmap data={data} />
       <div className="grid gap-4 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-8">
           <RecentResultsPanel runs={recentRuns} onSelectRun={selectRun} onSelectBranch={selectBranch} />
@@ -667,6 +662,8 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
           <DecisionCandidatesPanel runs={decisionRuns} onSelectRun={selectRun} />
         </div>
       </div>
+      <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
+      <DashboardActivityHeatmap data={data} />
       <DashboardCollapsedSection title="System Overview">
         <div className="space-y-4 p-3">
           <DashboardActivityTimeline data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} />
@@ -721,7 +718,7 @@ function ActiveResearchPanel({ rows, selectResearch, selectRun }) {
               <th className="px-4 py-3 text-right">{t("7D Runs")}</th>
               <th className="px-4 py-3 text-right">{t("Fail Rate")}</th>
               <th className="px-4 py-3 text-right">{t("Branches")}</th>
-              <th className="px-4 py-3">{t("Champion")}</th>
+              <th className="px-4 py-3">{t("代表 Run")}</th>
               <th className="px-4 py-3 text-right">{t("Sharpe")}</th>
               <th className="px-4 py-3 text-right">{t("Last Run")}</th>
             </tr>
@@ -758,7 +755,7 @@ function ActiveResearchPanel({ rows, selectResearch, selectRun }) {
 function DecisionCandidatesPanel({ runs, onSelectRun }) {
   return (
     <Panel className="overflow-hidden">
-      <PanelHeader title="Decision Candidates" icon={Trophy} />
+      <PanelHeader title="代表 Run" icon={Trophy} />
       <div className="divide-y divide-line">
         {runs.length ? runs.map((run) => (
           <button className="block w-full px-4 py-3 text-left transition hover:bg-white/45" key={run.id} onClick={() => onSelectRun(run.id)} type="button">
@@ -775,11 +772,11 @@ function DecisionCandidatesPanel({ runs, onSelectRun }) {
   );
 }
 
-function DecisionRunsTable({ runs, onSelectRun, onSelectBranch, emptyText }) {
+function DecisionRunsTable({ runs, onSelectRun, onSelectBranch, emptyText, hideBranch = false }) {
   const orderedRuns = sortRunsByRecentActivity(runs);
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[920px] border-collapse">
+      <table className={`decision-runs-table ${hideBranch ? 'hide-branch' : ''}`}>
         <thead className="table-head">
           <tr><th className="px-4 py-3">{t("Run")}</th><th className="px-4 py-3">{t("Branch")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3">{t("Creator")}</th><th className="px-4 py-3 text-right">{t("Sharpe")}</th><th className="px-4 py-3 text-right">{t("Runtime")}</th><th className="px-4 py-3 text-right">{t("Updated")}</th></tr>
         </thead>
@@ -1873,9 +1870,9 @@ function ResearchTable({ rows, branches = [], runs = [], onSelect, onSelectRun }
           <thead className="table-head">
             <tr>
               <th className="px-4 py-3">{t("Research")}</th>
-              <th className="px-4 py-3">{t("Project")}</th>
+              <th className="px-4 py-3">近期活动</th>
               <th className="px-4 py-3">{t("Status")}</th>
-              <th className="px-4 py-3">{t("Champion Run")}</th>
+              <th className="px-4 py-3">{t("代表 Run")}</th>
               <th className="px-4 py-3 text-right">{t("Sharpe")}</th>
               <th className="px-4 py-3 text-right">{t("Max DD")}</th>
               <th className="px-4 py-3 text-right">{t("Branches")}</th>
@@ -1888,8 +1885,8 @@ function ResearchTable({ rows, branches = [], runs = [], onSelect, onSelectRun }
               const champion = researchChampionRun(row, branches, runs);
               return (
                 <tr className="cursor-pointer transition hover:bg-white/45" key={row.id} onClick={() => onSelect(row.id)}>
-                  <td className="table-cell font-semibold text-ink">{row.title || row.key}</td>
-                  <td className="table-cell text-muted">{row.project_key}</td>
+                  <td className="table-cell"><button className="font-semibold text-ink" type="button" onClick={() => onSelect(row.id)}>{row.title || row.key}</button><p className="mt-1 text-xs text-muted">{row.goal || row.hypothesis || '目标未记录'}</p></td>
+                  <td className="table-cell text-muted">{row.project_key}<div className="text-xs mt-1">7 日 Run {row.run_count_7d ?? '--'} · 失败 {row.failed_run_count_7d ?? '--'}</div></td>
                   <td className="table-cell"><Badge tone={row.status === 'active' ? 'positive' : 'neutral'}>{tStatus(row.status)}</Badge></td>
                   <td className="table-cell">
                     {champion ? (
@@ -1901,7 +1898,7 @@ function ResearchTable({ rows, branches = [], runs = [], onSelect, onSelectRun }
                         }}
                         type="button"
                       >
-                        {champion.name}
+                        {champion.name}<span className="block text-xs font-normal text-muted">{representativeReason(champion)}</span>
                       </button>
                     ) : <span className="text-muted">--</span>}
                   </td>
@@ -2006,15 +2003,14 @@ function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, se
         <StatTile label="Running" value={running} tone="warning" />
       </div>
       {projectDetailError ? <InlineError message={projectDetailError} /> : null}
-      <ProjectEditPanel project={project} onChanged={onChanged} />
-      <ProjectResearchHeatPanel researches={researches} branches={branches} runs={runs} selectResearch={selectResearch} selectRun={selectRun} />
+      <ResearchTable rows={researches} branches={branches} runs={runs} onSelect={selectResearch} onSelectRun={selectRun} />
       <QuickCompareCard
         title="Compare"
         targets={researches.map((research) => ({ type: 'research', id: research.id }))}
         emptyText="No researches available for compare."
         onSelectRun={selectRun}
       />
-      <ResearchTable rows={researches} branches={branches} runs={runs} onSelect={selectResearch} onSelectRun={selectRun} />
+      <DashboardCollapsedSection title="项目设置"><div className="p-3"><ProjectEditPanel project={project} onChanged={onChanged} /></div></DashboardCollapsedSection>
       <ScopedResearchMapsPanel scope="project" scopeId={project.id} refreshToken={data} onSelectMap={selectMap} />
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <ProjectSavedItems title="Compare Sets" icon={Layers3} items={compareSets} renderDetail={(item) => `${item.run_ids_json?.length || 0} runs`} actionLabel="Open" onSelect={selectCompareSet} />
@@ -2038,7 +2034,7 @@ function ProjectResearchHeatPanel({ researches, branches, runs, selectResearch, 
               <th className="px-4 py-3 text-right">{t("7D Runs")}</th>
               <th className="px-4 py-3 text-right">{t("Fail Rate")}</th>
               <th className="px-4 py-3 text-right">{t("Branches")}</th>
-              <th className="px-4 py-3">{t("Champion")}</th>
+              <th className="px-4 py-3">{t("代表 Run")}</th>
               <th className="px-4 py-3 text-right">{t("Sharpe")}</th>
               <th className="px-4 py-3 text-right">{t("Last Run")}</th>
             </tr>
@@ -2228,21 +2224,25 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
   const branches = data?.branches || [];
   const dashboardRuns = data?.runs || [];
   const [allRuns, setAllRuns] = useState(dashboardRuns);
-  const [loadingRuns, setLoadingRuns] = useState(false);
+  const [loadingRuns, setLoadingRuns] = useState(true);
   const [runsError, setRunsError] = useState(null);
-  const [query, setQuery] = useState('');
-  const [projectKey, setProjectKey] = useState('');
-  const [researchKey, setResearchKey] = useState('');
-  const [branchKey, setBranchKey] = useState('');
-  const [status, setStatus] = useState('');
-  const [creator, setCreator] = useState('');
-  const [artifactOnly, setArtifactOnly] = useState('');
-  const [sort, setSort] = useState({ key: 'updated', direction: 'desc' });
-  const [page, setPage] = useState(1);
+  const [query, setQuery] = usePageQuery('/runs', 'query', '');
+  const [projectKey, setProjectKey] = usePageQuery('/runs', 'projectKey', '');
+  const [researchKey, setResearchKey] = usePageQuery('/runs', 'researchKey', '');
+  const [branchKey, setBranchKey] = usePageQuery('/runs', 'branchKey', '');
+  const [status, setStatus] = usePageQuery('/runs', 'status', '');
+  const [creator, setCreator] = usePageQuery('/runs', 'creator', '');
+  const [artifactOnly, setArtifactOnly] = usePageQuery('/runs', 'artifactOnly', '');
+  const [sort, setSort] = usePageQuery('/runs', 'sort', { key: 'updated', direction: 'desc' });
+  const [page, setPage] = usePageQuery('/runs', 'page', 1);
   const [selectedRunIds, setSelectedRunIds] = useState([]);
   const [compareCreateLoading, setCompareCreateLoading] = useState(false);
   const [compareCreateError, setCompareCreateError] = useState(null);
   const pageSize = 50;
+  const filterKey = JSON.stringify([query, projectKey, researchKey, branchKey, status, creator, artifactOnly, sort]);
+  const previousFilters = useRef(filterKey);
+  const [showColumns, setShowColumns] = usePageQuery('/runs', 'columns', false);
+  const [showFilters, setShowFilters] = usePageQuery('/runs', 'advanced', false);
   const runs = allRuns.length ? allRuns : dashboardRuns;
   const statusOptions = Array.from(new Set(runs.map((run) => run.status).filter(Boolean))).sort();
   const creatorOptions = Array.from(new Set(runs.map((run) => run.created_by_type || 'human').filter(Boolean))).sort();
@@ -2285,12 +2285,12 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
   const allPageRunsSelected = Boolean(pageRunIds.length) && pageRunIds.every((id) => selectedRunSet.has(id));
 
   useEffect(() => {
-    setPage(1);
+    if (previousFilters.current !== filterKey) { setPage(1); previousFilters.current = filterKey; }
   }, [query, projectKey, researchKey, branchKey, status, creator, artifactOnly, sort.key, sort.direction]);
 
   useEffect(() => {
-    setPage((current) => Math.min(Math.max(current, 1), pageCount));
-  }, [pageCount]);
+    if (!loadingRuns) setPage((current) => Math.min(Math.max(Number(current) || 1, 1), pageCount));
+  }, [pageCount, loadingRuns]);
 
   useEffect(() => {
     const availableIds = new Set(runs.map((run) => run.id));
@@ -2359,12 +2359,12 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
 
   return (
     <div className="space-y-4">
-      <Hero eyebrow="Runs" title="Run Explorer" />
+      <Hero eyebrow="Runs" title="Run 查询" description={`当前在已加载的 ${runs.length} 条 Run 中筛选；系统共 ${data?.summary?.runs ?? '--'} 条。最多加载 1000 条，不代表全库查询。`} />
       <RunsBoardSummary runs={runs} filteredRuns={filteredRuns} />
       <Panel className="overflow-hidden">
         <PanelHeader
-          title="All Runs"
-          action={<div className="text-xs font-semibold text-muted">{loadingRuns ? 'Loading runs...' : `${filteredRuns.length} / ${runs.length} shown`}</div>}
+          title="已加载的 Run"
+          action={<div className="text-xs font-semibold text-muted">{loadingRuns ? 'Loading runs...' : `${filteredRuns.length} / ${runs.length} 条（已加载范围）`}</div>}
         />
         <InlineError message={runsError} />
         <RunCompareSelectionBar
@@ -2374,7 +2374,7 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
           onCreate={createCompareFromSelectedRuns}
           onClear={clearRunSelection}
         />
-        <div className="grid gap-3 border-b border-line p-4 lg:grid-cols-[minmax(220px,1.6fr)_repeat(5,minmax(140px,1fr))_auto]">
+        <div className={`run-filters ${showFilters ? "show-advanced" : ""}`}>
           <Field label="Search runs">
             <TextInput value={query} onChange={(event) => setQuery(event.target.value)} placeholder="run, project, branch, config, tag" />
           </Field>
@@ -2384,31 +2384,31 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
               {projects.map((project) => <option key={project.id} value={project.key}>{project.key}</option>)}
             </SelectInput>
           </Field>
-          <Field label="Research">
+          <div className="run-filter-advanced"><Field label="Research">
             <SelectInput value={researchKey} onChange={(event) => setResearchKey(event.target.value)}>
               <option value="">{t("Any research")}</option>
               {researches.map((research) => <option key={research.id} value={research.key}>{research.key}</option>)}
             </SelectInput>
-          </Field>
-          <Field label="Branch">
+          </Field></div>
+          <div className="run-filter-advanced"><Field label="Branch">
             <SelectInput value={branchKey} onChange={(event) => setBranchKey(event.target.value)}>
               <option value="">{t("Any branch")}</option>
               {branches.map((branch) => <option key={branch.id} value={branch.key}>{branch.key}</option>)}
             </SelectInput>
-          </Field>
+          </Field></div>
           <Field label="Status">
             <SelectInput value={status} onChange={(event) => setStatus(event.target.value)}>
               <option value="">{t("Any status")}</option>
               {statusOptions.map((item) => <option key={item} value={item}>{tStatus(item)}</option>)}
             </SelectInput>
           </Field>
-          <Field label="Creator">
+          <div className="run-filter-advanced"><Field label="Creator">
             <SelectInput value={creator} onChange={(event) => setCreator(event.target.value)}>
               <option value="">{t("Any creator")}</option>
               {creatorOptions.map((item) => <option key={item} value={item}>{item}</option>)}
             </SelectInput>
-          </Field>
-          <div className="flex items-end gap-2">
+          </Field></div>
+          <div className="run-filter-advanced flex items-end gap-2">
             <Field label="Artifacts">
               <SelectInput value={artifactOnly} onChange={(event) => setArtifactOnly(event.target.value)}>
                 <option value="">{t("Any")}</option>
@@ -2420,23 +2420,14 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
             <button className="secondary-button mb-0.5 shrink-0" type="button" onClick={clearFilters}>{t("Clear")}</button>
           </div>
         </div>
+        <div className="query-summary">
+          <span>已用条件：{[query && `关键词 ${query}`, projectKey, researchKey, branchKey, status && tStatus(status), creator, artifactOnly && `产物 ${artifactOnly}`].filter(Boolean).join(' · ') || '无'}</span>
+          <button className="secondary-button" type="button" aria-expanded={showFilters} onClick={() => setShowFilters(v => !v)}>{showFilters ? '收起高级条件' : '更多条件'}</button>
+          <button className="secondary-button" type="button" onClick={clearFilters}>清除全部条件</button>
+          <button className="secondary-button" type="button" aria-pressed={showColumns} onClick={() => setShowColumns(v => !v)}>{showColumns ? '精简列' : '完整列（含配置、作者、时间）'}</button>
+        </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1532px] table-fixed border-collapse">
-            <colgroup>
-              <col className="w-[52px]" />
-              <col className="w-[280px]" />
-              <col className="w-[180px]" />
-              <col className="w-[220px]" />
-              <col className="w-[96px]" />
-              <col className="w-[130px]" />
-              <col className="w-[84px]" />
-              <col className="w-[92px]" />
-              <col className="w-[88px]" />
-              <col className="w-[100px]" />
-              <col className="w-[260px]" />
-              <col className="w-[110px]" />
-              <col className="w-[118px]" />
-            </colgroup>
+          <table className={`runs-table ${showColumns ? "show-columns" : ""}`}>
             <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">
@@ -2796,6 +2787,7 @@ function ResearchPage({ data, selectedResearchId, selectProject, selectResearch,
       });
     return () => { cancelled = true; };
   }, [research?.id, data?.summary?.runs, data?.summary?.compare_sets, branches.length, runs.length]);
+  const [view, setView] = usePageQuery(`/researches/${research?.id}`, 'view', 'map');
   if (!research) return <EmptyState title="No research yet" detail="Create a run through the SDK or bbox CLI, then refresh this page." />;
   const lineageBranches = lineage?.branches || branches;
   const lineageRuns = lineage?.runs || runs;
@@ -2806,7 +2798,11 @@ function ResearchPage({ data, selectedResearchId, selectProject, selectResearch,
     <div className="space-y-4">
       <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
       <ResearchWorkspaceSummary research={research} branches={lineageBranches} runs={lineageRuns} />
+      <PageTabs label="研究线视图" prefix="research-view" value={view} onChange={setView} tabs={[{id:'map',label:'研究脉络'},{id:'runs',label:'分支与 Run'},{id:'review',label:'评审记录'},{id:'history',label:'来源与历史'}]} />
+      <div hidden={view !== 'map'} role="tabpanel" id="research-view-panel-map" aria-labelledby="research-view-tab-map">
       <ResearchMapEmbed researchId={research.id} refreshToken={data} nav={mapNav} onIndex={setMapIndex} locate={mapLocate} selectMap={selectMap} />
+      </div>
+      <div hidden={view !== 'review'} role="tabpanel" id="research-view-panel-review" aria-labelledby="research-view-tab-review">
       <ResearchReviewPanel
         review={researchReview}
         error={reviewError}
@@ -2815,11 +2811,11 @@ function ResearchPage({ data, selectedResearchId, selectProject, selectResearch,
         onSelectCompareSet={selectCompareSet}
         onChanged={onChanged}
       />
-      <div className="space-y-4">
-        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} mapIndex={mapIndex} onLocateMapNode={locateMapNode} />
-        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} mapIndex={mapIndex} onLocateMapNode={locateMapNode} />
-        <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
       </div>
+      <div hidden={view !== 'runs'} className="space-y-4" role="tabpanel" id="research-view-panel-runs" aria-labelledby="research-view-tab-runs">
+        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} mapIndex={mapIndex} onLocateMapNode={(...args) => { setView('map'); locateMapNode(...args); }} />
+        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} mapIndex={mapIndex} onLocateMapNode={(...args) => { setView('map'); locateMapNode(...args); }} />
+        <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
       {lineageExpanded ? <LineageChartModal option={lineageChartOption} onClose={() => setLineageExpanded(false)} /> : null}
       <QuickCompareCard
         title="Compare"
@@ -2827,12 +2823,13 @@ function ResearchPage({ data, selectedResearchId, selectProject, selectResearch,
         emptyText="No branches available for compare."
         onSelectRun={selectRun}
       />
-      <DashboardCollapsedSection title="Lineage and Activity">
+      </div>
+      <div hidden={view !== 'history'} role="tabpanel" id="research-view-panel-history" aria-labelledby="research-view-tab-history">
         <div className="space-y-4 p-3">
           <ResearchEditPanel research={research} onChanged={onChanged} />
           <Panel className="overflow-hidden">
             <PanelHeader
-              title="Branch Lineage"
+              title="实验来源关系"
               icon={GitBranch}
               action={(
                 <button className="icon-button" type="button" onClick={() => setLineageExpanded(true)} aria-label="Expand branch lineage">
@@ -2845,7 +2842,7 @@ function ResearchPage({ data, selectedResearchId, selectProject, selectResearch,
           </Panel>
           <ResearchTimelinePanel research={research} branches={lineageBranches} runs={lineageRuns} notes={data?.notes || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
         </div>
-      </DashboardCollapsedSection>
+      </div>
     </div>
   );
 }
@@ -2858,7 +2855,7 @@ function ResearchWorkspaceSummary({ research, branches, runs }) {
   return (
     <Panel className="p-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-        <ReadOnlyField label="Status" value={research.status || 'active'} />
+        <ReadOnlyField label="Status" value={tStatus(research.status || 'active')} />
         <ReadOnlyField label="Branches" value={branches.length} />
         <ReadOnlyField label="Completed Runs" value={completedRuns} />
         <ReadOnlyField label="Running" value={runningRuns} />
@@ -2923,7 +2920,7 @@ function ResearchReviewPanel({ review, error, onSelectRun, onSelectBranch, onSel
             <ReadOnlyField label="Compare Sets" value={state.compare_set_count ?? 0} />
             <ReadOnlyField label="Decision Notes" value={state.decision_note_count ?? 0} />
             <ReadOnlyField label="Archive Queue" value={state.archive_candidate_count ?? 0} />
-            <ReadOnlyField label="Next" value={(state.next_actions || []).join(', ') || '--'} />
+            <ReadOnlyField label="下一步" value={(state.next_actions || []).map(action => ({ save_candidate_compare_set: '保存候选对比集', review_candidates: '评审候选', archive_stale_branches: '复核陈旧分支' }[action] || '查看评审证据')).join('，') || '暂无待办'} />
           </div>
           <InlineError message={saveError} />
           {message ? <div className="rounded-md bg-positiveSoft px-3 py-2 text-xs font-semibold text-positive">{message}</div> : null}
@@ -3359,6 +3356,10 @@ function BranchPage({ data, selectedBranchId, selectBranch, selectRun, onChanged
         </div>
         <BranchChampionPanel runs={branchRuns} onSelectRun={selectRun} />
       </div>
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+            <BranchMetricEvolution runs={orderedRuns} onSelectRun={selectRun} />
+            <BranchConfigEvolution runs={orderedRuns} onSelectRun={selectRun} />
+          </div>
       <QuickCompareCard
         title="Compare"
         targets={orderedRuns.map((run) => ({ type: 'run', id: run.id }))}
@@ -3369,10 +3370,7 @@ function BranchPage({ data, selectedBranchId, selectBranch, selectRun, onChanged
         <div className="space-y-4 p-3">
           <BranchEditPanel branch={branch} onChanged={onChanged} />
           <BranchLineagePanel lineage={lineage} error={lineageError} fallbackBranch={branch} fallbackBranches={data?.branches || []} fallbackRuns={data?.runs || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
-          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-            <BranchMetricEvolution runs={orderedRuns} onSelectRun={selectRun} />
-            <BranchConfigEvolution runs={orderedRuns} onSelectRun={selectRun} />
-          </div>
+
         </div>
       </DashboardCollapsedSection>
     </div>
@@ -3398,16 +3396,15 @@ function BranchWorkspaceSummary({ branch, runs, sweeps }) {
 }
 
 function BranchChampionPanel({ runs, onSelectRun }) {
-  const champion = [...runs]
-    .filter((run) => run.status === 'completed')
-    .sort((a, b) => Number(metricValue(b, 'strategy.summary', 'sharpe') || -Infinity) - Number(metricValue(a, 'strategy.summary', 'sharpe') || -Infinity))[0];
+  const champion = representativeRun(runs);
   return (
     <Panel className="overflow-hidden xl:col-span-4">
-      <PanelHeader title="Best Candidate" icon={Trophy} />
+      <PanelHeader title="代表 Run" icon={Trophy} />
       {champion ? (
         <div className="space-y-4 p-4">
+          <p className="text-sm text-muted">{representativeReason(champion)} · 仅作证据入口，非研究通过结论</p>
           <button className="break-words text-left text-xl font-semibold text-ink hover:underline [overflow-wrap:anywhere]" onClick={() => onSelectRun(champion.id)} type="button">
-            {champion.name}
+            {champion.name}<span className="block text-xs font-normal text-muted">{representativeReason(champion)}</span>
           </button>
           <div className="grid grid-cols-2 gap-3">
             <ReadOnlyField label="Sharpe" value={formatMetric(metricValue(champion, 'strategy.summary', 'sharpe'))} />
@@ -3426,7 +3423,7 @@ function DecisionRunsPanel({ title, runs, onSelectRun, onSelectBranch }) {
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title={title} icon={LineChart} />
-      <DecisionRunsTable runs={ordered} onSelectRun={onSelectRun} onSelectBranch={onSelectBranch} emptyText="No runs on this branch." />
+      <DecisionRunsTable runs={ordered} onSelectRun={onSelectRun} onSelectBranch={onSelectBranch} emptyText="No runs on this branch." hideBranch />
     </Panel>
   );
 }
@@ -4355,7 +4352,7 @@ function SweepParetoPanel({ summary, runs, onSelectRun }) {
 }
 
 function RunPage({ runDetail, data, onRunChanged }) {
-  const [activeTab, setActiveTab] = useState('results');
+  const [activeTab, setActiveTab] = usePageQuery(`/runs/${runDetail?.id}`, 'tab', ['running', 'failed'].includes(runDetail?.status) ? 'events' : 'results');
   if (!runDetail) return <EmptyState title="No run selected" detail="Select a run from Dashboard, Research, or Branch." />;
   const metrics = runDetail.metrics || [];
   const artifacts = runDetail.artifacts || [];
@@ -4371,9 +4368,10 @@ function RunPage({ runDetail, data, onRunChanged }) {
       <Hero
         eyebrow={`Run / ${tStatus(runDetail.status)}`}
         title={runDetail.title || runDetail.name}
-        description={runHeroDescription(runDetail)}
+        description={runDetail.description || null}
         action={<StatusBadge status={runDetail.status} />}
       />
+      <details className="bento-panel p-4"><summary className="cursor-pointer font-semibold">运行状态操作 · {tStatus(runDetail.status)}</summary><p className="my-3 text-sm text-muted">仅记录当前 Run 的完成、失败或取消；取消记录不代表远程进程已停止。终态操作受现有服务端规则约束。</p><RunStatusActions run={runDetail} onRunChanged={onRunChanged} /></details>
       <RunSummaryStrip run={runDetail} />
       <RunResultSummaryPanel
         run={runDetail}
@@ -4478,7 +4476,7 @@ function RunSummaryStrip({ run }) {
   ];
   return (
     <Panel className="p-4">
-      <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-9">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => <ReadOnlyField key={item.label} label={item.label} value={item.value} />)}
       </div>
     </Panel>
@@ -4503,7 +4501,7 @@ function DiagnosticCountBadges({ errorCount = 0, warningCount = 0, showHealthy =
       ) : null}
       {!errors && !warnings && showHealthy ? (
         <span className="rounded-sm bg-positiveSoft px-2 py-1 text-xs font-semibold uppercase text-positive">
-          HEALTHY
+          证据检查无告警
         </span>
       ) : null}
     </span>
@@ -4629,7 +4627,6 @@ function RunWritePanel({ run, data, onRunChanged }) {
     setActiveAction('');
   }, [run.id]);
   const actions = [
-    { id: 'lifecycle', label: 'Lifecycle', icon: CheckCircle2 },
     { id: 'clone', label: 'Clone', icon: GitBranch },
     { id: 'event', label: 'Event', icon: Activity },
     { id: 'metric', label: 'Metric', icon: BarChart3 },
@@ -4673,7 +4670,6 @@ function RunWritePanel({ run, data, onRunChanged }) {
         </div>
         {active ? (
           <div className="p-4">
-            {activeAction === 'lifecycle' ? <RunStatusActions run={run} onRunChanged={onRunChanged} /> : null}
             {activeAction === 'clone' ? <RunCloneForm run={run} data={data} onRunChanged={onRunChanged} /> : null}
             {activeAction === 'event' ? <EventForm run={run} onRunChanged={onRunChanged} /> : null}
             {activeAction === 'metric' ? <MetricForm run={run} onRunChanged={onRunChanged} /> : null}
@@ -5121,6 +5117,15 @@ function RunPrimaryChart({ chart }) {
   );
 }
 
+function PageTabs({ label, prefix, value, onChange, tabs }) {
+  return <div className="page-tabs" role="tablist" aria-label={label}>
+    {tabs.map(({id, label: text, icon: Icon}, index) => <button key={id} id={`${prefix}-tab-${id}`} type="button" role="tab" aria-selected={value === id} aria-controls={`${prefix}-panel-${id}`} tabIndex={value === id ? 0 : -1} onClick={() => onChange(id)} onKeyDown={event => {
+      const next = event.key === 'ArrowRight' ? (index + 1) % tabs.length : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : null;
+      if (next !== null) { event.preventDefault(); onChange(tabs[next].id); event.currentTarget.parentElement.children[next].focus(); }
+    }}>{Icon ? <Icon className="h-4 w-4" /> : null}{t(text)}</button>)}
+  </div>;
+}
+
 function RunTabs({ activeTab, setActiveTab, resultItems, keyMetrics, equityChart, metrics, events, artifacts, run, notes }) {
   const tabs = [
     { id: 'results', label: 'Results', icon: LineChart },
@@ -5133,17 +5138,8 @@ function RunTabs({ activeTab, setActiveTab, resultItems, keyMetrics, equityChart
   ];
   return (
     <Panel className="overflow-hidden">
-      <div className="flex flex-wrap gap-2 border-b border-line p-3">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${activeTab === id ? 'bg-panel2 text-ink' : 'text-muted hover:bg-surface2 hover:text-ink'}`}
-            key={id}
-            onClick={() => setActiveTab(id)}
-          >
-            <Icon className="h-4 w-4" />{label}
-          </button>
-        ))}
-      </div>
+      <PageTabs label="Run 内容" prefix="run-content" value={activeTab} onChange={setActiveTab} tabs={tabs} />
+      <div role="tabpanel" id={`run-content-panel-${activeTab}`} aria-labelledby={`run-content-tab-${activeTab}`}>
       {activeTab === 'results' && <RunResultsPanel chart={equityChart} resultItems={resultItems || []} keyMetrics={keyMetrics || []} />}
       {activeTab === 'metrics' && <MetricsPanel metrics={metrics} artifacts={artifacts} />}
       {activeTab === 'events' && <EventsPanel events={events} />}
@@ -5151,6 +5147,7 @@ function RunTabs({ activeTab, setActiveTab, resultItems, keyMetrics, equityChart
       {activeTab === 'config' && <RunConfigPanel run={run} />}
       {activeTab === 'snapshots' && <SnapshotsDetailPanel snapshots={run.snapshots} />}
       {activeTab === 'notes' && <NotesPanel notes={notes} />}
+      </div>
     </Panel>
   );
 }
@@ -5210,8 +5207,8 @@ function RunConfigPanel({ run }) {
     <div>
       <PanelHeader title="Config" icon={GitBranch} />
       <div className="grid gap-4 p-4 xl:grid-cols-2">
-        <ReadOnlyField label="Current Config" value={configSummary(run.config_json || {})} code />
-        <ReadOnlyField label="Context" value={configSummary(run.context_json || {})} code />
+        <ReadOnlyField label="Current Config" value={JSON.stringify(run.config_json || {}, null, 2)} code />
+        <ReadOnlyField label="Context" value={JSON.stringify(run.context_json || {}, null, 2)} code />
       </div>
       <SourceConfigDiffPanel sourceRun={run.source_run} rows={sourceDiff} />
     </div>
@@ -6159,7 +6156,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
   const views = data?.search_views || [];
   const [viewQuery, setViewQuery] = useState('');
   const [projectId, setProjectId] = useState(projects[0]?.id || '');
-  const [filterForm, setFilterForm] = useState({
+  const [filterForm, setFilterForm] = usePageQuery('/search', 'conditions', {
     project_key: '',
     research_key: '',
     branch_key: '',
@@ -6179,13 +6176,15 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
     where: '',
     limit: '20',
   });
-  const [filtersText, setFiltersText] = useState('{"limit":20}');
+  const [filtersText, setFiltersText] = usePageQuery('/search', 'filters', '{"limit":20}');
   const [viewForm, setViewForm] = useState({ name: '', description: '' });
   const [activeViewId, setActiveViewId] = useState(selectedSearchViewId || null);
   const [results, setResults] = useState([]);
   const [researchResults, setResearchResults] = useState([]);
-  const [researchFilter, setResearchFilter] = useState({ project_key: '', status: '', text: '', tags: '', limit: '20' });
-  const [activeSearchPanel, setActiveSearchPanel] = useState(null);
+  const [researchFilter, setResearchFilter] = usePageQuery('/search', 'researchConditions', { project_key: '', status: '', text: '', tags: '', limit: '20' });
+  const [activeSearchPanel, setActiveSearchPanel] = usePageQuery('/search', 'panel', 'structured');
+  const [resultType, setResultType] = usePageQuery('/search', 'object', 'runs');
+  const [searched, setSearched] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -6197,11 +6196,12 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
   const selectedView = views.find((item) => item.id === activeViewId) || null;
   const normalizedViewQuery = viewQuery.trim().toLowerCase();
   const filteredViews = views.filter((view) => !normalizedViewQuery || searchViewSearchText(view).includes(normalizedViewQuery));
-  const runSearch = async (filters = parseJsonObject(filtersText)) => {
+  const runSearch = async (filters) => {
+    setResultType('runs'); setSearched(true);
     setLoading(true);
     setError(null);
     try {
-      const rows = await apiPost('/api/v1/search/runs', filters);
+      const rows = await apiPost('/api/v1/search/runs', filters || parseJsonObject(filtersText));
       setResults(rows);
     } catch (err) {
       setError(err.message);
@@ -6234,6 +6234,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
     }
   };
   const runView = async (view) => {
+    setResultType('runs'); setActiveSearchPanel('json'); setSearched(true);
     setActiveViewId(view.id);
     setProjectId(view.project_id || projectId);
     setViewForm({ name: view.name || '', description: view.description || '' });
@@ -6278,6 +6279,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
     }
   };
   const runResearchSearch = async () => {
+    setResultType('research'); setSearched(true);
     setLoading(true);
     setError(null);
     try {
@@ -6303,14 +6305,14 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
   }, [quickSearch?.nonce]);
   return (
     <div className="space-y-4">
-      <Hero eyebrow="Search" title="Saved Run Search" description={null} />
+      <Hero eyebrow="Search" title="研究搜索" description={null} />
       <Panel className="overflow-hidden">
         <PanelHeader title="Search Controls" icon={Search} />
         <div className="border-b border-line p-4">
           <div className="flex flex-wrap gap-2">
             {[
-              { id: 'structured', label: 'Structured Filters', icon: Search },
-              { id: 'research', label: 'Research Search', icon: TableProperties },
+              { id: 'structured', label: 'Run 条件', icon: Search },
+              { id: 'research', label: '研究线条件', icon: TableProperties },
               { id: 'json', label: 'JSON Filters', icon: FileText },
               { id: 'view', label: selectedView ? 'Update View' : 'Save View', icon: ListTree },
             ].map(({ id, label, icon: Icon }) => (
@@ -6318,7 +6320,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
                 className={activeSearchPanel === id ? 'primary-button' : 'secondary-button'}
                 key={id}
                 type="button"
-                onClick={() => setActiveSearchPanel((current) => (current === id ? null : id))}
+                onClick={() => { setActiveSearchPanel(id); if (id === 'structured' || id === 'json') setResultType('runs'); if (id === 'research') setResultType('research'); }}
               >
                 <Icon className="h-4 w-4" />
                 {label}
@@ -6348,7 +6350,8 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
                   </SelectInput>
                 </Field>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <details className="border border-line rounded p-3"><summary className="cursor-pointer text-sm font-semibold">高级条件：研究分支、指标、配置和时间</summary>
+              <div className="grid grid-cols-2 gap-2 mt-3">
                 <Field label="Research">
                   <SelectInput value={filterForm.research_key} onChange={(event) => updateFilter('research_key', event.target.value)}>
                     <option value="">{t("Any research")}</option>
@@ -6363,7 +6366,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
                 </Field>
               </div>
               <Field label="Tags"><TextInput value={filterForm.tags} onChange={(event) => updateFilter('tags', event.target.value)} placeholder="baseline,post-cost" /></Field>
-              <div className="grid grid-cols-12 gap-2">
+              <div className="metric-filter-row">
                 <Field label="Metric"><TextInput className="col-span-12" value={filterForm.metric} onChange={(event) => updateFilter('metric', event.target.value)} /></Field>
                 <Field label="Op"><SelectInput value={filterForm.op} onChange={(event) => updateFilter('op', event.target.value)}>{['>', '>=', '<', '<=', '==', '!='].map((op) => <option key={op} value={op}>{op}</option>)}</SelectInput></Field>
                 <Field label="Value"><TextInput value={filterForm.metric_value} onChange={(event) => updateFilter('metric_value', event.target.value)} placeholder="1.0" /></Field>
@@ -6397,15 +6400,19 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Limit"><TextInput value={filterForm.limit} onChange={(event) => updateFilter('limit', event.target.value)} type="number" min="1" /></Field>
               </div>
-              <button className="secondary-button w-full" disabled={loading} onClick={applyStructuredFilters}>
+              </details>
+              <button className="primary-button w-full" disabled={loading} onClick={applyStructuredFilters}>
                 {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                Apply filters
+                查询 Run
               </button>
+              <button className="secondary-button w-full" type="button" onClick={() => { setFilterForm(current => Object.fromEntries(Object.entries(current).map(([key]) => [key, key === 'limit' ? '20' : key === 'op' ? '>' : '']))); setFiltersText('{"limit":20}'); setResults([]); setSearched(false); setError(null); }}>重置条件与结果</button>
+              <details><summary className="cursor-pointer text-sm text-muted">高级表达式</summary>
               <Field label="Where expression"><TextArea value={filterForm.where} onChange={(event) => updateFilter('where', event.target.value)} placeholder={'metrics.strategy.summary.sharpe > 1 and tags contains "baseline"'} /></Field>
               <button className="secondary-button w-full" disabled={loading} onClick={applyWhereFilters}>
                 {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 Apply where
               </button>
+              </details>
             </div>
           </FormCard></div> : null}
           {activeSearchPanel === 'research' ? <div className="max-w-3xl"><FormCard title="Research Search">
@@ -6457,7 +6464,10 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
           </FormCard></div> : null}
         </div>
       </Panel>
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+      <InlineError message={error} />
+      <div className="query-summary"><span>{resultType === 'research' ? '研究线' : 'Run'} · {searched ? `${resultType === 'research' ? researchResults.length : results.length} 条命中（按查询 limit 截取）` : '尚未执行查询'}</span><span>{resultType === 'runs' ? formatFilterTextSummary(filtersText) : JSON.stringify(buildResearchSearchFilters(researchFilter))}</span></div>
+      {resultType === 'runs' ? <RunsTable title="Search Results" runs={results} onSelectRun={selectRun} onSelectBranch={selectBranch} /> : <ResearchSearchResults rows={researchResults} onSelect={selectResearch} />}
+      <DashboardCollapsedSection title="已保存搜索视图"><div className="p-3">
         <Panel className="overflow-hidden">
           <PanelHeader title="Saved Views" icon={ListTree} />
           <div className="grid gap-3 border-b border-line p-4 md:grid-cols-[1fr_auto]">
@@ -6476,9 +6486,7 @@ function SearchPage({ data, selectRun, selectResearch, selectBranch, selectedSea
             )) : <div className="p-4 text-sm text-muted">{views.length ? t('No saved views match the current search.') : t('No saved search views.')}</div>}
           </div>
         </Panel>
-        <RunsTable title="Search Results" runs={results} onSelectRun={selectRun} onSelectBranch={selectBranch} />
-      </div>
-      <ResearchSearchResults rows={researchResults} onSelect={selectResearch} />
+      </div></DashboardCollapsedSection>
     </div>
   );
 }
@@ -6489,7 +6497,7 @@ function ResearchSearchResults({ rows, onSelect }) {
       <PanelHeader title="Research Results" icon={TableProperties} />
       <div className="overflow-x-auto">
         <table className="w-full min-w-[860px] border-collapse">
-          <thead className="table-head"><tr><th className="px-4 py-3">{t("Research")}</th><th className="px-4 py-3">{t("Project")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3 text-right">{t("Branches")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th><th className="px-4 py-3">{t("Champion")}</th></tr></thead>
+          <thead className="table-head"><tr><th className="px-4 py-3">{t("Research")}</th><th className="px-4 py-3">{t("Project")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3 text-right">{t("Branches")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th><th className="px-4 py-3">{t("代表 Run")}</th></tr></thead>
           <tbody>
             {rows.length ? rows.map((row) => (
               <tr className="cursor-pointer hover:bg-white/45" key={row.id} onClick={() => onSelect(row.id)}>
@@ -6525,7 +6533,8 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
   const metrics = parseCsv(metricsText);
   const comparedRuns = mergeRunsBySelection(selectedIds, runs, result?.runs || []);
   const sortedRuns = sortComparedRuns(comparedRuns, result?.metrics || {}, sortMetric || metrics[0], sortDirection);
-  const baselineRun = comparedRuns[0] || sortedRuns[0] || null;
+  const [baselineId, setBaselineId] = usePageQuery(selectedCompareSetId ? `/compare/${selectedCompareSetId}` : '/compare', 'baseline', '');
+  const baselineRun = comparedRuns.find(run => run.id === baselineId) || representativeRun(comparedRuns);
   const selectedCompareSet = compareSets.find((item) => item.id === activeCompareSetId) || null;
 
   const openWorkbench = () => {
@@ -6657,6 +6666,10 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
         description={selectedCompareSet ? selectedCompareSet.name : '临时 Run 对比'}
         action={<button className="secondary-button" onClick={openWorkbench} type="button"><ListTree className="h-4 w-4" />返回对比列表</button>}
       />
+      <Panel className="p-4 space-y-3"><Field label="比较基准（仅影响本页差值）"><SelectInput value={baselineRun?.id || ''} onChange={event => setBaselineId(event.target.value)}>
+        {comparedRuns.map(run => <option key={run.id} value={run.id}>{run.name}</option>)}
+      </SelectInput></Field><p className="text-xs text-muted">{baselineId && comparedRuns.some(run => run.id === baselineId) ? '本页手动选择' : `默认：${representativeReason(baselineRun)}`}。不会修改研究地图基准或研究评审结论。</p></Panel>
+      <ComparisonScopePanel runs={sortedRuns} />
       <CompareDecisionSummaryPanel
         metrics={result?.metrics || {}}
         metricNames={metrics}
@@ -6665,11 +6678,12 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
         series={result?.series || {}}
         error={compareError}
       />
+        <MetricMatrixPanel metrics={result?.metrics || {}} runs={sortedRuns} baselineRunId={baselineRun?.id || sortedRuns[0]?.id} error={compareError} />
+            {result ? <CompareConfigDiffPanel diff={result.config_diff || {}} runs={sortedRuns} /> : <p className="text-sm text-muted">配置比较尚未返回，不能判断配置是否一致。</p>}
       <CompareDiagnosticsPanel diagnostics={compareDiagnostics(sortedRuns, result?.series || {}, result?.metrics || {}, metrics)} />
       <div className="space-y-3">
         <ComparePrimarySeriesPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
         <CompareDrawdownPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
-        <MetricMatrixPanel metrics={result?.metrics || {}} runs={sortedRuns} baselineRunId={baselineRun?.id || sortedRuns[0]?.id} error={compareError} />
         <ParetoPanel metrics={result?.metrics || {}} runs={sortedRuns} metricNames={metrics} onSelectRun={selectRun} />
       </div>
       <RunsTable title="参与对比的 Runs" runs={sortedRuns} onSelectRun={selectRun} onSelectBranch={selectBranch} />
@@ -6702,7 +6716,6 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
         <div className="space-y-4 p-4">
           <SeriesPreviewPanel series={result?.series || {}} runs={result?.runs || sortedRuns} onSelectRun={selectRun} />
           <div className="space-y-3">
-            <CompareConfigDiffPanel diff={result?.config_diff || {}} runs={sortedRuns} />
             <ArtifactComparisonPanel artifacts={result?.artifacts || {}} runs={sortedRuns} />
           </div>
         </div>
@@ -6715,7 +6728,8 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
   const rows = useMemo(() => buildCompareWorkbenchRows(compareSets, data), [compareSets, data]);
   const [projectId, setProjectId] = useState('');
   const [researchId, setResearchId] = useState('');
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = usePageQuery('/compare', 'query', '');
+  const [creating, setCreating] = useState(false);
   const normalizedQuery = query.trim().toLowerCase();
   const projectOptions = rows.filter((row) => row.project).map((row) => row.project);
   const uniqueProjects = Array.from(new Map(projectOptions.map((project) => [project.id, project])).values())
@@ -6740,7 +6754,30 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
 
   return (
     <div className="space-y-4">
-      <Hero eyebrow="Compare" title="对比工作台" description="按项目和研究阶段管理保存的对比集合，再进入具体对比结果。" />
+      <Hero eyebrow="Compare" title="对比工作台" description="按项目和研究阶段管理保存的对比集合，再进入具体对比结果。" action={<button className="primary-button" type="button" onClick={() => setCreating(current => !current)}>{creating ? '返回对比目录' : '新建对比'}</button>} />
+      <div hidden={!creating} className="bento-panel" aria-label="新建对比">
+        <div className="space-y-4 p-4">
+          <CompareControlPanel
+            data={data}
+            metricsText={metricsText}
+            onMetricsChange={onMetricsChange}
+            seriesText={seriesText}
+            onSeriesChange={onSeriesChange}
+            sortMetric={sortMetric}
+            onSortMetricChange={onSortMetricChange}
+            sortDirection={sortDirection}
+            onSortDirectionChange={onSortDirectionChange}
+            onRunCompare={onRunCompare}
+            onChanged={onChanged}
+            result={result}
+            selectedIds={selectedIds}
+            selectedCompareSet={selectedCompareSet}
+            comparedRuns={comparedRuns}
+            onClearCompareSet={onClearCompareSet}
+          />
+          <RunSelectionTable runs={runs} selectedIds={selectedIds} onToggle={onToggleRun} onSelectRun={onSelectRun} />
+        </div>
+      </div>
       <div className="dashboard-stats-grid">
         <Panel><ReadOnlyField label="Compare Sets" value={String(rows.length)} /></Panel>
         <Panel><ReadOnlyField label="Projects" value={String(projectCount)} /></Panel>
@@ -6769,9 +6806,9 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
           <table className="w-full text-left text-sm">
             <thead className="table-head">
               <tr>
+                <th className="table-cell">Compare Set</th>
                 <th className="table-cell">Project</th>
                 <th className="table-cell">Research / 阶段</th>
-                <th className="table-cell">Compare Set</th>
                 <th className="table-cell text-right">Runs</th>
                 <th className="table-cell">模板</th>
                 <th className="table-cell text-right">Created</th>
@@ -6782,16 +6819,17 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
               {filteredRows.length ? filteredRows.map((row) => (
                 <tr className="table-row" key={row.id}>
                   <td className="table-cell">
+                    <button className="font-semibold text-ink hover:underline" type="button" onClick={() => onRunCompareSet(row.id)}>{row.name}</button>
+                    <div className="mt-1 truncate text-xs text-muted">{row.runCount} 个 Run · {row.stage}</div>
+                  </td>
+
+                  <td className="table-cell">
                     {row.project ? <button className="font-semibold text-ink hover:underline" type="button" onClick={() => onSelectProject(row.project.id)}>{entityName(row.project)}</button> : <span className="text-muted">--</span>}
                     <div className="text-xs text-muted">{row.project?.key || row.project_id || '--'}</div>
                   </td>
                   <td className="table-cell">
                     {row.research ? <button className="font-semibold text-ink hover:underline" type="button" onClick={() => onSelectResearch(row.research.id)}>{entityName(row.research)}</button> : <span className="font-semibold text-muted">项目级</span>}
                     <div className="mt-1 text-xs text-muted">{row.stage}</div>
-                  </td>
-                  <td className="table-cell">
-                    <button className="font-semibold text-ink hover:underline" type="button" onClick={() => onRunCompareSet(row.id)}>{row.name}</button>
-                    <div className="mt-1 truncate text-xs text-muted">{(row.run_ids_json || []).slice(0, 4).join(', ')}{(row.run_ids_json || []).length > 4 ? ` +${(row.run_ids_json || []).length - 4}` : ''}</div>
                   </td>
                   <td className="table-cell text-right font-semibold text-info">{row.runCount}</td>
                   <td className="table-cell text-muted">{compareSetLayoutSummary(row)}</td>
@@ -6803,36 +6841,24 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
                     </button>
                   </td>
                 </tr>
-              )) : <tr><td className="table-cell text-muted" colSpan="7">暂无保存的对比集合。可以在下方临时选择 runs 后保存为 Compare Set。</td></tr>}
+              )) : <tr><td className="table-cell text-muted" colSpan="7">{rows.length ? '当前条件无匹配，请清除筛选。' : '暂无保存的对比集合。点击新建对比选择 Run。'}</td></tr>}
             </tbody>
           </table>
         </div>
       </Panel>
-      <DashboardCollapsedSection title="临时 Run 对比与保存">
-        <div className="space-y-4 p-4">
-          <CompareControlPanel
-            data={data}
-            metricsText={metricsText}
-            onMetricsChange={onMetricsChange}
-            seriesText={seriesText}
-            onSeriesChange={onSeriesChange}
-            sortMetric={sortMetric}
-            onSortMetricChange={onSortMetricChange}
-            sortDirection={sortDirection}
-            onSortDirectionChange={onSortDirectionChange}
-            onRunCompare={onRunCompare}
-            onChanged={onChanged}
-            result={result}
-            selectedIds={selectedIds}
-            selectedCompareSet={selectedCompareSet}
-            comparedRuns={comparedRuns}
-            onClearCompareSet={onClearCompareSet}
-          />
-          <RunSelectionTable runs={runs} selectedIds={selectedIds} onToggle={onToggleRun} onSelectRun={onSelectRun} />
-        </div>
-      </DashboardCollapsedSection>
+
     </div>
   );
+}
+
+function ComparisonScopePanel({ runs }) {
+  const groups = compareScope(runs);
+  return <Panel className="overflow-hidden"><PanelHeader title="比较口径与未校验项" icon={TableProperties} />
+    <p className="p-4 text-sm text-muted">保留跨样本、跨费用比较；差异不自动判定优劣。以下按已记录字段识别，未知字段请核对完整配置；数值保持原始单位，不自动换算百分比、费率或币种。</p>
+    {groups.map(group => <details key={group.label} className="border-t border-line p-3" open={group.status === '存在差异'}><summary className="cursor-pointer text-sm font-semibold">{group.label} · {group.status}</summary>
+      {group.rows.length ? <div className="overflow-x-auto mt-3"><table className="w-full text-sm"><thead className="table-head"><tr><th className="table-cell">记录字段</th>{runs.map(run => <th className="table-cell" key={run.id}>{run.name}</th>)}</tr></thead><tbody>{group.rows.map(row => <tr key={row.key}><th className="table-cell text-left font-normal">{row.key}</th>{row.values.map((value,index) => <td className="table-cell font-mono" key={runs[index].id}>{value}</td>)}</tr>)}</tbody></table></div> : <p className="text-sm text-muted mt-2">未识别到记录字段，需人工核验。</p>}
+    </details>)}
+  </Panel>;
 }
 
 function CompareDecisionSummaryPanel({ metrics, metricNames, runs, baselineRun, series, error }) {
@@ -6851,12 +6877,12 @@ function CompareDecisionSummaryPanel({ metrics, metricNames, runs, baselineRun, 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-ink">决策摘要</div>
-          <div className="mt-1 text-xs text-muted">先回答哪个方案更值得推进，再给出曲线、回撤、指标和诊断证据。</div>
+          <div className="mt-1 text-xs text-muted">数值排名仅在当前比较范围内成立；采纳与否以研究评审记录为准。</div>
         </div>
-        <Badge tone={error ? 'negative' : runs.length >= 2 ? 'positive' : 'warning'}>{error ? '错误' : runs.length >= 2 ? '可决策' : '需要更多 Run'}</Badge>
+        <Badge tone={error ? 'negative' : 'neutral'}>{error ? '对比失败' : runs.length >= 2 ? '已生成对比 · 研究结论待评审' : '需要更多 Run'}</Badge>
       </div>
       {error ? <div className="mb-3"><InlineError message={error} /></div> : null}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-8">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <ReadOnlyField label="模板" value="绩效对比" />
         <ReadOnlyField label="Runs" value={String(runs.length)} />
         <ReadOnlyField label="基准" value={baselineRun?.name || '--'} />
@@ -7286,7 +7312,7 @@ function MetricMatrixPanel({ metrics, runs, baselineRunId, error }) {
               const baseline = toNumber(byRun?.[baselineRunId]);
               return (
                 <tr className="hover:bg-white/45" key={metric}>
-                  <td className="table-cell font-semibold text-ink">{shortMetricName(metric)}</td>
+                  <td className="table-cell font-semibold text-ink">{shortMetricName(metric)}<div className="text-xs font-normal text-muted">{metric.startsWith('strategy.summary.') && /annual_return|annual_volatility|max_drawdown/.test(metric) ? '单位：% · 差值：百分点' : /sharpe|sortino|calmar/.test(metric) ? '无量纲比值' : '按原始记录单位'}</div></td>
                   {(runs || []).map((run) => {
                     const raw = byRun?.[run.id];
                     const value = toNumber(raw);
@@ -9263,12 +9289,12 @@ function lineageOption(branches, runs = []) {
 
 function branchLabel(branch, runs) {
   if (!branch) return 'empty';
-  const best = [...runs].sort((left, right) => Number(metricValue(right, 'strategy.summary', 'sharpe') ?? -Infinity) - Number(metricValue(left, 'strategy.summary', 'sharpe') ?? -Infinity))[0];
+  const best = representativeRun(runs);
   const bestSharpe = best ? metricValue(best, 'strategy.summary', 'sharpe') : null;
   return [
     branch.key || branch.title || branch.id,
     `${branch.status || 'unknown'} · ${runs.length} runs`,
-    bestSharpe === null || bestSharpe === undefined ? null : `best sharpe ${formatMetric(bestSharpe)}`,
+    bestSharpe === null || bestSharpe === undefined ? null : `${representativeReason(best)} ${formatMetric(bestSharpe)}`,
   ].filter(Boolean).join('\n');
 }
 
@@ -9923,9 +9949,7 @@ function researchChampionRun(research, branches, runs) {
   const branchIds = new Set((branches || [])
     .filter((branch) => !research?.id || branch.research_id === research.id)
     .map((branch) => branch.id));
-  return [...(runs || [])]
-    .filter((run) => (!branchIds.size || branchIds.has(run.branch_id)) && run.status === 'completed')
-    .sort((a, b) => Number(metricValue(b, 'strategy.summary', 'sharpe') ?? -Infinity) - Number(metricValue(a, 'strategy.summary', 'sharpe') ?? -Infinity))[0] || null;
+  return representativeRun((runs || []).filter(run => branchIds.has(run.branch_id)));
 }
 
 function summaryMetricRows(summary) {
@@ -11189,7 +11213,7 @@ function buildPageContext(data, active, selections, runDetail) {
     research = researches.find((item) => item.id === branch?.research_id || item.id === run?.research_id) || selectedResearch;
     project = projects.find((item) => item.id === run?.project_id || item.id === research?.project_id) || selectedProject;
   } else if (active === 'runs') {
-    extra = { label: 'Runs', value: 'All Runs' };
+    extra = { label: 'Runs', value: 'Run 查询' };
   } else if (active === 'sweep') {
     extra = { label: 'Sweep', value: entityName(selectedSweep), id: selectedSweep?.id };
     branch = branches.find((item) => item.id === selectedSweep?.branch_id) || selectedBranch;
@@ -11198,10 +11222,10 @@ function buildPageContext(data, active, selections, runDetail) {
   } else if (active === 'compare') {
     extra = { label: 'Compare', value: entityName(selectedCompareSet), id: selectedCompareSet?.id };
     research = researches.find((item) => item.id === selectedCompareSet?.research_id) || null;
-    project = projects.find((item) => item.id === selectedCompareSet?.project_id) || selectedProject;
+    project = projects.find((item) => item.id === selectedCompareSet?.project_id) || null;
   } else if (active === 'search') {
     extra = { label: 'Search', value: entityName(selectedSearchView), id: selectedSearchView?.id };
-    project = projects.find((item) => item.id === selectedSearchView?.project_id) || selectedProject;
+    project = projects.find((item) => item.id === selectedSearchView?.project_id) || null;
   } else if (active === 'maps') {
     extra = { label: 'Research Map', value: selections.mapId ? t('Research Map') : t('Research Maps'), active: 'maps' };
   }
@@ -11345,7 +11369,7 @@ function App() {
       return;
     }
     if (window.location.pathname !== nextPath) {
-      window.history.pushState({}, '', nextPath);
+      window.history.pushState({}, '', nextPath + savedPageQuery(nextPath));
     }
   }, [active, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
 
@@ -11529,7 +11553,7 @@ function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
       >
-        <div className="page-enter" key={`${active}:${data ? 'ready' : 'pending'}`}>
+        <div className="page-enter" key={`${active}:${selectedRunId && active === 'run' ? selectedRunId : active === 'research' ? selectedResearchId : active === 'maps' ? selectedMapId : ''}:${data ? 'ready' : 'pending'}`}>
           {page}
         </div>
       </Shell>

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ExternalLink, Maximize2, Minimize2, Network, RefreshCw } from 'lucide-react';
 import { apiGet, artifactContentUrl } from './api';
 import { t } from './i18n';
+import { usePageQuery } from './pageState';
 
 // Research maps are maintained by hand by research agents (bbox map / SDK / API).
 // This module only renders them. Structure and narrative come from the map; evidence
@@ -37,16 +38,21 @@ const clip = (s, n) => (s && s.length > n ? `${s.slice(0, n - 1)}…` : s || '')
 const runOf = (node) => (node?.binding && node.binding.run) || null;
 const metricsOf = (node) => { const run = runOf(node); return run && run.metrics ? run.metrics : null; };
 
+function mapDate(value) {
+  const text = String(value);
+  return new Date(/^\d{4}-\d\d-\d\dT/.test(text) && !/(?:Z|[+-]\d\d:\d\d)$/i.test(text) ? `${text}Z` : text);
+}
+
 function formatWhen(value) {
   if (!value) return '--';
-  const date = new Date(value);
+  const date = mapDate(value);
   if (Number.isNaN(date.getTime())) return String(value);
   const pad = (n) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 function ago(value) {
   if (!value) return '--';
-  const ms = Date.now() - new Date(value).getTime();
+  const ms = Date.now() - mapDate(value).getTime();
   if (!Number.isFinite(ms)) return String(value);
   const m = Math.round(ms / 60000);
   if (m < 1) return t('just now');
@@ -126,7 +132,7 @@ export const TreeCanvas = forwardRef(function TreeCanvas({ index, collapsed, onT
     const maxX = Math.max(...vis.map((n) => n.x)) + NW + 40;
     const maxY = Math.max(...vis.map((n) => n.y)) + NH;
     const rect = canvas.getBoundingClientRect();
-    const k = Math.max(0.6, Math.min(1.15, (rect.width - 60) / maxX, (rect.height - 70) / maxY));
+    const k = Math.max(0.25, Math.min(1.15, (rect.width - 60) / maxX, (rect.height - 70) / maxY));
     setView({ k, tx: Math.max(24, (rect.width - maxX * k) / 2), ty: Math.max(24, (rect.height - maxY * k) / 2) });
   }, []);
   const focus = useCallback((key) => {
@@ -182,7 +188,13 @@ export const TreeCanvas = forwardRef(function TreeCanvas({ index, collapsed, onT
   const isHit = (n) => q && ((n.title || '').toLowerCase().includes(q) || (n.key || '').toLowerCase().includes(q));
 
   return (
-    <div className={`rmap-canvas ${className}`} ref={canvasRef} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
+    <div className={`rmap-canvas ${className}`} ref={canvasRef} tabIndex={0} role="region" aria-label="研究树画布：方向键平移，加减缩放，Home 适应窗口" onKeyDown={event => {
+      if (event.target !== event.currentTarget) return;
+      const shifts = {ArrowLeft:[40,0], ArrowRight:[-40,0], ArrowUp:[0,40], ArrowDown:[0,-40]};
+      if (shifts[event.key]) { event.preventDefault(); const [dx,dy] = shifts[event.key]; setView(current => ({...current,tx:current.tx+dx,ty:current.ty+dy})); }
+      if (['+','=','-'].includes(event.key)) { event.preventDefault(); setView(current => ({...current,k:Math.min(2.5,Math.max(.25,current.k*(event.key==='-' ? .85 : 1.15)))})); }
+      if (event.key==='Home') { event.preventDefault(); fit(); }
+    }} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
       <svg className="block h-full w-full" role="img" aria-label={t('Research tree')}>
         <g transform={`translate(${view.tx},${view.ty}) scale(${view.k})`}>
           <g>
@@ -209,7 +221,7 @@ export const TreeCanvas = forwardRef(function TreeCanvas({ index, collapsed, onT
               const isCollapsed = collapsed.has(n.key);
               return (
                 <g className={classes.join(' ')} key={n.id} transform={`translate(${n.x},${n.y})`} style={{ '--c': fam.color }} tabIndex={0} role="button" aria-label={n.title}
-                  onClick={() => onSelect(n.key)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(n.key); } }}>
+                  onClick={() => onSelect(n.key)} onKeyDown={(e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); if (n.children.length && (e.key === 'ArrowLeft' ? !isCollapsed : isCollapsed)) onToggleCollapse(n.key); } if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(n.key); } }}>
                   <rect className="box" width={NW} height={NH} rx={3} />
                   <rect className="tag" x={0} y={0} width={5} height={NH} />
                   <text className="t" x={12} y={17}>{(n.is_baseline ? '★ ' : '') + clip(n.title, primary ? 13 : 16)}</text>
@@ -400,12 +412,15 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
   const index = useMemo(() => buildIndex(map), [map]);
   const settings = map.settings_json || {};
   const canvasRef = useRef(null);
-  const [selectedKey, setSelectedKey] = useState(null);
-  const [tab, setTab] = useState('overview');
+  const scope = embedded ? `/researches/${map.research_id}` : `/maps/${map.id}`;
+  const [nodeKey, setNodeKey] = usePageQuery(scope, `node-${map.id}`, '');
+  const selectedKey = nodeKey || index.baseline?.key || index.roots[0]?.key || null;
+  const setSelectedKey = key => setNodeKey(key || '');
+  const [tab, setTab] = usePageQuery(scope, `mapTab-${map.id}`, 'overview');
   const [collapsed, setCollapsed] = useState(() => new Set());
   const [hiddenFamilies, setHiddenFamilies] = useState(() => new Set());
   const [hiddenStages, setHiddenStages] = useState(() => new Set());
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = usePageQuery(scope, `mapQuery-${map.id}`, '');
   const [density, setDensity] = useState('metric');
   const [fullscreen, setFullscreen] = useState(false);
   const initializedFor = useRef(null);
@@ -415,9 +430,8 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
     if (initializedFor.current === map.id) return;
     initializedFor.current = map.id;
     setCollapsed(new Set((settings.collapsed || []).filter((k) => index.byKey[k])));
-    setHiddenFamilies(new Set()); setHiddenStages(new Set()); setQuery(''); setTab('overview');
-    const initial = index.baseline ? index.baseline.key : index.roots[0]?.key || null;
-    setSelectedKey(initial);
+    setHiddenFamilies(new Set()); setHiddenStages(new Set());
+    const initial = selectedKey;
     pendingFocus.current = initial ? { key: initial } : { fit: true };
   }, [map.id, index, settings.collapsed]);
   useEffect(() => { if (selectedKey && !index.byKey[selectedKey]) setSelectedKey(index.roots[0]?.key || null); }, [index, selectedKey]);
@@ -460,6 +474,7 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
         <div className="rmap-seg" role="group" aria-label={t('Card density')}><button type="button" className={density === 'compact' ? 'on' : ''} onClick={() => setDensity('compact')}>{t('Compact')}</button><button type="button" className={density === 'metric' ? 'on' : ''} onClick={() => setDensity('metric')}>{t('With metric')}</button></div>
         <button className="secondary-button" type="button" onClick={mainlineOnly}>{t('Mainline only')}</button>
         <button className="secondary-button" type="button" onClick={expandAll}>{t('Expand all')}</button>
+        <button className="secondary-button" type="button" onClick={() => { setQuery(''); setHiddenFamilies(new Set()); setHiddenStages(new Set()); }}>清除高亮条件</button>
         <button className="secondary-button" type="button" onClick={() => canvasRef.current?.fit()}><Maximize2 className="h-4 w-4" />{t('Fit')}</button>
         {embedded ? <button className="secondary-button" type="button" onClick={() => { setFullscreen((f) => !f); pendingFocus.current = { fit: true }; }}>{fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}{fullscreen ? t('Exit fullscreen') : t('Fullscreen')}</button> : null}
         {embedded && onOpenPage ? <button className="secondary-button" type="button" onClick={onOpenPage}>{t('Open map page')} →</button> : null}
@@ -471,9 +486,9 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
   );
   const right = (
     <aside className="rmap-right">
-      <div className="rmap-tabs" role="tablist">
-        <button className={`rmap-tab ${tab === 'overview' ? 'on' : ''}`} role="tab" aria-selected={tab === 'overview'} type="button" onClick={() => setTab('overview')}>{t('Overview')}</button>
-        <button className={`rmap-tab ${tab === 'node' ? 'on' : ''}`} role="tab" aria-selected={tab === 'node'} type="button" onClick={() => setTab('node')}>{t('Node')}{selected ? <span className="rmap-tab-sub">{selected.title}</span> : null}</button>
+      <div className="rmap-tabs" role="group" aria-label="地图详情视图">
+        <button className={`rmap-tab ${tab === 'overview' ? 'on' : ''}`} aria-pressed={tab === 'overview'} type="button" onClick={() => setTab('overview')}>{t('Overview')}</button>
+        <button className={`rmap-tab ${tab === 'node' ? 'on' : ''}`} aria-pressed={tab === 'node'} type="button" onClick={() => setTab('node')}>{t('Node')}{selected ? <span className="rmap-tab-sub">{selected.title}</span> : null}</button>
       </div>
       <div className="rmap-tabbody">
         {tab === 'overview'
@@ -535,7 +550,7 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
         ) : <div className="text-xs text-subtle">{t('No baseline')}</div>}
       </section>
       <section className="sec">
-        <h4>{t('Decision')}<span className="src">{t('click to filter')}</span></h4>
+        <h4>{t('Decision')}<span className="src">点击淡化 / 恢复，保留树结构</span></h4>
         <div className="rmap-legend">
           {Object.entries(FAMILIES).map(([k, f]) => <button className="rmap-chip" key={k} type="button" aria-pressed={!hiddenFamilies.has(k)} title={t(f.hint)} style={{ '--c': f.color }} onClick={() => toggleFamily(k)}><i />{t(f.label)}<b>{counts.families?.[k] || 0}</b></button>)}
         </div>
@@ -562,22 +577,24 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
 function useMap(mapId, refreshToken) {
   const [map, setMap] = useState(null);
   const [error, setError] = useState(null);
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
+    setMap(null); setError(null);
     if (!mapId) { setMap(null); return undefined; }
     let cancelled = false;
     apiGet(`/api/v1/research-maps/${mapId}`).then((payload) => { if (!cancelled) { setMap(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
-  }, [mapId, refreshToken]);
-  return { map, error };
+  }, [mapId, refreshToken, retry]);
+  return { map, error, reload: () => setRetry(value => value + 1) };
 }
 
 export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject, selectResearch, selectBranch, selectRun, selectCompareSet }) {
   const nav = { selectProject, selectResearch, selectBranch, selectRun, selectCompareSet };
-  const { map, error } = useMap(selectedMapId, data);
+  const { map, error, reload } = useMap(selectedMapId, data);
   if (selectedMapId) {
-    if (error && !map) return <div className="space-y-3"><button className="secondary-button" type="button" onClick={() => selectMap(null)}>{t('All research maps')}</button><div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}</div></div>;
+    if (error && !map) return <div className="space-y-3"><button className="secondary-button" type="button" onClick={() => selectMap(null)}>{t('All research maps')}</button><div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}</div><button className="secondary-button" onClick={reload} type="button">重试加载地图</button></div>;
     if (!map) return <div className="flex items-center gap-2 px-2 py-6 text-sm text-muted"><RefreshCw className="h-4 w-4 animate-spin" />{t('Loading')}</div>;
-    return <ResearchMapView map={map} nav={nav} />;
+    return <ResearchMapView key={map.id} map={map} nav={nav} />;
   }
   return <ResearchMapList refreshToken={data} onSelectMap={selectMap} selectProject={selectProject} selectResearch={selectResearch} />;
 }
@@ -585,12 +602,14 @@ export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject
 function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResearch }) {
   const [maps, setMaps] = useState(null);
   const [error, setError] = useState(null);
+  const [retry, setRetry] = useState(0);
+  const [query, setQuery] = usePageQuery('/maps', 'query', '');
   useEffect(() => {
     let cancelled = false;
     apiGet('/api/v1/research-maps').then((payload) => { if (!cancelled) { setMaps(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
-  }, [refreshToken]);
-  const rows = maps || [];
+  }, [refreshToken, retry]);
+  const rows = (maps || []).filter(map => [map.title,map.key,map.project_key,map.research_key].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
   return (
     <div className="space-y-4">
       <section className="bento-panel p-4">
@@ -598,14 +617,13 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
         <h1 className="text-2xl font-semibold text-ink md:text-3xl">{t('Research Maps')}</h1>
         <p className="mt-2 max-w-4xl text-sm leading-5 text-muted">{t('Research maps are maintained by research agents by hand. Structure and narrative are written; evidence is read from the bound run, branch, or compare set.')}</p>
       </section>
-      {error ? <div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}</div> : null}
+      <input className="form-control" type="search" aria-label="搜索地图" placeholder="搜索地图、项目、研究线" value={query} onChange={event => setQuery(event.target.value)} />
+      {error ? <div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}<button className="secondary-button ml-3" type="button" onClick={() => setRetry(value => value + 1)}>重试</button></div> : null}
       <section className="bento-panel overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3"><h2 className="text-sm font-semibold text-ink">{t('Research Maps')}</h2><span className="text-xs text-muted">{rows.length}</span></div>
-        {maps === null && !error ? <div className="flex items-center gap-2 px-4 py-6 text-sm text-muted"><RefreshCw className="h-4 w-4 animate-spin" />{t('Loading')}</div> : rows.length === 0 ? (
+        {error ? <p className="p-4 text-sm text-muted">地图加载失败，当前数量未知。</p> : maps === null ? <div className="flex items-center gap-2 px-4 py-6 text-sm text-muted"><RefreshCw className="h-4 w-4 animate-spin" />{t('Loading')}</div> : rows.length === 0 ? (
           <div className="space-y-3 px-4 py-6 text-sm text-muted">
-            <p>{t('No research maps yet. Agents create them with the CLI, for example:')}</p>
-            <pre className="overflow-x-auto rounded-md border border-line bg-panel2/60 p-3 font-mono text-xs text-ink">{'bbox map init --project <project-key> --research <research-key> --key <map-key> --title "..." --created-by-id <agent-id>\nbbox map node set --map <project-key>/<map-key> --key <node> --title "..." --stage experiment --run <run_id> --created-by-id <agent-id>'}</pre>
-            <p>{t('See docs/research-map.md for the document format.')}</p>
+            <p>{maps?.length ? '当前条件无匹配，请清除搜索。' : '当前范围尚无研究地图。'}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -614,7 +632,7 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
               <tbody>
                 {rows.map((row) => (
                   <tr className="cursor-pointer hover:bg-white/45" key={row.id} onClick={() => onSelectMap(row.id)}>
-                    <td className="table-cell font-semibold text-ink">{row.title}</td>
+                    <td className="table-cell font-semibold text-ink"><button type="button" onClick={event => { event.stopPropagation(); onSelectMap(row.id); }}>{row.title}</button></td>
                     <td className="table-cell font-mono text-xs text-muted">{row.key}</td>
                     <td className="table-cell"><button className="font-semibold text-info hover:underline" type="button" onClick={(e) => { e.stopPropagation(); selectProject(row.project_id); }}>{row.project_key || row.project_id}</button></td>
                     <td className="table-cell">{row.research_id ? <button className="font-semibold text-info hover:underline" type="button" onClick={(e) => { e.stopPropagation(); selectResearch(row.research_id); }}>{row.research_key || row.research_id}</button> : <span className="text-muted">--</span>}</td>
@@ -636,17 +654,19 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
 
 export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelectMap }) {
   const [maps, setMaps] = useState(null);
+  const [listError, setListError] = useState(null);
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
     if (!scopeId) { setMaps(null); return undefined; }
     let cancelled = false;
-    apiGet(`/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps`).then((payload) => { if (!cancelled) setMaps(payload); }).catch(() => { if (!cancelled) setMaps([]); });
+    apiGet(`/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps`).then((payload) => { if (!cancelled) { setMaps(payload); setListError(null); } }).catch(err => { if (!cancelled) setListError(err.message); });
     return () => { cancelled = true; };
-  }, [scope, scopeId, refreshToken]);
+  }, [scope, scopeId, refreshToken, retry]);
   const rows = maps || [];
   return (
     <section className="bento-panel overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3"><div className="flex items-center gap-2"><Network className="h-4 w-4 text-muted" /><h2 className="text-sm font-semibold text-ink">{t('Research Maps')}</h2></div><span className="text-xs text-muted">{rows.length}</span></div>
-      {rows.length === 0 ? <div className="px-4 py-4 text-sm text-muted">{t('No research map for this scope yet. Agents maintain maps with bbox map.')}</div> : (
+      {listError ? <div className="p-4 text-sm text-negative">地图加载失败：{listError}<button className="secondary-button ml-3" onClick={() => setRetry(value => value + 1)}>重试</button></div> : maps === null ? <p className="p-4">加载地图中…</p> : rows.length === 0 ? <div className="px-4 py-4 text-sm text-muted">{t('No research map for this scope yet. Agents maintain maps with bbox map.')}</div> : (
         <ul className="divide-y divide-line/70">
           {rows.map((row) => (
             <li className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5" key={row.id}>
@@ -666,14 +686,16 @@ export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelect
 /** Embedded map for the Research page. Reports an entity→nodes index so tables can show the map-node column. */
 export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locate, selectMap }) {
   const [maps, setMaps] = useState(null);
+  const [listError, setListError] = useState(null);
+  const [retry, setRetry] = useState(0);
   const [mapId, setMapId] = useState(null);
   useEffect(() => {
     if (!researchId) { setMaps(null); setMapId(null); return undefined; }
     let cancelled = false;
-    apiGet(`/api/v1/researches/${researchId}/research-maps`).then((payload) => { if (!cancelled) { setMaps(payload); setMapId((current) => (payload.some((m) => m.id === current) ? current : payload[0]?.id || null)); } }).catch(() => { if (!cancelled) setMaps([]); });
+    apiGet(`/api/v1/researches/${researchId}/research-maps`).then((payload) => { if (!cancelled) { setListError(null); setMaps(payload); setMapId((current) => (payload.some((m) => m.id === current) ? current : payload[0]?.id || null)); } }).catch(err => { if (!cancelled) setListError(err.message); });
     return () => { cancelled = true; };
-  }, [researchId, refreshToken]);
-  const { map } = useMap(mapId, refreshToken);
+  }, [researchId, refreshToken, retry]);
+  const { map, error: mapError, reload } = useMap(mapId, refreshToken);
   useEffect(() => {
     if (!onIndex) return;
     if (!map) { onIndex({ byRun: {}, byBranch: {}, mapId: null }); return; }
@@ -686,7 +708,8 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     });
     onIndex({ byRun, byBranch, mapId: map.id });
   }, [map, onIndex]);
-  if (maps === null) return null;
+  if (listError || mapError) return <section className="bento-panel p-4 text-sm text-negative">地图加载失败：{listError || mapError}<button className="secondary-button ml-3" onClick={() => { setRetry(value => value + 1); reload(); }}>重试</button></section>;
+  if (maps === null) return <p className="text-sm text-muted">加载地图中…</p>;
   if (!maps.length) {
     return (
       <section className="bento-panel px-4 py-3 text-sm text-muted">
@@ -700,7 +723,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     </select>
   ) : null;
   if (!map) return <section className="bento-panel px-4 py-3 text-sm text-muted"><RefreshCw className="inline h-4 w-4 animate-spin" /> {t('Loading')}</section>;
-  return <ResearchMapView map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={switcher} />;
+  return <ResearchMapView key={map.id} map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={switcher} />;
 }
 
 /** Table cell: which map nodes bind this entity. */

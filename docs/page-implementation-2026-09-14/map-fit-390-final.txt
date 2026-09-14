@@ -1,0 +1,135 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "研究地图"
+  - generic: 期权研究地图 · 页面验收
+  - searchbox "搜索节点…"
+  - group "卡片密度":
+    - button "简洁"
+    - button "带指标"
+  - button "只看主线"
+  - button "全部展开"
+  - button "清除高亮条件"
+  - button "适应窗口" [active]:
+    - text: 适应窗口
+  - region "研究树画布：方向键平移，加减缩放，Home 适应窗口":
+    - img "研究分支树":
+      - button "跨样本候选":
+        - generic: 跨样本候选
+        - generic: 实验
+        - generic: "1.56"
+        - generic: Sharpe
+      - button "零指标证据":
+        - generic: 零指标证据
+        - generic: 实验
+        - generic: "0.00"
+        - generic: Sharpe
+      - button "人工基准":
+        - generic: ★ 人工基准
+        - generic: 实验
+        - generic: "0.78"
+        - generic: Sharpe
+        - generic: −
+      - button "待验证思路":
+        - generic: 待验证思路
+        - generic: 假设
+      - button "研究命题":
+        - generic: 研究命题
+        - generic: 假设
+        - generic: −
+    - generic: 拖拽平移 · 滚轮缩放 · 点节点看详情 · 点 ± 折叠分支 · 粗线为通往基准的主线
+  - complementary:
+    - group "地图详情视图":
+      - button "总览" [pressed]
+      - button "节点 人工基准":
+        - text: 节点
+        - generic: 人工基准
+    - heading "期权研究地图 · 页面验收" [level=2]
+    - term: 项目
+    - definition:
+      - button "page-review"
+    - term: 研究线
+    - definition:
+      - button "options"
+    - term: 节点
+    - definition: 5 · 5 个未决
+    - term: 主线
+    - definition: 2 · 由根到基准自动派生
+    - term: 主指标
+    - definition: Sharpe
+    - term: 更新时间
+    - definition: 25 分钟前 · 2026-09-14 14:50
+    - term: 键
+    - definition: options-tree
+    - heading "当前基准" [level=4]
+    - button "★ 人工基准 年化12.01% Sharpe0.78 最大回撤-0.95% Calmar12.64 质量门警告":
+      - generic: ★ 人工基准
+      - generic: 年化12.01%
+      - generic: Sharpe0.78
+      - generic: 最大回撤-0.95%
+      - generic: Calmar12.64
+      - generic: 质量门警告
+    - heading "去向 点击淡化 / 恢复，保留树结构" [level=4]:
+      - text: 去向
+      - generic: 点击淡化 / 恢复，保留树结构
+    - button "进行中 5" [pressed]:
+      - text: 进行中
+      - generic: "5"
+    - button "采纳 0" [pressed]:
+      - text: 采纳
+      - generic: "0"
+    - button "保留 0" [pressed]:
+      - text: 保留
+      - generic: "0"
+    - button "终止 0" [pressed]:
+      - text: 终止
+      - generic: "0"
+    - heading "阶段" [level=4]
+    - button "假设 2" [pressed]:
+      - text: 假设
+      - generic: "2"
+    - button "实验 3" [pressed]:
+      - text: 实验
+      - generic: "3"
+    - heading "需要关注" [level=4]
+    - list:
+      - generic: 结果已到未写结论
+      - button "人工基准"
+      - button "跨样本候选"
+      - button "零指标证据"
+    - heading "最近更新" [level=4]
+    - list:
+      - button "待验证思路"
+      - generic: 25 分钟前 · human
+      - button "零指标证据"
+      - generic: 25 分钟前 · human
+      - button "跨样本候选"
+      - generic: 25 分钟前 · human
+      - button "人工基准"
+      - generic: 25 分钟前 · human
+    - paragraph: 由研究 agent 通过 bbox map 维护；WebUI 只读。
+- button "总览":
+  - text: 总览
+- button "项目":
+  - text: 项目
+- button "研究线":
+  - text: 研究线
+- button "研究分支":
+  - text: 研究分支
+- button "Run":
+  - text: Run
+- button "对比":
+  - text: 对比
+- button "研究地图":
+  - text: 研究地图
+- button "搜索":
+  - text: 搜索
+- button "管理":
+  - text: 管理

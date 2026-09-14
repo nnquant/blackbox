@@ -1,0 +1,108 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+  - generic: 搜索
+  - heading "已保存 Run 搜索" [level=1]
+  - heading "搜索控制" [level=2]
+  - button "Structured Filters":
+    - text: Structured Filters
+  - button "Research Search":
+    - text: Research Search
+  - button "JSON Filters":
+    - text: JSON Filters
+  - button "Save View":
+    - text: Save View
+  - generic: Current Filters
+  - generic "limit=20":
+    - generic: limit=20
+  - heading "已保存视图" [level=2]
+  - text: 搜索已保存视图
+  - textbox "搜索已保存视图":
+    - /placeholder: name, description, filters
+  - generic: 0 / 0 shown
+  - generic: 暂无保存的搜索视图。
+  - heading "搜索结果" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究线 / 研究分支 状态 创建者 Sharpe 最大回撤 IC 均值 耗时 配置 产物 更新时间":
+        - columnheader "Run"
+        - columnheader "研究线 / 研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "最大回撤"
+        - columnheader "IC 均值"
+        - columnheader "耗时"
+        - columnheader "配置"
+        - columnheader "产物"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "暂无 Run。":
+        - cell "暂无 Run。"
+  - heading "研究线结果" [level=2]
+  - table:
+    - rowgroup:
+      - row "研究线 项目 状态 研究分支 Run 最优候选":
+        - columnheader "研究线"
+        - columnheader "项目"
+        - columnheader "状态"
+        - columnheader "研究分支"
+        - columnheader "Run"
+        - columnheader "最优候选"
+    - rowgroup:
+      - row "暂无研究线搜索结果。":
+        - cell "暂无研究线搜索结果。"

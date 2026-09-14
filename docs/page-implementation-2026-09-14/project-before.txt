@@ -1,0 +1,469 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+  - generic: 项目
+  - heading "页面验收 · 量化研究" [level=1]
+  - paragraph: 隔离测试数据，不作为策略研究结论
+  - generic: 工作区
+  - generic: local
+  - generic: 研究线
+  - generic: "4"
+  - generic: Run
+  - generic: "8"
+  - generic: 运行中
+  - generic: "4"
+  - heading "项目元数据" [level=2]
+  - button "Edit project metadata":
+  - generic: 标题
+  - generic "页面验收 · 量化研究":
+    - generic: 页面验收 · 量化研究
+  - generic: 标签
+  - generic: "--"
+  - generic: 描述
+  - generic "隔离测试数据，不作为策略研究结论":
+    - generic: 隔离测试数据，不作为策略研究结论
+  - generic: Retention Policy
+  - generic "--":
+    - generic: "--"
+  - heading "研究线活动" [level=2]
+  - table:
+    - rowgroup:
+      - row "研究线 7日 Run 失败率 研究分支 最优候选 Sharpe 最近 Run":
+        - columnheader "研究线"
+        - columnheader "7日 Run"
+        - columnheader "失败率"
+        - columnheader "研究分支"
+        - columnheader "最优候选"
+        - columnheader "Sharpe"
+        - columnheader "最近 Run"
+    - rowgroup:
+      - row "期权风险溢价研究 8 0% 1 人工基准 · 费用 10bps 0.78 2026/9/14 14:56:51":
+        - cell "期权风险溢价研究":
+          - button "期权风险溢价研究"
+        - cell "8"
+        - cell "0%"
+        - cell "1"
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "0.78"
+        - cell "2026/9/14 14:56:51"
+      - row "备选线索 · 稳健性 0 0% 0 暂无已完成 Run。 -- 2026/9/14 14:50:45":
+        - cell "备选线索 · 稳健性":
+          - button "备选线索 · 稳健性"
+        - cell "0"
+        - cell "0%"
+        - cell "0"
+        - cell "暂无已完成 Run。"
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 尾部风险 0 0% 0 暂无已完成 Run。 -- 2026/9/14 14:50:45":
+        - cell "备选线索 · 尾部风险":
+          - button "备选线索 · 尾部风险"
+        - cell "0"
+        - cell "0%"
+        - cell "0"
+        - cell "暂无已完成 Run。"
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 流动性 0 0% 0 暂无已完成 Run。 -- 2026/9/14 14:50:45":
+        - cell "备选线索 · 流动性":
+          - button "备选线索 · 流动性"
+        - cell "0"
+        - cell "0%"
+        - cell "0"
+        - cell "暂无已完成 Run。"
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+  - heading "对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Toggle all compare series 目标 ↕ Run ↕ annual return ↕ annual volatility ↕ max drawdown ↕ sharpe ↕ sortino ↕ calmar ↕ turnover ↕":
+        - columnheader "Toggle all compare series":
+          - checkbox "Toggle all compare series" [checked]
+        - columnheader "目标 ↕":
+          - button "目标 ↕":
+            - generic: 目标
+            - generic: ↕
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "annual return ↕":
+          - button "annual return ↕":
+            - generic: annual return
+            - generic: ↕
+        - columnheader "annual volatility ↕":
+          - button "annual volatility ↕":
+            - generic: annual volatility
+            - generic: ↕
+        - columnheader "max drawdown ↕":
+          - button "max drawdown ↕":
+            - generic: max drawdown
+            - generic: ↕
+        - columnheader "sharpe ↕":
+          - button "sharpe ↕":
+            - generic: sharpe
+            - generic: ↕
+        - columnheader "sortino ↕":
+          - button "sortino ↕":
+            - generic: sortino
+            - generic: ↕
+        - columnheader "calmar ↕":
+          - button "calmar ↕":
+            - generic: calmar
+            - generic: ↕
+        - columnheader "turnover ↕":
+          - button "turnover ↕":
+            - generic: turnover
+            - generic: ↕
+    - rowgroup:
+      - row "Toggle 备选线索 · 稳健性 备选线索 · 稳健性 research 暂无代表 Run -- -- -- -- -- -- --":
+        - cell "Toggle 备选线索 · 稳健性":
+          - checkbox "Toggle 备选线索 · 稳健性" [disabled]
+        - cell "备选线索 · 稳健性 research":
+          - generic: 备选线索 · 稳健性
+          - generic: research
+        - cell "暂无代表 Run"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+      - row "Toggle 备选线索 · 尾部风险 备选线索 · 尾部风险 research 暂无代表 Run -- -- -- -- -- -- --":
+        - cell "Toggle 备选线索 · 尾部风险":
+          - checkbox "Toggle 备选线索 · 尾部风险" [disabled]
+        - cell "备选线索 · 尾部风险 research":
+          - generic: 备选线索 · 尾部风险
+          - generic: research
+        - cell "暂无代表 Run"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+      - row "Toggle 备选线索 · 流动性 备选线索 · 流动性 research 暂无代表 Run -- -- -- -- -- -- --":
+        - cell "Toggle 备选线索 · 流动性":
+          - checkbox "Toggle 备选线索 · 流动性" [disabled]
+        - cell "备选线索 · 流动性 research":
+          - generic: 备选线索 · 流动性
+          - generic: research
+        - cell "暂无代表 Run"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+      - row "Toggle 期权风险溢价研究 期权风险溢价研究 research 人工基准 · 费用 10bps 12.01% 16.17% -0.95% 0.78 1.18 12.64 2.00":
+        - cell "Toggle 期权风险溢价研究":
+          - checkbox "Toggle 期权风险溢价研究" [checked]
+        - cell "期权风险溢价研究 research":
+          - generic: 期权风险溢价研究
+          - generic: research
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "12.01%"
+        - cell "16.17%"
+        - cell "-0.95%"
+        - cell "0.78"
+        - cell "1.18"
+        - cell "12.64"
+        - cell "2.00"
+  - heading "研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "研究线 项目 状态 最优 Run Sharpe 最大回撤 研究分支 Run 更新时间":
+        - columnheader "研究线"
+        - columnheader "项目"
+        - columnheader "状态"
+        - columnheader "最优 Run"
+        - columnheader "Sharpe"
+        - columnheader "最大回撤"
+        - columnheader "研究分支"
+        - columnheader "Run"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "期权风险溢价研究 page-review 活跃 人工基准 · 费用 10bps 0.78 -0.95 1 8 2026/9/14 14:50:44":
+        - cell "期权风险溢价研究"
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "0.78"
+        - cell "-0.95"
+        - cell "1"
+        - cell "8"
+        - cell "2026/9/14 14:50:44"
+      - row "备选线索 · 稳健性 page-review 活跃 最高指标 · 不同样本 1.56 -0.90 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 稳健性"
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 尾部风险 page-review 活跃 最高指标 · 不同样本 1.56 -0.90 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 尾部风险"
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+      - row "备选线索 · 流动性 page-review 活跃 最高指标 · 不同样本 1.56 -0.90 0 0 2026/9/14 14:50:45":
+        - cell "备选线索 · 流动性"
+        - cell "page-review"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "0"
+        - cell "0"
+        - cell "2026/9/14 14:50:45"
+  - heading "研究地图" [level=2]
+  - generic: "1"
+  - list:
+    - button "期权研究地图 · 页面验收"
+    - generic: options-tree · 5 个节点 · 5 个未决 · 基准 人工基准 · 8 小时前
+    - button "打开"
+  - heading "对比集" [level=2]
+  - text: 搜索对比集
+  - textbox "搜索对比集":
+    - /placeholder: 名称、过滤条件、指标、Run
+  - generic: 1 / 1 已显示
+  - generic: 费用与样本敏感性对比
+  - generic: 3 runs
+  - button "打开"
+  - heading "搜索视图" [level=2]
+  - text: 搜索搜索视图
+  - textbox "搜索搜索视图":
+    - /placeholder: 名称、过滤条件、指标、Run
+  - generic: 0 / 0 已显示
+  - generic: No saved items.
+  - heading "最近项目 Run" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究线 / 研究分支 状态 创建者 Sharpe 最大回撤 IC 均值 耗时 配置 产物 更新时间":
+        - columnheader "Run"
+        - columnheader "研究线 / 研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "最大回撤"
+        - columnheader "IC 均值"
+        - columnheader "耗时"
+        - columnheader "配置"
+        - columnheader "产物"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "状态验收 · 完成 options baseline 运行中 human 0.62 -0.96 -- 6m start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "0.62"
+        - cell "-0.96"
+        - cell "--"
+        - cell "6m"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "负值指标 options baseline 已完成 human -0.78 -2.46 -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "-0.78"
+        - cell "-2.46"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "零值指标 options baseline 已完成 human 0.00 -1.13 -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.00"
+        - cell "-1.13"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "最高指标 · 不同样本 options baseline 已完成 human 1.56 -0.90 -- 0s start_date=2024-01-01, end_date=2025-12-31, fee_bps=0 table_csv · 2 2026/9/14 14:56:51":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2024-01-01, end_date=2025-12-31, fee_bps=0":
+          - generic: start_date=2024-01-01, end_date=2025-12-31, fee_bps=0
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "人工基准 · 费用 10bps options baseline 已完成 human 0.78 -0.95 -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.78"
+        - cell "-0.95"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "状态验收 · 取消 options baseline 运行中 human -- -- -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 -- 2026/9/14 14:50:45":
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+      - row "状态验收 · 失败 options baseline 运行中 human -- -- -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 -- 2026/9/14 14:50:45":
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+      - row "最新运行 · 待证据 options baseline 运行中 human -- -- -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 -- 2026/9/14 14:50:45":
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "--"
+        - cell "2026/9/14 14:50:45"

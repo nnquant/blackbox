@@ -611,3 +611,29 @@ table td button {
 .side-tree .row.lv2 { padding-left: 24px; }
 .side-tree .row.lv3 { padding-left: 40px; font-size: 12.5px; }
 .side-tree .empty { padding: 4px 12px 4px 24px; font-size: 12px; color: var(--dim); }
+
+/* Query controls keep the primary task visible across viewport sizes. */
+.page-tabs { display:flex; flex-wrap:wrap; gap:4px; padding:10px; border-bottom:1px solid rgb(var(--c-line)); }
+.page-tabs button { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:4px; font-size:14px; color:rgb(var(--c-muted)); }
+.page-tabs button[aria-selected="true"] { background:rgb(var(--c-panel2)); color:rgb(var(--c-ink)); font-weight:600; }
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px solid rgb(var(--c-info)); outline-offset:3px; }
+[hidden] { display:none !important; }
+.run-filters { display:grid; grid-template-columns:minmax(180px,2fr) repeat(2,minmax(150px,1fr)); gap:12px; padding:16px; border-bottom:1px solid rgb(var(--c-line)); }
+.run-filters > * { min-width:0; }
+.run-filters:not(.show-advanced) .run-filter-advanced { display:none; }
+.query-summary { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:12px 16px; font-size:12px; color:rgb(var(--c-muted)); overflow-wrap:anywhere; }
+.runs-table { width:100%; min-width:820px; border-collapse:collapse; }
+.runs-table th { white-space:nowrap; }
+.runs-table td:nth-child(2) { min-width:160px; max-width:290px; }
+.runs-table:not(.show-columns) :is(th,td):is(:nth-child(3),:nth-child(6),:nth-child(9),:nth-child(11),:nth-child(12)) { display:none; }
+.runs-table.show-columns { min-width:1650px; }
+.runs-table:not(.show-columns) td:nth-child(2) > div { display:none; }
+.runs-table.show-columns td:nth-child(11) { max-width:300px; overflow-wrap:anywhere; }
+.metric-filter-row { display:grid; grid-template-columns:minmax(180px,2fr) minmax(80px,.6fr) minmax(100px,1fr); gap:8px; }
+.metric-filter-row > * { min-width:0; }
+@media(max-width:767px) { .run-filters,.metric-filter-row { grid-template-columns:minmax(0,1fr); } .page-tabs button { padding:8px; } }
+
+.decision-runs-table { width:100%; min-width:700px; border-collapse:collapse; }
+.decision-runs-table.hide-branch { min-width:560px; }
+.decision-runs-table.hide-branch :is(th,td):nth-child(2) { display:none; }
+.rmap-canvas:focus-visible { outline-offset:-3px; }

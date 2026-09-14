@@ -1,0 +1,864 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 59":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "59"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 59":
+      - generic: 期权风险溢价研究
+      - generic: "59"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "Run 查询"
+  - generic: Run
+  - heading "Run 查询" [level=1]
+  - paragraph: 当前在已加载的 59 条 Run 中筛选；系统共 59 条。最多加载 1000 条，不代表全库查询。
+  - generic: 已过滤
+  - generic "51 / 59":
+    - generic: 51 / 59
+  - generic: 已完成
+  - generic "5":
+    - generic: "5"
+  - generic: 运行中
+  - generic "52":
+    - generic: "52"
+  - generic: 失败
+  - generic "1":
+    - generic: "1"
+  - generic: 有产物
+  - generic "5":
+    - generic: "5"
+  - generic: 最新
+  - generic "2026/9/14 15:15:13":
+    - generic: 2026/9/14 15:15:13
+  - heading "已加载的 Run" [level=2]
+  - generic: 51 / 59 条（已加载范围）
+  - generic: 已选择 2 个 Run
+  - generic: "Project: page-review · Research: options"
+  - generic: 分页验收 00, 分页验收 50
+  - button "创建对比":
+    - text: 创建对比
+  - button "清空选择"
+  - text: 搜索 Run
+  - textbox "搜索 Run":
+    - /placeholder: run, project, branch, config, tag
+    - text: 分页验收
+  - text: 项目
+  - combobox "项目":
+    - option "任意项目" [selected]
+    - option "page-review"
+  - text: 研究线
+  - combobox "研究线":
+    - option "任意研究线" [selected]
+    - option "lead-2"
+    - option "lead-1"
+    - option "lead-0"
+    - option "options"
+  - text: 研究分支
+  - combobox "研究分支":
+    - option "任意研究分支" [selected]
+    - option "baseline"
+  - text: 状态
+  - combobox "状态":
+    - option "任意状态" [selected]
+    - option "已取消"
+    - option "已完成"
+    - option "失败"
+    - option "运行中"
+  - text: 创建者
+  - combobox "创建者":
+    - option "任意创建者" [selected]
+    - option "human"
+  - text: 产物
+  - combobox "产物":
+    - option "任意" [selected]
+    - option "有产物"
+    - option "有报告"
+    - option "无产物"
+  - button "清空"
+  - generic: 已用条件：关键词 分页验收
+  - button "收起高级条件" [expanded]
+  - button "清除全部条件"
+  - button "完整列（含配置、作者、时间）"
+  - table:
+    - rowgroup:
+      - row "选择当前页 runs Run ↕ 研究线 / 研究分支 ↕ 状态 ↕ Sharpe ↕ 最大回撤 ↕ 产物 ↕ 更新时间 ↓":
+        - columnheader "选择当前页 runs":
+          - checkbox "选择当前页 runs"
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "研究线 / 研究分支 ↕":
+          - button "研究线 / 研究分支 ↕":
+            - generic: 研究线 / 研究分支
+            - generic: ↕
+        - columnheader "状态 ↕":
+          - button "状态 ↕":
+            - generic: 状态
+            - generic: ↕
+        - columnheader "Sharpe ↕":
+          - button "Sharpe ↕":
+            - generic: Sharpe
+            - generic: ↕
+        - columnheader "最大回撤 ↕":
+          - button "最大回撤 ↕":
+            - generic: 最大回撤
+            - generic: ↕
+        - columnheader "产物 ↕":
+          - button "产物 ↕":
+            - generic: 产物
+            - generic: ↕
+        - columnheader "更新时间 ↓":
+          - button "更新时间 ↓":
+            - generic: 更新时间
+            - generic: ↓
+    - rowgroup:
+      - row "选择 run 分页验收 50 分页验收 50 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 50":
+          - checkbox "选择 run 分页验收 50" [checked] [active]
+        - cell "分页验收 50":
+          - button "分页验收 50"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 49 分页验收 49 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 49":
+          - checkbox "选择 run 分页验收 49"
+        - cell "分页验收 49":
+          - button "分页验收 49"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 48 分页验收 48 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 48":
+          - checkbox "选择 run 分页验收 48"
+        - cell "分页验收 48":
+          - button "分页验收 48"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 47 分页验收 47 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 47":
+          - checkbox "选择 run 分页验收 47"
+        - cell "分页验收 47":
+          - button "分页验收 47"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 46 分页验收 46 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 46":
+          - checkbox "选择 run 分页验收 46"
+        - cell "分页验收 46":
+          - button "分页验收 46"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 45 分页验收 45 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 45":
+          - checkbox "选择 run 分页验收 45"
+        - cell "分页验收 45":
+          - button "分页验收 45"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 44 分页验收 44 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 44":
+          - checkbox "选择 run 分页验收 44"
+        - cell "分页验收 44":
+          - button "分页验收 44"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 43 分页验收 43 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 43":
+          - checkbox "选择 run 分页验收 43"
+        - cell "分页验收 43":
+          - button "分页验收 43"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 42 分页验收 42 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 42":
+          - checkbox "选择 run 分页验收 42"
+        - cell "分页验收 42":
+          - button "分页验收 42"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 41 分页验收 41 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 41":
+          - checkbox "选择 run 分页验收 41"
+        - cell "分页验收 41":
+          - button "分页验收 41"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 40 分页验收 40 options baseline 运行中 -- -- -- 2026/9/14 15:15:13":
+        - cell "选择 run 分页验收 40":
+          - checkbox "选择 run 分页验收 40"
+        - cell "分页验收 40":
+          - button "分页验收 40"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:13"
+      - row "选择 run 分页验收 39 分页验收 39 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 39":
+          - checkbox "选择 run 分页验收 39"
+        - cell "分页验收 39":
+          - button "分页验收 39"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 38 分页验收 38 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 38":
+          - checkbox "选择 run 分页验收 38"
+        - cell "分页验收 38":
+          - button "分页验收 38"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 37 分页验收 37 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 37":
+          - checkbox "选择 run 分页验收 37"
+        - cell "分页验收 37":
+          - button "分页验收 37"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 36 分页验收 36 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 36":
+          - checkbox "选择 run 分页验收 36"
+        - cell "分页验收 36":
+          - button "分页验收 36"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 35 分页验收 35 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 35":
+          - checkbox "选择 run 分页验收 35"
+        - cell "分页验收 35":
+          - button "分页验收 35"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 34 分页验收 34 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 34":
+          - checkbox "选择 run 分页验收 34"
+        - cell "分页验收 34":
+          - button "分页验收 34"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 33 分页验收 33 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 33":
+          - checkbox "选择 run 分页验收 33"
+        - cell "分页验收 33":
+          - button "分页验收 33"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 32 分页验收 32 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 32":
+          - checkbox "选择 run 分页验收 32"
+        - cell "分页验收 32":
+          - button "分页验收 32"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 31 分页验收 31 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 31":
+          - checkbox "选择 run 分页验收 31"
+        - cell "分页验收 31":
+          - button "分页验收 31"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 30 分页验收 30 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 30":
+          - checkbox "选择 run 分页验收 30"
+        - cell "分页验收 30":
+          - button "分页验收 30"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 29 分页验收 29 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 29":
+          - checkbox "选择 run 分页验收 29"
+        - cell "分页验收 29":
+          - button "分页验收 29"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 28 分页验收 28 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 28":
+          - checkbox "选择 run 分页验收 28"
+        - cell "分页验收 28":
+          - button "分页验收 28"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 27 分页验收 27 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 27":
+          - checkbox "选择 run 分页验收 27"
+        - cell "分页验收 27":
+          - button "分页验收 27"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 26 分页验收 26 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 26":
+          - checkbox "选择 run 分页验收 26"
+        - cell "分页验收 26":
+          - button "分页验收 26"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 25 分页验收 25 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 25":
+          - checkbox "选择 run 分页验收 25"
+        - cell "分页验收 25":
+          - button "分页验收 25"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 24 分页验收 24 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 24":
+          - checkbox "选择 run 分页验收 24"
+        - cell "分页验收 24":
+          - button "分页验收 24"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 23 分页验收 23 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 23":
+          - checkbox "选择 run 分页验收 23"
+        - cell "分页验收 23":
+          - button "分页验收 23"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 22 分页验收 22 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 22":
+          - checkbox "选择 run 分页验收 22"
+        - cell "分页验收 22":
+          - button "分页验收 22"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 21 分页验收 21 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 21":
+          - checkbox "选择 run 分页验收 21"
+        - cell "分页验收 21":
+          - button "分页验收 21"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 20 分页验收 20 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 20":
+          - checkbox "选择 run 分页验收 20"
+        - cell "分页验收 20":
+          - button "分页验收 20"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 19 分页验收 19 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 19":
+          - checkbox "选择 run 分页验收 19"
+        - cell "分页验收 19":
+          - button "分页验收 19"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 18 分页验收 18 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 18":
+          - checkbox "选择 run 分页验收 18"
+        - cell "分页验收 18":
+          - button "分页验收 18"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 17 分页验收 17 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 17":
+          - checkbox "选择 run 分页验收 17"
+        - cell "分页验收 17":
+          - button "分页验收 17"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 16 分页验收 16 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 16":
+          - checkbox "选择 run 分页验收 16"
+        - cell "分页验收 16":
+          - button "分页验收 16"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 15 分页验收 15 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 15":
+          - checkbox "选择 run 分页验收 15"
+        - cell "分页验收 15":
+          - button "分页验收 15"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 14 分页验收 14 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 14":
+          - checkbox "选择 run 分页验收 14"
+        - cell "分页验收 14":
+          - button "分页验收 14"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 13 分页验收 13 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 13":
+          - checkbox "选择 run 分页验收 13"
+        - cell "分页验收 13":
+          - button "分页验收 13"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 12 分页验收 12 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 12":
+          - checkbox "选择 run 分页验收 12"
+        - cell "分页验收 12":
+          - button "分页验收 12"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 11 分页验收 11 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 11":
+          - checkbox "选择 run 分页验收 11"
+        - cell "分页验收 11":
+          - button "分页验收 11"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 10 分页验收 10 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 10":
+          - checkbox "选择 run 分页验收 10"
+        - cell "分页验收 10":
+          - button "分页验收 10"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 09 分页验收 09 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 09":
+          - checkbox "选择 run 分页验收 09"
+        - cell "分页验收 09":
+          - button "分页验收 09"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 08 分页验收 08 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 08":
+          - checkbox "选择 run 分页验收 08"
+        - cell "分页验收 08":
+          - button "分页验收 08"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 07 分页验收 07 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 07":
+          - checkbox "选择 run 分页验收 07"
+        - cell "分页验收 07":
+          - button "分页验收 07"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 06 分页验收 06 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 06":
+          - checkbox "选择 run 分页验收 06"
+        - cell "分页验收 06":
+          - button "分页验收 06"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 05 分页验收 05 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 05":
+          - checkbox "选择 run 分页验收 05"
+        - cell "分页验收 05":
+          - button "分页验收 05"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 04 分页验收 04 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 04":
+          - checkbox "选择 run 分页验收 04"
+        - cell "分页验收 04":
+          - button "分页验收 04"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 03 分页验收 03 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 03":
+          - checkbox "选择 run 分页验收 03"
+        - cell "分页验收 03":
+          - button "分页验收 03"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 02 分页验收 02 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 02":
+          - checkbox "选择 run 分页验收 02"
+        - cell "分页验收 02":
+          - button "分页验收 02"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+      - row "选择 run 分页验收 01 分页验收 01 options baseline 运行中 -- -- -- 2026/9/14 15:15:12":
+        - cell "选择 run 分页验收 01":
+          - checkbox "选择 run 分页验收 01"
+        - cell "分页验收 01":
+          - button "分页验收 01"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:15:12"
+  - generic: Page 1 / 2 · 50 rows on this page
+  - button "上一页" [disabled]
+  - button "下一页"

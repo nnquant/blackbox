@@ -25,3 +25,6 @@ webui/.vite/
 Thumbs.db
 
 .dev-data/
+
+# Isolated page review database, baseline bundle, and temporary checks.
+work/page-review/

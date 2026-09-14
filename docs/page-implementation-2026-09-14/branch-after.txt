@@ -1,0 +1,448 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+    - generic: /
+    - button "期权风险溢价研究"
+    - generic: /
+    - button "波动率过滤 · 基准思路"
+  - generic: Research / options
+  - heading "波动率过滤 · 基准思路" [level=1]
+  - paragraph: 加入波动率门槛后，收益是否来自少数样本？
+  - generic: 状态
+  - generic "活跃":
+    - generic: 活跃
+  - generic: Run
+  - generic "8":
+    - generic: "8"
+  - generic: 已完成
+  - generic "4":
+    - generic: "4"
+  - generic: 运行中
+  - generic "4":
+    - generic: "4"
+  - generic: 最新 Run
+  - generic "状态验收 · 完成":
+    - generic: 状态验收 · 完成
+  - heading "Branch Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 状态 创建者 Sharpe 耗时 更新时间":
+        - columnheader "Run"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "耗时"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "状态验收 · 完成 运行中 human 0.62 6m 2026/9/14 14:56:51":
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "0.62"
+        - cell "6m"
+        - cell "2026/9/14 14:56:51"
+      - row "负值指标 已完成 human -0.78 0s 2026/9/14 14:56:51":
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "-0.78"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "零值指标 已完成 human 0.00 0s 2026/9/14 14:56:51":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.00"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "最高指标 · 不同样本 已完成 human 1.56 0s 2026/9/14 14:56:51":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "1.56"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "人工基准 · 费用 10bps 已完成 human 0.78 0s 2026/9/14 14:56:51":
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.78"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "状态验收 · 取消 运行中 human -- 0s 2026/9/14 14:50:45":
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+      - row "状态验收 · 失败 运行中 human -- 0s 2026/9/14 14:50:45":
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+      - row "最新运行 · 待证据 运行中 human -- 0s 2026/9/14 14:50:45":
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+  - heading "代表 Run" [level=2]
+  - paragraph: 人工基准 · 仅作证据入口，非研究通过结论
+  - button "人工基准 · 费用 10bps 人工基准":
+    - text: 人工基准 · 费用 10bps
+    - generic: 人工基准
+  - generic: Sharpe
+  - generic "0.78":
+    - generic: "0.78"
+  - generic: 最大回撤
+  - generic "-0.95":
+    - generic: "-0.95"
+  - generic: 耗时
+  - generic "0s":
+    - generic: 0s
+  - generic: 更新时间
+  - generic "2026/9/14 14:56:51":
+    - generic: 2026/9/14 14:56:51
+  - heading "Metric Evolution" [level=2]
+  - button "人工基准 · 费用 10bps":
+    - text: 人工基准 · 费用 10bps
+  - button "最高指标 · 不同样本":
+    - text: 最高指标 · 不同样本
+  - button "零值指标":
+    - text: 零值指标
+  - button "负值指标":
+    - text: 负值指标
+  - button "最新运行 · 待证据":
+    - text: 最新运行 · 待证据
+  - button "状态验收 · 完成":
+    - text: 状态验收 · 完成
+  - button "状态验收 · 失败":
+    - text: 状态验收 · 失败
+  - button "状态验收 · 取消":
+    - text: 状态验收 · 取消
+  - heading "Config Evolution" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 配置路径 之前 之后":
+        - columnheader "Run"
+        - columnheader "配置路径"
+        - columnheader "之前"
+        - columnheader "之后"
+    - rowgroup:
+      - row "最高指标 · 不同样本 enabled true false":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "enabled"
+        - cell "true"
+        - cell "false"
+      - row "最高指标 · 不同样本 fee_bps 10 0":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "fee_bps"
+        - cell "10"
+        - cell "0"
+      - row "最高指标 · 不同样本 lookback 20 21":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "lookback"
+        - cell "20"
+        - cell "21"
+      - row "最高指标 · 不同样本 start_date 2023-01-01 2024-01-01":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "start_date"
+        - cell "2023-01-01"
+        - cell "2024-01-01"
+      - row "零值指标 enabled false true":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "enabled"
+        - cell "false"
+        - cell "true"
+      - row "零值指标 fee_bps 0 10":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "fee_bps"
+        - cell "0"
+        - cell "10"
+      - row "零值指标 lookback 21 22":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "lookback"
+        - cell "21"
+        - cell "22"
+      - row "零值指标 start_date 2024-01-01 2023-01-01":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "start_date"
+        - cell "2024-01-01"
+        - cell "2023-01-01"
+      - row "负值指标 lookback 22 23":
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "lookback"
+        - cell "22"
+        - cell "23"
+      - row "最新运行 · 待证据 lookback 23 24":
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "lookback"
+        - cell "23"
+        - cell "24"
+      - row "状态验收 · 完成 lookback 24 25":
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "lookback"
+        - cell "24"
+        - cell "25"
+      - row "状态验收 · 失败 lookback 25 26":
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "lookback"
+        - cell "25"
+        - cell "26"
+      - row "状态验收 · 取消 lookback 26 27":
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "lookback"
+        - cell "26"
+        - cell "27"
+  - heading "对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Toggle all compare series 目标 ↕ Run ↕ annual return ↕ annual volatility ↕ max drawdown ↕ sharpe ↕ sortino ↕ calmar ↕ turnover ↕":
+        - columnheader "Toggle all compare series":
+          - checkbox "Toggle all compare series" [checked]
+        - columnheader "目标 ↕":
+          - button "目标 ↕":
+            - generic: 目标
+            - generic: ↕
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "annual return ↕":
+          - button "annual return ↕":
+            - generic: annual return
+            - generic: ↕
+        - columnheader "annual volatility ↕":
+          - button "annual volatility ↕":
+            - generic: annual volatility
+            - generic: ↕
+        - columnheader "max drawdown ↕":
+          - button "max drawdown ↕":
+            - generic: max drawdown
+            - generic: ↕
+        - columnheader "sharpe ↕":
+          - button "sharpe ↕":
+            - generic: sharpe
+            - generic: ↕
+        - columnheader "sortino ↕":
+          - button "sortino ↕":
+            - generic: sortino
+            - generic: ↕
+        - columnheader "calmar ↕":
+          - button "calmar ↕":
+            - generic: calmar
+            - generic: ↕
+        - columnheader "turnover ↕":
+          - button "turnover ↕":
+            - generic: turnover
+            - generic: ↕
+    - rowgroup:
+      - row "Toggle 人工基准 · 费用 10bps 人工基准 · 费用 10bps run 人工基准 · 费用 10bps 12.01% 16.17% -0.95% 0.78 1.18 12.64 2.00":
+        - cell "Toggle 人工基准 · 费用 10bps":
+          - checkbox "Toggle 人工基准 · 费用 10bps" [checked]
+        - cell "人工基准 · 费用 10bps run":
+          - generic: 人工基准 · 费用 10bps
+          - generic: run
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "12.01%"
+        - cell "16.17%"
+        - cell "-0.95%"
+        - cell "0.78"
+        - cell "1.18"
+        - cell "12.64"
+        - cell "2.00"
+      - row "Toggle 最高指标 · 不同样本 最高指标 · 不同样本 run 最高指标 · 不同样本 27.04% 16.17% -0.90% 1.56 2.49 30.04 2.00":
+        - cell "Toggle 最高指标 · 不同样本":
+          - checkbox "Toggle 最高指标 · 不同样本" [checked]
+        - cell "最高指标 · 不同样本 run":
+          - generic: 最高指标 · 不同样本
+          - generic: run
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "27.04%"
+        - cell "16.17%"
+        - cell "-0.90%"
+        - cell "1.56"
+        - cell "2.49"
+        - cell "30.04"
+        - cell "2.00"
+      - row "Toggle 零值指标 零值指标 run 零值指标 -1.25% 16.17% -1.13% 0.00 0.00 -1.11 2.00":
+        - cell "Toggle 零值指标":
+          - checkbox "Toggle 零值指标" [checked]
+        - cell "零值指标 run":
+          - generic: 零值指标
+          - generic: run
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "-1.25%"
+        - cell "16.17%"
+        - cell "-1.13%"
+        - cell "0.00"
+        - cell "0.00"
+        - cell "-1.11"
+        - cell "2.00"
+      - row "Toggle 负值指标 负值指标 run 负值指标 -12.95% 16.17% -2.46% -0.78 -1.07 -5.27 2.00":
+        - cell "Toggle 负值指标":
+          - checkbox "Toggle 负值指标" [checked]
+        - cell "负值指标 run":
+          - generic: 负值指标
+          - generic: run
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "-12.95%"
+        - cell "16.17%"
+        - cell "-2.46%"
+        - cell "-0.78"
+        - cell "-1.07"
+        - cell "-5.27"
+        - cell "2.00"
+      - row "Toggle 最新运行 · 待证据 最新运行 · 待证据 run 最新运行 · 待证据 -- -- -- -- -- -- --":
+        - cell "Toggle 最新运行 · 待证据":
+          - checkbox "Toggle 最新运行 · 待证据" [checked]
+        - cell "最新运行 · 待证据 run":
+          - generic: 最新运行 · 待证据
+          - generic: run
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+      - row "Toggle 状态验收 · 完成 状态验收 · 完成 run 状态验收 · 完成 9.22% 16.17% -0.96% 0.62 0.94 9.60 2.00":
+        - cell "Toggle 状态验收 · 完成":
+          - checkbox "Toggle 状态验收 · 完成" [checked]
+        - cell "状态验收 · 完成 run":
+          - generic: 状态验收 · 完成
+          - generic: run
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "9.22%"
+        - cell "16.17%"
+        - cell "-0.96%"
+        - cell "0.62"
+        - cell "0.94"
+        - cell "9.60"
+        - cell "2.00"
+      - row "Toggle 状态验收 · 失败 状态验收 · 失败 run 状态验收 · 失败 -- -- -- -- -- -- --":
+        - cell "Toggle 状态验收 · 失败":
+          - checkbox "Toggle 状态验收 · 失败" [checked]
+        - cell "状态验收 · 失败 run":
+          - generic: 状态验收 · 失败
+          - generic: run
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+      - row "Toggle 状态验收 · 取消 状态验收 · 取消 run 状态验收 · 取消 -- -- -- -- -- -- --":
+        - cell "Toggle 状态验收 · 取消":
+          - checkbox "Toggle 状态验收 · 取消" [checked]
+        - cell "状态验收 · 取消 run":
+          - generic: 状态验收 · 取消
+          - generic: run
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+  - generic "Branch Context":
+    - generic: Branch Context

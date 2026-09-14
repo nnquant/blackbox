@@ -1,0 +1,252 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "Run 查询"
+  - generic: Run
+  - heading "Run 查询" [level=1]
+  - paragraph: 当前在已加载的 8 条 Run 中筛选；系统共 8 条。最多加载 1000 条，不代表全库查询。
+  - generic: 已过滤
+  - generic "8 / 8":
+    - generic: 8 / 8
+  - generic: 已完成
+  - generic "5":
+    - generic: "5"
+  - generic: 运行中
+  - generic "1":
+    - generic: "1"
+  - generic: 失败
+  - generic "1":
+    - generic: "1"
+  - generic: 有产物
+  - generic "5":
+    - generic: "5"
+  - generic: 最新
+  - generic "2026/9/14 15:08:39":
+    - generic: 2026/9/14 15:08:39
+  - heading "已加载的 Run" [level=2]
+  - generic: 8 / 8 条（已加载范围）
+  - text: 搜索 Run
+  - textbox "搜索 Run":
+    - /placeholder: run, project, branch, config, tag
+  - text: 项目
+  - combobox "项目":
+    - option "任意项目" [selected]
+    - option "page-review"
+  - text: 状态
+  - combobox "状态":
+    - option "任意状态" [selected]
+    - option "已取消"
+    - option "已完成"
+    - option "失败"
+    - option "运行中"
+  - generic: 已用条件：无
+  - button "更多条件"
+  - button "清除全部条件"
+  - button "完整列（含配置、作者、时间）"
+  - table:
+    - rowgroup:
+      - row "选择当前页 runs Run ↕ 研究线 / 研究分支 ↕ 状态 ↕ Sharpe ↕ 最大回撤 ↕ 产物 ↕ 更新时间 ↓":
+        - columnheader "选择当前页 runs":
+          - checkbox "选择当前页 runs"
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "研究线 / 研究分支 ↕":
+          - button "研究线 / 研究分支 ↕":
+            - generic: 研究线 / 研究分支
+            - generic: ↕
+        - columnheader "状态 ↕":
+          - button "状态 ↕":
+            - generic: 状态
+            - generic: ↕
+        - columnheader "Sharpe ↕":
+          - button "Sharpe ↕":
+            - generic: Sharpe
+            - generic: ↕
+        - columnheader "最大回撤 ↕":
+          - button "最大回撤 ↕":
+            - generic: 最大回撤
+            - generic: ↕
+        - columnheader "产物 ↕":
+          - button "产物 ↕":
+            - generic: 产物
+            - generic: ↕
+        - columnheader "更新时间 ↓":
+          - button "更新时间 ↓":
+            - generic: 更新时间
+            - generic: ↓
+    - rowgroup:
+      - row "选择 run 状态验收 · 取消 状态验收 · 取消 options baseline 已取消 -- -- -- 2026/9/14 15:08:39":
+        - cell "选择 run 状态验收 · 取消":
+          - checkbox "选择 run 状态验收 · 取消"
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已取消":
+          - generic: 已取消
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:08:39"
+      - row "选择 run 状态验收 · 失败 状态验收 · 失败 options baseline 失败 -- -- -- 2026/9/14 15:08:20":
+        - cell "选择 run 状态验收 · 失败":
+          - checkbox "选择 run 状态验收 · 失败"
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "失败":
+          - generic: 失败
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 15:08:20"
+      - row "选择 run 状态验收 · 完成 状态验收 · 完成 options baseline 已完成 0.62 -0.96 table_csv · 2 2026/9/14 15:08:07":
+        - cell "选择 run 状态验收 · 完成":
+          - checkbox "选择 run 状态验收 · 完成"
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "0.62"
+        - cell "-0.96"
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 15:08:07"
+      - row "选择 run 负值指标 负值指标 options baseline 已完成 -0.78 -2.46 table_csv · 2 2026/9/14 14:56:51":
+        - cell "选择 run 负值指标":
+          - checkbox "选择 run 负值指标"
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "-0.78"
+        - cell "-2.46"
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "选择 run 零值指标 零值指标 options baseline 已完成 0.00 -1.13 table_csv · 2 2026/9/14 14:56:51":
+        - cell "选择 run 零值指标":
+          - checkbox "选择 run 零值指标"
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "0.00"
+        - cell "-1.13"
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "选择 run 最高指标 · 不同样本 最高指标 · 不同样本 options baseline 已完成 1.56 -0.90 table_csv · 2 2026/9/14 14:56:51":
+        - cell "选择 run 最高指标 · 不同样本":
+          - checkbox "选择 run 最高指标 · 不同样本"
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "选择 run 人工基准 · 费用 10bps 人工基准 · 费用 10bps options baseline 已完成 0.78 -0.95 table_csv · 2 2026/9/14 14:56:51":
+        - cell "选择 run 人工基准 · 费用 10bps":
+          - checkbox "选择 run 人工基准 · 费用 10bps"
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "0.78"
+        - cell "-0.95"
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "选择 run 最新运行 · 待证据 最新运行 · 待证据 options baseline 运行中 -- -- -- 2026/9/14 14:50:45":
+        - cell "选择 run 最新运行 · 待证据":
+          - checkbox "选择 run 最新运行 · 待证据"
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 14:50:45"
+  - generic: Page 1 / 1 · 8 rows on this page
+  - button "上一页" [disabled]
+  - button "下一页" [disabled]

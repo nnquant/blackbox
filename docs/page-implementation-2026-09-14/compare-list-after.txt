@@ -1,0 +1,111 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+  - generic: 对比
+  - heading "对比工作台" [level=1]
+  - paragraph: 按项目和研究阶段管理保存的对比集合，再进入具体对比结果。
+  - button "新建对比"
+  - generic: 对比集
+  - generic "1":
+    - generic: "1"
+  - generic: 项目
+  - generic "1":
+    - generic: "1"
+  - generic: 研究线
+  - generic "1":
+    - generic: "1"
+  - generic: Run References
+  - generic "3":
+    - generic: "3"
+  - heading "项目 / 阶段对比表" [level=2]
+  - text: 项目
+  - combobox "项目":
+    - option "全部项目" [selected]
+    - option "页面验收 · 量化研究"
+  - text: 研究线
+  - combobox "研究线":
+    - option "全部研究" [selected]
+    - option "期权风险溢价研究"
+  - text: 搜索
+  - textbox "搜索":
+    - /placeholder: 项目、研究、阶段、对比名称、指标
+  - generic: 1 / 1 shown
+  - table:
+    - rowgroup:
+      - row "Compare Set Project Research / 阶段 Runs 模板 Created Action":
+        - columnheader "Compare Set"
+        - columnheader "Project"
+        - columnheader "Research / 阶段"
+        - columnheader "Runs"
+        - columnheader "模板"
+        - columnheader "Created"
+        - columnheader "Action"
+    - rowgroup:
+      - row "费用与样本敏感性对比 3 个 Run · 未标注阶段 页面验收 · 量化研究 page-review 期权风险溢价研究 未标注阶段 3 3 metrics / 1 series 2026/9/14 14:50:45 打开":
+        - cell "费用与样本敏感性对比 3 个 Run · 未标注阶段":
+          - button "费用与样本敏感性对比"
+          - generic: 3 个 Run · 未标注阶段
+        - cell "页面验收 · 量化研究 page-review":
+          - button "页面验收 · 量化研究"
+          - generic: page-review
+        - cell "期权风险溢价研究 未标注阶段":
+          - button "期权风险溢价研究"
+          - generic: 未标注阶段
+        - cell "3"
+        - cell "3 metrics / 1 series"
+        - cell "2026/9/14 14:50:45"
+        - cell "打开":
+          - button "打开":
+            - text: 打开

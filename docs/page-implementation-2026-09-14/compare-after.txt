@@ -1,0 +1,341 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+    - generic: /
+    - button "期权风险溢价研究"
+    - generic: /
+    - button "费用与样本敏感性对比"
+  - generic: 对比
+  - heading "策略结果对比" [level=1]
+  - paragraph: 费用与样本敏感性对比
+  - button "返回对比列表":
+    - text: 返回对比列表
+  - text: 比较基准（仅影响本页差值）
+  - combobox "比较基准（仅影响本页差值）":
+    - option "人工基准 · 费用 10bps" [selected]
+    - option "最高指标 · 不同样本"
+    - option "零值指标"
+  - paragraph: 默认：人工基准。不会修改研究地图基准或研究评审结论。
+  - heading "比较口径与未校验项" [level=2]
+  - paragraph: 保留跨样本、跨费用比较；差异不自动判定优劣。以下按已记录字段识别，未知字段请核对完整配置；数值保持原始单位，不自动换算百分比、费率或币种。
+  - generic "样本 / 时间窗 · 存在差异"
+  - table:
+    - rowgroup:
+      - row "记录字段 最高指标 · 不同样本 人工基准 · 费用 10bps 零值指标":
+        - columnheader "记录字段"
+        - columnheader "最高指标 · 不同样本"
+        - columnheader "人工基准 · 费用 10bps"
+        - columnheader "零值指标"
+    - rowgroup:
+      - row "config.end_date \"2025-12-31\" \"2025-12-31\" \"2025-12-31\"":
+        - rowheader "config.end_date"
+        - cell "\"2025-12-31\""
+        - cell "\"2025-12-31\""
+        - cell "\"2025-12-31\""
+      - row "config.start_date \"2024-01-01\" \"2023-01-01\" \"2023-01-01\"":
+        - rowheader "config.start_date"
+        - cell "\"2024-01-01\""
+        - cell "\"2023-01-01\""
+        - cell "\"2023-01-01\""
+      - row "context.sample \"valid\" \"train\" \"train\"":
+        - rowheader "context.sample"
+        - cell "\"valid\""
+        - cell "\"train\""
+        - cell "\"train\""
+  - generic "费用 / 滑点 · 存在差异"
+  - table:
+    - rowgroup:
+      - row "记录字段 最高指标 · 不同样本 人工基准 · 费用 10bps 零值指标":
+        - columnheader "记录字段"
+        - columnheader "最高指标 · 不同样本"
+        - columnheader "人工基准 · 费用 10bps"
+        - columnheader "零值指标"
+    - rowgroup:
+      - row "config.fee_bps 0 10 10":
+        - rowheader "config.fee_bps"
+        - cell "0"
+        - cell "10"
+        - cell "10"
+  - generic "资产 / 数据 / 单位 · 已记录字段一致 · 未校验业务等价性"
+  - generic: 决策摘要
+  - generic: 数值排名仅在当前比较范围内成立；采纳与否以研究评审记录为准。
+  - generic: 已生成对比 · 研究结论待评审
+  - generic: 模板
+  - generic "绩效对比":
+    - generic: 绩效对比
+  - generic: Run
+  - generic "3":
+    - generic: "3"
+  - generic: 基准
+  - generic "人工基准 · 费用 10bps":
+    - generic: 人工基准 · 费用 10bps
+  - generic: 领先候选
+  - generic "最高指标 · 不同样本 / 1.56":
+    - generic: 最高指标 · 不同样本 / 1.56
+  - generic: 主指标
+  - generic "sharpe":
+    - generic: sharpe
+  - generic: 回撤最优
+  - generic "最高指标 · 不同样本 / -0.90":
+    - generic: 最高指标 · 不同样本 / -0.90
+  - generic: 序列
+  - generic "1 组 / 3 runs":
+    - generic: 1 组 / 3 runs
+  - generic: 指标覆盖
+  - generic "9/9":
+    - generic: 9/9
+  - generic: 建议
+  - generic: 最高指标 · 不同样本 是当前主指标领先候选，相对基准提升 +0.78，该候选 max_drawdown=-0.90；风险最优为 最高指标 · 不同样本。建议围绕成本、OOS 和异常诊断再做 promote / iterate 决策。
+  - heading "关键指标表" [level=2]
+  - table:
+    - rowgroup:
+      - row "指标 最高指标 · 不同样本 人工基准 · 费用 10bps (基准) 零值指标":
+        - columnheader "指标"
+        - columnheader "最高指标 · 不同样本"
+        - columnheader "人工基准 · 费用 10bps (基准)"
+        - columnheader "零值指标"
+    - rowgroup:
+      - row "sharpe 无量纲比值 1.56 +0.78 / +100.00% 0.78 0.00 -0.78 / -100.00%":
+        - cell "sharpe 无量纲比值":
+          - text: sharpe
+          - generic: 无量纲比值
+        - cell "1.56 +0.78 / +100.00%":
+          - generic: "1.56"
+          - generic: +0.78 / +100.00%
+        - cell "0.78":
+          - generic: "0.78"
+        - cell "0.00 -0.78 / -100.00%":
+          - generic: "0.00"
+          - generic: "-0.78 / -100.00%"
+      - row "annual_return 单位：% · 差值：百分点 27.04 +15.03 / +125.19% 12.01 -1.25 -13.26 / -110.43%":
+        - cell "annual_return 单位：% · 差值：百分点":
+          - text: annual_return
+          - generic: 单位：% · 差值：百分点
+        - cell "27.04 +15.03 / +125.19%":
+          - generic: "27.04"
+          - generic: +15.03 / +125.19%
+        - cell "12.01":
+          - generic: "12.01"
+        - cell "-1.25 -13.26 / -110.43%":
+          - generic: "-1.25"
+          - generic: "-13.26 / -110.43%"
+      - row "max_drawdown 单位：% · 差值：百分点 -0.90 +0.05 / +5.26% -0.95 -1.13 -0.18 / -18.80%":
+        - cell "max_drawdown 单位：% · 差值：百分点":
+          - text: max_drawdown
+          - generic: 单位：% · 差值：百分点
+        - cell "-0.90 +0.05 / +5.26%":
+          - generic: "-0.90"
+          - generic: +0.05 / +5.26%
+        - cell "-0.95":
+          - generic: "-0.95"
+        - cell "-1.13 -0.18 / -18.80%":
+          - generic: "-1.13"
+          - generic: "-0.18 / -18.80%"
+  - heading "配置差异" [level=2]
+  - table:
+    - rowgroup:
+      - row "路径 最高指标 · 不同样本 人工基准 · 费用 10bps 零值指标":
+        - columnheader "路径"
+        - columnheader "最高指标 · 不同样本"
+        - columnheader "人工基准 · 费用 10bps"
+        - columnheader "零值指标"
+    - rowgroup:
+      - row "enabled false true true":
+        - cell "enabled"
+        - cell "false"
+        - cell "true"
+        - cell "true"
+      - row "fee_bps 0 10 10":
+        - cell "fee_bps"
+        - cell "0"
+        - cell "10"
+        - cell "10"
+      - row "lookback 21 20 22":
+        - cell "lookback"
+        - cell "21"
+        - cell "20"
+        - cell "22"
+      - row "start_date 2024-01-01 2023-01-01 2023-01-01":
+        - cell "start_date"
+        - cell "2024-01-01"
+        - cell "2023-01-01"
+        - cell "2023-01-01"
+  - button "对比诊断 1 WARNING":
+    - generic: 对比诊断
+    - generic: 1 WARNING
+  - heading "曲线对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 序列 模式 行数 值":
+        - columnheader "Run"
+        - columnheader "序列"
+        - columnheader "模式"
+        - columnheader "行数"
+        - columnheader "值"
+    - rowgroup:
+      - row "人工基准 · 费用 10bps returns_series period_return 28 series_values":
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "returns_series"
+        - cell "period_return"
+        - cell "28"
+        - cell "series_values"
+      - row "最高指标 · 不同样本 returns_series period_return 28 series_values":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "returns_series"
+        - cell "period_return"
+        - cell "28"
+        - cell "series_values"
+      - row "零值指标 returns_series period_return 28 series_values":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "returns_series"
+        - cell "period_return"
+        - cell "28"
+        - cell "series_values"
+  - heading "回撤对比" [level=2]
+  - generic: 暂无回撤序列数据
+  - heading "收益风险散点" [level=2]
+  - button "最高指标 · 不同样本 1.56 / 27.04":
+    - generic: 最高指标 · 不同样本
+    - generic: 1.56 / 27.04
+  - button "人工基准 · 费用 10bps 0.78 / 12.01":
+    - generic: 人工基准 · 费用 10bps
+    - generic: 0.78 / 12.01
+  - button "零值指标 0.00 / -1.25":
+    - generic: 零值指标
+    - generic: 0.00 / -1.25
+  - heading "参与对比的 Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究线 / 研究分支 状态 创建者 Sharpe 最大回撤 IC 均值 耗时 配置 产物 更新时间":
+        - columnheader "Run"
+        - columnheader "研究线 / 研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "最大回撤"
+        - columnheader "IC 均值"
+        - columnheader "耗时"
+        - columnheader "配置"
+        - columnheader "产物"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "零值指标 options baseline 已完成 human 0.00 -1.13 -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.00"
+        - cell "-1.13"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "最高指标 · 不同样本 options baseline 已完成 human 1.56 -0.90 -- 0s start_date=2024-01-01, end_date=2025-12-31, fee_bps=0 table_csv · 2 2026/9/14 14:56:51":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "1.56"
+        - cell "-0.90"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2024-01-01, end_date=2025-12-31, fee_bps=0":
+          - generic: start_date=2024-01-01, end_date=2025-12-31, fee_bps=0
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+      - row "人工基准 · 费用 10bps options baseline 已完成 human 0.78 -0.95 -- 0s start_date=2023-01-01, end_date=2025-12-31, fee_bps=10 table_csv · 2 2026/9/14 14:56:51":
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "options baseline":
+          - generic: options
+          - button "baseline"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.78"
+        - cell "-0.95"
+        - cell "--"
+        - cell "0s"
+        - cell "start_date=2023-01-01, end_date=2025-12-31, fee_bps=10":
+          - generic: start_date=2023-01-01, end_date=2025-12-31, fee_bps=10
+        - cell "table_csv · 2":
+          - generic: table_csv · 2
+        - cell "2026/9/14 14:56:51"
+  - generic "对比设置与保存":
+    - generic: 对比设置与保存
+  - option "全部项目" [selected]
+  - option "page-review"
+  - option "全部状态" [selected]
+  - option "已完成"
+  - option "运行中"
+  - generic "高级诊断与原始明细":
+    - generic: 高级诊断与原始明细

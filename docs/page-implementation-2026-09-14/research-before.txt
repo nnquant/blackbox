@@ -1,0 +1,503 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为深色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ 页面验收 · 量化研究 8":
+      - text: ▾
+      - generic: 页面验收 · 量化研究
+      - generic: "8"
+    - button "备选线索 · 稳健性 0":
+      - generic: 备选线索 · 稳健性
+      - generic: "0"
+    - button "备选线索 · 尾部风险 0":
+      - generic: 备选线索 · 尾部风险
+      - generic: "0"
+    - button "备选线索 · 流动性 0":
+      - generic: 备选线索 · 流动性
+      - generic: "0"
+    - button "期权风险溢价研究 8":
+      - generic: 期权风险溢价研究
+      - generic: "8"
+    - button "baseline 8":
+      - generic: baseline
+      - generic: "8"
+  - generic: 研究地图
+  - list:
+    - button "期权研究地图 · 页面验收 5":
+      - generic: 期权研究地图 · 页面验收
+      - generic: "5"
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "页面验收 · 量化研究"
+    - generic: /
+    - button "期权风险溢价研究"
+  - generic: Project / page-review
+  - heading "期权风险溢价研究" [level=1]
+  - paragraph: 比较费用敏感性与样本稳定性，保留完整研究证据
+  - generic: 状态
+  - generic "active":
+    - generic: active
+  - generic: 研究分支
+  - generic "1":
+    - generic: "1"
+  - generic: 已完成 Run
+  - generic "4":
+    - generic: "4"
+  - generic: 运行中
+  - generic "4":
+    - generic: "4"
+  - generic: 失败
+  - generic "0":
+    - generic: "0"
+  - generic: 最新 Run
+  - generic "状态验收 · 完成":
+    - generic: 状态验收 · 完成
+  - generic: 研究地图
+  - generic: 期权研究地图 · 页面验收
+  - searchbox "搜索节点…"
+  - group "卡片密度":
+    - button "简洁"
+    - button "带指标"
+  - button "只看主线"
+  - button "全部展开"
+  - button "适应窗口":
+    - text: 适应窗口
+  - button "全屏":
+    - text: 全屏
+  - button "完整地图页 →"
+  - img "研究分支树":
+    - button "跨样本候选":
+      - generic: 跨样本候选
+      - generic: 实验
+      - generic: "1.56"
+      - generic: Sharpe
+    - button "零指标证据":
+      - generic: 零指标证据
+      - generic: 实验
+      - generic: "0.00"
+      - generic: Sharpe
+    - button "人工基准":
+      - generic: ★ 人工基准
+      - generic: 实验
+      - generic: "0.78"
+      - generic: Sharpe
+      - generic: −
+    - button "待验证思路":
+      - generic: 待验证思路
+      - generic: 假设
+    - button "研究命题":
+      - generic: 研究命题
+      - generic: 假设
+      - generic: −
+  - complementary:
+    - tablist:
+      - tab "总览" [selected]
+      - tab "节点 人工基准":
+        - text: 节点
+        - generic: 人工基准
+    - heading "期权研究地图 · 页面验收" [level=2]
+    - term: 项目
+    - definition:
+      - button "page-review"
+    - term: 研究线
+    - definition:
+      - button "options"
+    - term: 节点
+    - definition: 5 · 5 个未决
+    - term: 主线
+    - definition: 2 · 由根到基准自动派生
+    - term: 主指标
+    - definition: Sharpe
+    - term: 更新时间
+    - definition: 8 小时前 · 2026-09-14 06:50
+    - term: 键
+    - definition: options-tree
+    - heading "当前基准" [level=4]
+    - button "★ 人工基准 年化12.01% Sharpe0.78 最大回撤-0.95% Calmar12.64 质量门警告":
+      - generic: ★ 人工基准
+      - generic: 年化12.01%
+      - generic: Sharpe0.78
+      - generic: 最大回撤-0.95%
+      - generic: Calmar12.64
+      - generic: 质量门警告
+    - heading "去向 点击过滤" [level=4]:
+      - text: 去向
+      - generic: 点击过滤
+    - button "进行中 5" [pressed]:
+      - text: 进行中
+      - generic: "5"
+    - button "采纳 0" [pressed]:
+      - text: 采纳
+      - generic: "0"
+    - button "保留 0" [pressed]:
+      - text: 保留
+      - generic: "0"
+    - button "终止 0" [pressed]:
+      - text: 终止
+      - generic: "0"
+    - heading "阶段" [level=4]
+    - button "假设 2" [pressed]:
+      - text: 假设
+      - generic: "2"
+    - button "实验 3" [pressed]:
+      - text: 实验
+      - generic: "3"
+    - heading "需要关注" [level=4]
+    - list:
+      - generic: 结果已到未写结论
+      - button "人工基准"
+      - button "跨样本候选"
+      - button "零指标证据"
+    - heading "最近更新" [level=4]
+    - list:
+      - button "待验证思路"
+      - generic: 8 小时前 · human
+      - button "零指标证据"
+      - generic: 8 小时前 · human
+      - button "跨样本候选"
+      - generic: 8 小时前 · human
+      - button "人工基准"
+      - generic: 8 小时前 · human
+    - paragraph: 由研究 agent 通过 bbox map 维护；WebUI 只读。
+  - heading "Research Review" [level=2]
+  - button "Save candidate set":
+    - text: Save candidate set
+  - generic: State
+  - generic "活跃":
+    - generic: 活跃
+  - generic: Candidates
+  - generic "4":
+    - generic: "4"
+  - generic: 对比集
+  - generic "1":
+    - generic: "1"
+  - generic: Decision Notes
+  - generic "0":
+    - generic: "0"
+  - generic: Archive Queue
+  - generic "0":
+    - generic: "0"
+  - generic: 下一页
+  - generic "monitor_running_runs, write_decision_note":
+    - generic: monitor_running_runs, write_decision_note
+    - button "展开"
+  - generic: Candidate Set
+  - table:
+    - rowgroup:
+      - row "Run Branch Metric Compared Updated":
+        - columnheader "Run"
+        - columnheader "Branch"
+        - columnheader "Metric"
+        - columnheader "Compared"
+        - columnheader "Updated"
+    - rowgroup:
+      - row "最高指标 · 不同样本 baseline 1.56 yes 2026/9/14 14:56:51":
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "baseline":
+          - button "baseline"
+        - cell "1.56"
+        - cell "yes"
+        - cell "2026/9/14 14:56:51"
+      - row "人工基准 · 费用 10bps baseline 0.78 yes 2026/9/14 14:56:51":
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "baseline":
+          - button "baseline"
+        - cell "0.78"
+        - cell "yes"
+        - cell "2026/9/14 14:56:51"
+      - row "零值指标 baseline 0.00 yes 2026/9/14 14:56:51":
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "baseline":
+          - button "baseline"
+        - cell "0.00"
+        - cell "yes"
+        - cell "2026/9/14 14:56:51"
+      - row "负值指标 baseline -0.78 no 2026/9/14 14:56:51":
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "baseline":
+          - button "baseline"
+        - cell "-0.78"
+        - cell "no"
+        - cell "2026/9/14 14:56:51"
+  - generic: Archive Queue
+  - table:
+    - rowgroup:
+      - row "Branch Status Runs Reason Latest":
+        - columnheader "Branch"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Reason"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "No archive candidates.":
+        - cell "No archive candidates."
+  - generic: Compare Sets
+  - button "费用与样本敏感性对比 3 runs":
+    - generic: 费用与样本敏感性对比
+    - generic: 3 runs
+  - generic: Decision Notes
+  - generic: No decision notes yet.
+  - heading "研究分支" [level=2]
+  - button "Batch Status":
+    - text: Batch Status
+  - generic: 0 selected · target archived
+  - generic: 批量状态
+  - generic "0 selected · target archived":
+    - generic: 0 selected · target archived
+  - table:
+    - rowgroup:
+      - row "使用 研究分支 状态 原因 Run 地图节点 更新时间":
+        - columnheader "使用"
+        - columnheader "研究分支"
+        - columnheader "状态"
+        - columnheader "原因"
+        - columnheader "Run"
+        - columnheader "地图节点"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "波动率过滤 · 基准思路 活跃 -- 8 实验 人工基准 +2 定位 2026/9/14 14:50:44":
+        - cell:
+          - checkbox
+        - cell "波动率过滤 · 基准思路"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "--"
+        - cell "8"
+        - cell "实验 人工基准 +2 定位":
+          - generic: 实验
+          - generic: 人工基准
+          - generic: "+2"
+          - button "定位"
+        - cell "2026/9/14 14:50:44"
+  - heading "最近 Run" [level=2]
+  - generic: 8 runs
+  - table:
+    - rowgroup:
+      - row "研究分支 Run 状态 创建者 Sharpe 地图节点 耗时 更新时间":
+        - columnheader "研究分支"
+        - columnheader "Run"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "地图节点"
+        - columnheader "耗时"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "baseline 状态验收 · 完成 运行中 human 0.62 — 6m 2026/9/14 14:56:51":
+        - cell "baseline":
+          - button "baseline"
+        - cell "状态验收 · 完成":
+          - button "状态验收 · 完成"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "0.62"
+        - cell "—"
+        - cell "6m"
+        - cell "2026/9/14 14:56:51"
+      - row "baseline 负值指标 已完成 human -0.78 — 0s 2026/9/14 14:56:51":
+        - cell "baseline":
+          - button "baseline"
+        - cell "负值指标":
+          - button "负值指标"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "-0.78"
+        - cell "—"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "baseline 零值指标 已完成 human 0.00 实验 零指标证据 定位 0s 2026/9/14 14:56:51":
+        - cell "baseline":
+          - button "baseline"
+        - cell "零值指标":
+          - button "零值指标"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.00"
+        - cell "实验 零指标证据 定位":
+          - generic: 实验
+          - generic: 零指标证据
+          - button "定位"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "baseline 最高指标 · 不同样本 已完成 human 1.56 实验 跨样本候选 定位 0s 2026/9/14 14:56:51":
+        - cell "baseline":
+          - button "baseline"
+        - cell "最高指标 · 不同样本":
+          - button "最高指标 · 不同样本"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "1.56"
+        - cell "实验 跨样本候选 定位":
+          - generic: 实验
+          - generic: 跨样本候选
+          - button "定位"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "baseline 人工基准 · 费用 10bps 已完成 human 0.78 实验 人工基准 定位 0s 2026/9/14 14:56:51":
+        - cell "baseline":
+          - button "baseline"
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "human"
+        - cell "0.78"
+        - cell "实验 人工基准 定位":
+          - generic: 实验
+          - generic: 人工基准
+          - button "定位"
+        - cell "0s"
+        - cell "2026/9/14 14:56:51"
+      - row "baseline 状态验收 · 取消 运行中 human -- — 0s 2026/9/14 14:50:45":
+        - cell "baseline":
+          - button "baseline"
+        - cell "状态验收 · 取消":
+          - button "状态验收 · 取消"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "—"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+      - row "baseline 状态验收 · 失败 运行中 human -- — 0s 2026/9/14 14:50:45":
+        - cell "baseline":
+          - button "baseline"
+        - cell "状态验收 · 失败":
+          - button "状态验收 · 失败"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "—"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+      - row "baseline 最新运行 · 待证据 运行中 human -- — 0s 2026/9/14 14:50:45":
+        - cell "baseline":
+          - button "baseline"
+        - cell "最新运行 · 待证据":
+          - button "最新运行 · 待证据"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "human"
+        - cell "--"
+        - cell "—"
+        - cell "0s"
+        - cell "2026/9/14 14:50:45"
+  - heading "对比集" [level=2]
+  - generic: 1 sets
+  - table:
+    - rowgroup:
+      - row "名称 Run Layout 创建时间 Action":
+        - columnheader "名称"
+        - columnheader "Run"
+        - columnheader "Layout"
+        - columnheader "创建时间"
+        - columnheader "Action"
+    - rowgroup:
+      - row "费用与样本敏感性对比 cmp_mu0vw32x_a6714f0e99 3 3 metrics / 1 series 2026/9/14 14:50:45 打开":
+        - cell "费用与样本敏感性对比 cmp_mu0vw32x_a6714f0e99":
+          - button "费用与样本敏感性对比"
+          - generic: cmp_mu0vw32x_a6714f0e99
+        - cell "3"
+        - cell "3 metrics / 1 series"
+        - cell "2026/9/14 14:50:45"
+        - cell "打开":
+          - button "打开"
+  - heading "对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Toggle all compare series 目标 ↕ Run ↕ annual return ↕ annual volatility ↕ max drawdown ↕ sharpe ↕ sortino ↕ calmar ↕ turnover ↕":
+        - columnheader "Toggle all compare series":
+          - checkbox "Toggle all compare series" [checked]
+        - columnheader "目标 ↕":
+          - button "目标 ↕":
+            - generic: 目标
+            - generic: ↕
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "annual return ↕":
+          - button "annual return ↕":
+            - generic: annual return
+            - generic: ↕
+        - columnheader "annual volatility ↕":
+          - button "annual volatility ↕":
+            - generic: annual volatility
+            - generic: ↕
+        - columnheader "max drawdown ↕":
+          - button "max drawdown ↕":
+            - generic: max drawdown
+            - generic: ↕
+        - columnheader "sharpe ↕":
+          - button "sharpe ↕":
+            - generic: sharpe
+            - generic: ↕
+        - columnheader "sortino ↕":
+          - button "sortino ↕":
+            - generic: sortino
+            - generic: ↕
+        - columnheader "calmar ↕":
+          - button "calmar ↕":
+            - generic: calmar
+            - generic: ↕
+        - columnheader "turnover ↕":
+          - button "turnover ↕":
+            - generic: turnover
+            - generic: ↕
+    - rowgroup:
+      - row "Toggle 波动率过滤 · 基准思路 波动率过滤 · 基准思路 branch 人工基准 · 费用 10bps 12.01% 16.17% -0.95% 0.78 1.18 12.64 2.00":
+        - cell "Toggle 波动率过滤 · 基准思路":
+          - checkbox "Toggle 波动率过滤 · 基准思路" [checked]
+        - cell "波动率过滤 · 基准思路 branch":
+          - generic: 波动率过滤 · 基准思路
+          - generic: branch
+        - cell "人工基准 · 费用 10bps":
+          - button "人工基准 · 费用 10bps"
+        - cell "12.01%"
+        - cell "16.17%"
+        - cell "-0.95%"
+        - cell "0.78"
+        - cell "1.18"
+        - cell "12.64"
+        - cell "2.00"
+  - generic "Lineage and Activity":
+    - generic: Lineage and Activity
