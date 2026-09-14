@@ -602,16 +602,16 @@ table td button {
 .side-h button:hover { color: var(--ink); }
 .side-tree { list-style: none; margin: 8px 0 12px; padding: 0; }
 .side-tree > li + li { margin-top: 4px; }
-.side-tree .row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; font-size: 15px; line-height: 24px; cursor: pointer; color: var(--subtle); text-align: left; width: 100%; border: 0; background: none; min-width: 0; }
+.side-tree .row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; font-size: 13px; line-height: 24px; cursor: pointer; color: var(--subtle); text-align: left; width: 100%; border: 0; background: none; min-width: 0; }
 .side-tree .row:hover { background: var(--surface2); color: var(--ink); }
 .side-tree .row.on { color: var(--c, var(--accent)); background: color-mix(in srgb, var(--c, var(--accent)) 14%, transparent); }
 .side-tree .row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--accent)); flex: none; }
 .side-tree .row .lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.side-tree .row .n { margin-left: auto; color: var(--muted); font-size: 15px; font-family: var(--mono); flex: none; }
+.side-tree .row .n { margin-left: auto; color: var(--muted); font-size: 13px; font-family: var(--mono); flex: none; }
 .side-tree .row.lv1 { font-weight: 400; color: var(--ink); }
 .side-tree .row.lv2 { padding-left: 24px; }
 .side-tree .row.lv3 { padding-left: 40px; }
-.side-tree .empty { padding: 8px 12px 8px 24px; font-size: 15px; color: var(--muted); }
+.side-tree .empty { padding: 8px 12px 8px 24px; font-size: 13px; color: var(--muted); }
 
 /* Query controls keep the primary task visible across viewport sizes. */
 .page-tabs { display:flex; flex-wrap:wrap; gap:4px; padding:10px; border-bottom:1px solid rgb(var(--c-line)); }
