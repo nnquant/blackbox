@@ -58,7 +58,8 @@ applyTheme(readTheme());
 // Theme colours for ECharts (which needs concrete values). Read at render time so a theme switch re-renders correctly.
 function tone(name) {
   const value = getComputedStyle(document.documentElement).getPropertyValue(`--c-${name}`).trim();
-  return value ? `rgb(${value})` : '#888';
+  // zrender's emphasis colour parser requires comma-separated RGB channels.
+  return value ? `rgb(${value.split(/\s+/).join(', ')})` : '#888';
 }
 
 const navItems = [
