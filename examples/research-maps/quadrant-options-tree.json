@@ -1,0 +1,995 @@
+{
+  "project": "quadrant-lab",
+  "research": "quadrant-options",
+  "key": "quadrant-options-tree",
+  "title": "象限期权研究树",
+  "subtitle": "估值-波动率象限 × 期权表达 · 整理至 2026-09-07",
+  "description": "示例研究地图：从老海龟 CTA 生产系统出发，经执行层改造、状态漂移研究，转向期权表达，直到用户选定 HOLD 作为后续 S2 期权研究的比较基准。结构与叙事由研究 agent 手动维护；指标等证据来自绑定的 run。",
+  "status": "active",
+  "baseline": "hold",
+  "primary_metric": "strategy.summary.sharpe",
+  "settings": {
+    "collapsed": [
+      "exec",
+      "drift"
+    ]
+  },
+  "nodes": [
+    {
+      "key": "root",
+      "title": "老海龟 CTA",
+      "stage": "live",
+      "decision": "accepted",
+      "full_title": "老海龟 CTA：高估低波状态池 + HH120 入场 + 金字塔 + LL60 出场",
+      "date_label": "服役中",
+      "hypothesis": "生产系统。买入理由是低波动支撑的高估延续，趋势成熟伴随波动膨胀；波动结构变化等于持有理由消失。",
+      "change": [
+        "状态池：估值分位 > 0.5 且期权 IV 分位 < 0.5（高估低波）",
+        "入场：HH120 突破，次 bar 开盘",
+        "加仓：池内每 0.5 ATR 加一层，最多 4 层；转高估高波后不再加仓但不平仓",
+        "出场：LL60 破位",
+        "仓位：风险资本 × 1% ÷ (ATR20 × 乘数) 取整；风险资本 = 权益 − max(浮盈, 0)"
+      ],
+      "reading": [
+        "加仓层利润占比：约 50%（4 层满仓 100% 胜）",
+        "大赢家回吐：中位 53.6% 峰值利润",
+        "组合池均品种数：约 1.9 个"
+      ],
+      "verdict": "继续服役。2026-08-22 统一图景：状态池 = alpha 源，HH120 = 参与开关，金字塔 = 凸性放大器。",
+      "refs": [
+        {
+          "kind": "file",
+          "id": "scripts/backtest_commodity_cta.py"
+        },
+        {
+          "kind": "file",
+          "id": "docs/cta_quadrant_daily_runbook.md"
+        }
+      ],
+      "children": [
+        {
+          "key": "exec",
+          "title": "执行层改造",
+          "stage": "experiment",
+          "decision": "rejected",
+          "full_title": "CTA v2 Phase 1 / 1c：执行层择时改造",
+          "date_label": "08-18 → 08-20",
+          "hypothesis": "用多信号评分、入场闸门、出场矩阵改造海龟执行层。",
+          "change": [
+            "连续评分 + 波动率目标仓位（15 变体）",
+            "入场闸门 composite ≥ θ，θ ∈ {0.1,0.2,0.3}",
+            "出场矩阵 8 变体：棘轮 / 波动收紧 / 通道 / 亏损帽"
+          ],
+          "reading": [
+            "连续评分 Sharpe：0.83 vs 海龟 0.85，Calmar 劣",
+            "入场闸门：θ 三点单调恶化，2024 拦掉 88% 早期入场",
+            "出场矩阵：0/8 过家族一致性"
+          ],
+          "verdict": "三族全部归档。教训：日频动量是慢变量，接到仓位或入场决策上都会卖掉右尾；信号预测期限必须与决策边际的时间尺度匹配。",
+          "refs": [
+            {
+              "kind": "file",
+              "id": "docs/cta_v2_reports/final_verdict.md"
+            },
+            {
+              "kind": "file",
+              "id": "docs/cta_v2_reports/phase1_experience.md"
+            }
+          ],
+          "children": [
+            {
+              "key": "exec1",
+              "title": "连续评分 + 波动率目标",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "08-18",
+              "hypothesis": "多信号连续评分接到仓位。",
+              "reading": [
+                "dev Sharpe / Calmar：0.83 / 0.65 vs 0.85 / 1.01"
+              ],
+              "verdict": "归档：凹性执行卖掉右尾。"
+            },
+            {
+              "key": "exec2",
+              "title": "入场信号闸门 θ",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "08-19",
+              "hypothesis": "只放行评分高的突破。",
+              "reading": [
+                "θ=0.1/0.2/0.3：单调恶化"
+              ],
+              "verdict": "归档：慢信号挡早入场。sig_don 负 IC 封存，禁反号。"
+            },
+            {
+              "key": "exec3",
+              "title": "出场矩阵 8 变体",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "08-20",
+              "hypothesis": "棘轮 / 波动膨胀收紧 / 通道切换 / 亏损帽。",
+              "reading": [
+                "过家族一致性：0 / 8"
+              ],
+              "verdict": "归档：在已测范围内 LL60 无更稳健替代。"
+            }
+          ]
+        },
+        {
+          "key": "drift",
+          "title": "状态漂移研究",
+          "stage": "experiment",
+          "decision": "kept",
+          "full_title": "high-low 状态漂移研究（修复面板）",
+          "date_label": "08-21 → 08-27",
+          "hypothesis": "alpha 到底在哪：HH120 时点、状态本身、还是参与开关？",
+          "change": [
+            "修复面板 trading_date_fixed（修掉周六缺失与当日 ATR 泄漏），旧面板数字作废"
+          ],
+          "reading": [
+            "HH120 持有期：N=11 冻结；状态内随机时点对照无增量（−24.5bp）",
+            "状态首日买入：2025 Sharpe 2.12，2026 −0.33；5 种确认规则 0/5",
+            "P0 归因：2026 差异 92.1% 来自参与开关；alpha +4.7bp/日区间含 0"
+          ],
+          "verdict": "支撑转向：alpha 是状态内 10-20 日慢漂移，不在执行层择时。P1 门控与 P2 分批退出随后归档。",
+          "refs": [
+            {
+              "kind": "file",
+              "id": "research/superquants/experiments/2026-08-21-high-low-hh120-holding-decay-baseline.md"
+            },
+            {
+              "kind": "file",
+              "id": "research/superquants/reviews/2026-08-23-high-low-drift-exposure-attribution-review-memo.md"
+            }
+          ],
+          "children": [
+            {
+              "key": "p1",
+              "title": "P1 漂移健康度门控",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "08-23",
+              "hypothesis": "X/Y 参数门控参与。",
+              "reading": [
+                "Stage A 9 点：3/9 个体过线，0/9 邻域稳定"
+              ],
+              "verdict": "归档：参数邻域不稳定；禁止在 X=5–10 之间加点复活。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/archive/INDEX.md"
+                }
+              ]
+            },
+            {
+              "key": "p2",
+              "title": "P2 7/11 分批退出 + 2ATR 止损",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "08-27",
+              "hypothesis": "时间分散退出与灾难止损。",
+              "reading": [
+                "B1 分批：年化 27.54% → 23.53%",
+                "B2 加止损：MDD −13.4% → −9.1%，Sharpe 仅 +0.088，bootstrap 79.7% 未过 80%"
+              ],
+              "verdict": "归档：分批卖掉右尾；止损改善主要来自释放仓位后的再入场，不是纯止损 alpha。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reviews/2026-08-27-high-low-hh120-staged-exit-stop-review-memo.md"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "opt",
+          "title": "转向期权表达",
+          "stage": "hypothesis",
+          "decision": "accepted",
+          "full_title": "既有研究复盘与期权研究起点",
+          "date_label": "09-05",
+          "hypothesis": "同一个高估低波机会，用期权表达是否值得付出这笔权利金？先测表达价值，再决定是否改写引擎。",
+          "change": [
+            "先证明收益来自哪里，再优化如何交易",
+            "期权对期货比较必须写明 delta 口径",
+            "IV−RV 的 0.43 IC 是共享 −RV_t 项造成的混淆，不能当作买波证据"
+          ],
+          "verdict": "复盘接受；方向：先买 Call（与保留右尾目标一致），不预设价差；双买需独立波动率证据。",
+          "refs": [
+            {
+              "kind": "file",
+              "id": "research/reviews/2026-09-05-research-retrospective-and-options-roadmap.md"
+            }
+          ],
+          "children": [
+            {
+              "key": "hb",
+              "title": "高位整理二次启动初筛",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "09-05",
+              "hypothesis": "前 10 日涨 ≥2ATR + 3 日窄幅整理后再启动，配期权价差。",
+              "reading": [
+                "Call / 牛 Call / 牛 Put（53 组）：−0.001 / −0.076 / −0.061 R"
+              ],
+              "verdict": "DROP。用户随后纠正：高位横住就是现有高估低波，不另加形态。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-05-high-base-options-pilot-result-report.md"
+                }
+              ]
+            },
+            {
+              "key": "hhexp",
+              "title": "HH120 期权表达",
+              "stage": "experiment",
+              "decision": "rejected",
+              "date_label": "09-05",
+              "hypothesis": "原 HH120 触发改用 Call / 牛 Call / 牛 Put。",
+              "reading": [
+                "Call 5 日经济预算收益：+10.93%，区间跨零",
+                "1.5ATR 牛 Call：−7.47%"
+              ],
+              "verdict": "隔离：单腿 Call 保留为基准，价差封顶砍掉右尾。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-05-hh120-option-expression-result-report.md"
+                }
+              ]
+            },
+            {
+              "key": "life",
+              "title": "完整持仓决策点账本",
+              "stage": "validation",
+              "decision": "kept",
+              "date_label": "09-05",
+              "hypothesis": "原持仓中底仓、加仓层、状态转换各贡献多少？",
+              "reading": [
+                "加仓层净现金占比：50.3%",
+                "转高波阶段占比：48.7%"
+              ],
+              "verdict": "GRADUATE-TO-DESIGN：动态转换、卖 Put、保护价差尚无绩效结果。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-05-hh120-lifecycle-options-result-report.md"
+                },
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-05-hh120-continuous-options-result-report.md"
+                }
+              ]
+            },
+            {
+              "key": "v5",
+              "title": "无条件期权库 V1→V5",
+              "stage": "experiment",
+              "decision": "kept",
+              "full_title": "无条件期权策略库：23 市场 × 52 结构，V5 账本基准",
+              "date_label": "09-05 → 09-06",
+              "hypothesis": "先有一个不带象限的、账本可核的期权表达工具库。",
+              "change": [
+                "初始 1000 万；开仓毛名义 ≤ 初始本金 1 倍；准备金 ≤ min(1000 万, 权益) 的 50%；买方支出 ≤ 权益 20%",
+                "商品用官方 rule0 主力/次主力池；近月 30-120 日目标 45；Delta 容差 0.10（外翼 0.07）",
+                "前日 OI>0 选腿；次日正开盘价且全日量>0 作事后存在性见证",
+                "M0：近腿 DTE ≤5 请求退出；C1 每边 5/3/15 元 + max(tick, 权利金 1%) 滑点"
+              ],
+              "reading": [
+                "账户：3,588（23×52×3 成本）",
+                "C1 参照：后市大涨 / 合成多头：+33% / +26% 累计",
+                "C1 参照：后市不涨 / 跨式盘整：−42% / −12%"
+              ],
+              "verdict": "沿用为所有后续期权实验的账本口径。自建月份规则 local_option_month_oi_v1 已建但未切换。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "configs/options_library_baseline_v5.json"
+                },
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-06-options-library-baseline-v5-result-report.md"
+                },
+                {
+                  "kind": "file",
+                  "id": "docs/options_delta_notation.md"
+                }
+              ]
+            },
+            {
+              "key": "qshort",
+              "title": "四象限固定Delta卖权",
+              "stage": "experiment",
+              "decision": "kept",
+              "full_title": "四象限25/50Delta：双卖与单卖Call/Put固定对照",
+              "date_label": "09-07 · 24规则完成",
+              "hypothesis": "已完成8条双卖与16条单腿规则、72个资金账户。双卖没有普遍优势，卖Put保留部分研究候选。",
+              "change": [
+                "全23市场、2022-01-04—2026-07-07；每次首次进入象限次开盘尝试一次",
+                "25Δ等手数宽跨；50Δ同执行价跨式；主力优先、次主力后备，30—120日、DTE5退出",
+                "每账户1000万元、毛名义上限1000万元、开仓准备金上限50%；不按CTA净Delta配仓",
+                "事件层比较同机会、同合约、同份数；独立资金账户会有不同准入和手数，不与HOLD直接排名"
+              ],
+              "reading": [
+                "C1双卖事件均值：8组全部负，95%描述区间全部跨零",
+                "同机会单腿分解：卖Call均值全部负，卖Put均值全部正",
+                "低估低波双卖资金累计25/50：13.48% / 20.92%，不代表事件层普遍盈利"
+              ],
+              "verdict": "双卖不作普遍策略；四个卖Put配置仅为已观察历史内的候选，不是独立确认。卖方承担左尾、收入封顶，与HOLD的多头右尾目标及仓位口径不同。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-07-quadrant-short-options-fixed-result-report.md"
+                },
+                {
+                  "kind": "file",
+                  "id": "configs/options_quadrant_short_fixed_20260907.json"
+                },
+                {
+                  "kind": "file",
+                  "id": "outputs/options_quadrant_short_fixed_20260907/figures/DB_C1_nav_drawdown.png"
+                },
+                {
+                  "kind": "file",
+                  "id": "outputs/options_quadrant_short_fixed_20260907/figures/paired_leg_contribution.png"
+                },
+                {
+                  "kind": "file",
+                  "id": "outputs/options_quadrant_short_fixed_20260907/analysis/account_metrics.csv"
+                },
+                {
+                  "kind": "file",
+                  "id": "outputs/options_quadrant_short_fixed_20260907/analysis/report_verification.json"
+                }
+              ]
+            },
+            {
+              "key": "map",
+              "title": "四象限收益来源地图",
+              "stage": "experiment",
+              "decision": "accepted",
+              "full_title": "四象限 × 状态年龄 → 期权收益来源标签",
+              "date_label": "09-06",
+              "hypothesis": "哪些格子有可用于期权的收益来源（方向 / 凸性 / 权利金 / 偏度）？",
+              "change": [
+                "12 格 × 3 指标 = 36 主检验，BH FDR 10%；200 次安慰剂置换",
+                "指标：20 日漂移（ATR）、RV−IV（vol pts）、迁移比例"
+              ],
+              "reading": [
+                "高估低波 1-8：凸性：RV−IV +1.35，向高波迁移 +0.115，漂移 +0.56 ATR",
+                "高估低波 21+：凸性：RV−IV +1.53",
+                "高估高波 1-8：权利金仅在 h=10 边缘成立"
+              ],
+              "verdict": "接受。下一轮原语只进'高估低波 1-8 → 凸性'。安慰剂通过但余量薄；RV−IV 超额为正不等于绝对值为正。",
+              "refs": [
+                {
+                  "kind": "file",
+                  "id": "research/superquants/reports/2026-09-06-quadrant-option-payoff-source-map-result-report.md"
+                },
+                {
+                  "kind": "file",
+                  "id": "outputs/quadrant_option_payoff_map_20260906/figures/iv_rv_skew_prototype.png"
+                }
+              ],
+              "children": [
+                {
+                  "key": "x12",
+                  "title": "原语条件实验 X1 / X2",
+                  "stage": "experiment",
+                  "decision": "accepted",
+                  "date_label": "09-06",
+                  "hypothesis": "高估低波年龄 ≤8 入场买凸性结构，X1 离开低波即退，X2 持到离开高估。",
+                  "reading": [
+                    "X1 买购：−71bp [−116,−31]，持有中位 6 日，92% 状态退出",
+                    "X2 买购：+85bp [+23,+149]，但方向对照同样改善",
+                    "X2 集中度：前 5% 周期占利润 70%，2025 占 51%"
+                  ],
+                  "verdict": "ARCHIVE（主命题否定）：状态迁移退出把持有期压到摩擦以下；账本里成立的是方向右尾而非凸性。X2 留作立项线索。",
+                  "refs": [
+                    {
+                      "kind": "file",
+                      "id": "research/superquants/reports/2026-09-06-high-low-convexity-primitive-conditional-result-report.md"
+                    }
+                  ],
+                  "children": [
+                    {
+                      "key": "prin",
+                      "title": "用户原则：先敞口后成本",
+                      "stage": "hypothesis",
+                      "decision": "accepted",
+                      "full_title": "用户原则（2026-09-06）：先敞口、后成本；退出是动态过程",
+                      "date_label": "09-06",
+                      "hypothesis": "期权的核心是用最低成本拿到最想要的敞口。第一步定各象限目标敞口，第二步才谈 IV / IV−RV / skew / 期限。",
+                      "change": [
+                        "退出不是离开状态即退，按'还想不想要这个敞口、有没有更便宜拿法'决定",
+                        "驻留时间是主维度：象限时钟、观点时钟、合约时钟分开",
+                        "买 call 要看 IV 未起且 skew 不使 call 相对 put 过贵"
+                      ],
+                      "verdict": "约束此后一切设计。总框架规格仍是 DRAFT（H4 驻留生存曲线未运行）。",
+                      "refs": [
+                        {
+                          "kind": "file",
+                          "id": "AGENTS.md"
+                        },
+                        {
+                          "kind": "file",
+                          "id": "research/superquants/specs/2026-09-06-v5-quadrant-exposure-first-research-spec.md"
+                        }
+                      ],
+                      "children": [
+                        {
+                          "key": "dyn",
+                          "title": "动态 call 表达 D/H/K/F",
+                          "stage": "experiment",
+                          "decision": "rejected",
+                          "date_label": "09-06 · 09-07 修订",
+                          "hypothesis": "按 skew 换拿法、vega 变现，对比期货。",
+                          "reading": [
+                            "持有 call 对 0.5Δ 静态期货：+44 ~ +48bp（凸性）",
+                            "持有 call 对每日 delta 复制：−52 ~ −73bp（IV>RV 净成本）",
+                            "变现 T2：−55bp，卖掉右尾"
+                          ],
+                          "verdict": "ARCHIVE。09-07 用户质疑仓位对齐后修订：撤回'贵 147bp'；比较必须写明静态 / 入场 delta 匹配 / 每日复制三基准。",
+                          "refs": [
+                            {
+                              "kind": "file",
+                              "id": "scripts/options_conditional/alignment_check.py"
+                            },
+                            {
+                              "kind": "file",
+                              "id": "research/superquants/reports/2026-09-06-high-low-call-exposure-dynamic-result-report.md"
+                            }
+                          ]
+                        },
+                        {
+                          "key": "floor",
+                          "title": "更便宜下限 F25 / F10",
+                          "stage": "experiment",
+                          "decision": "rejected",
+                          "date_label": "09-06",
+                          "hypothesis": "远 put 买下限是否更便宜。",
+                          "reading": [
+                            "F25 / F10 对复制期货：无显著差异；平值 put −45"
+                          ],
+                          "verdict": "ARCHIVE：远 put 价格与自己动态复制相当。撤回'贵两倍'。"
+                        },
+                        {
+                          "key": "sell",
+                          "title": "无仓位格子有界卖方",
+                          "stage": "experiment",
+                          "decision": "rejected",
+                          "date_label": "09-06",
+                          "hypothesis": "高估高波 / 低估高波年轻态卖宽跨式、铁鹰。",
+                          "reading": [
+                            "高估高波 1-8 宽跨：−0.5bp [−6.8,+4.7]",
+                            "其余：显著为负"
+                          ],
+                          "verdict": "ARCHIVE：费用后无正期望；低估高波是估值翻转地，不能卖波。"
+                        },
+                        {
+                          "key": "three",
+                          "title": "驻留三情形 S1 / S2 / S3",
+                          "stage": "experiment",
+                          "decision": "accepted",
+                          "full_title": "用户指定三情形：S1 持有到期、S2 满 10 日后离开退、S3 满 15 日买跨式",
+                          "date_label": "09-06",
+                          "hypothesis": "三个固定持有规则的资金路径、损失、持有时间。",
+                          "change": [
+                            {
+                              "what": "持有规则",
+                              "from": "X2：持到离开高估",
+                              "to": "S1 持有到期 / S2 满 10 日后离开即退 / S3 满 15 日买跨式"
+                            },
+                            {
+                              "what": "账户",
+                              "from": "每市场独立 1000 万",
+                              "to": "全 23 市场共享 + CTA 配仓（用户决定）"
+                            }
+                          ],
+                          "reading": [
+                            "商品 15 组 C1 Sharpe：S1 0.57 / S2 1.04 / S3 −0.05",
+                            "累计（商品 15）：8.31% / 10.95% / −0.09%"
+                          ],
+                          "verdict": "采纳 S2 为主线；S3 停止跟踪。",
+                          "caveats": [
+                            "商品 15 组样本，ETF 未纳入"
+                          ],
+                          "refs": [
+                            {
+                              "kind": "file",
+                              "id": "research/superquants/specs/2026-09-06-v5-residence-three-cases-research-brief.md"
+                            },
+                            {
+                              "kind": "file",
+                              "id": "research/superquants/reports/2026-09-06-v5-residence-three-cases-result-report.md"
+                            }
+                          ],
+                          "children": [
+                            {
+                              "key": "s1",
+                              "title": "S1 持有到期",
+                              "stage": "experiment",
+                              "decision": "kept",
+                              "date_label": "09-07",
+                              "hypothesis": "不因状态退出，持有到期交割。",
+                              "reading": [
+                                "C1 全 23 共享账户：累计 103%，Sharpe 0.62，回撤 −37.7%",
+                                "交割标的费滑点：764 万；7 日负现金最低 −2254 万"
+                              ],
+                              "verdict": "保留跟踪。交割融资未设上限未计息，不是严格自融资回测。"
+                            },
+                            {
+                              "key": "s3",
+                              "title": "S3 驻留 15 日买跨式",
+                              "stage": "experiment",
+                              "decision": "rejected",
+                              "date_label": "09-07",
+                              "hypothesis": "老状态买双向波动。",
+                              "reading": [
+                                "C1 全 23：累计 −8.9%，54 次入场"
+                              ],
+                              "verdict": "STOP_TRACKING（用户 2026-09-07）。仅入场近似中性，持有不再平衡。"
+                            },
+                            {
+                              "key": "s2",
+                              "title": "S2 + CTA 因果 Delta 配仓",
+                              "stage": "experiment",
+                              "decision": "superseded",
+                              "full_title": "S2 主线：全 23 市场共享 1000 万，Call Delta 名义匹配 CTA 首仓多头价值",
+                              "date_label": "09-07",
+                              "hypothesis": "把期权仓位对齐到老海龟的首仓风险预算，看真实资金路径。",
+                              "change": [
+                                {
+                                  "what": "仓位",
+                                  "from": "每市场固定 1 倍毛名义",
+                                  "to": "Call Delta 名义 = CTA 首仓多头价值（风险资本 × 1% ÷ ATR）"
+                                },
+                                {
+                                  "what": "再平衡",
+                                  "to": "不每日再平衡；满目标或整单拒绝"
+                                }
+                              ],
+                              "reading": [
+                                "S2 C1 累计 / 年化 / Sharpe / 回撤：310.81% / 37.00% / 1.20 / −24.82%",
+                                "入场 / 匹配率中位：235 / 99.71%",
+                                "Greeks 归因（pp）：Delta +320，Gamma+Theta −25，Vega +6，成本 −38"
+                              ],
+                              "verdict": "被 HOLD 取代：收益来源是方向敞口而非波动率；此后 S2 改法都在此口径比较。",
+                              "refs": [
+                                {
+                                  "kind": "file",
+                                  "id": "research/superquants/specs/2026-09-07-residence-cta-delta-sizing-research-brief.md"
+                                },
+                                {
+                                  "kind": "file",
+                                  "id": "research/superquants/reports/2026-09-07-residence-cta-delta-sizing-result-report.md"
+                                },
+                                {
+                                  "kind": "file",
+                                  "id": "research/superquants/reports/2026-09-07-s2-greeks-attribution-result-report.md"
+                                },
+                                {
+                                  "kind": "file",
+                                  "id": "configs/options_residence_cta_20260907.json"
+                                }
+                              ],
+                              "children": [
+                                {
+                                  "key": "sweep",
+                                  "title": "最低持有 5/10/20/30/40",
+                                  "stage": "experiment",
+                                  "decision": "kept",
+                                  "date_label": "09-07",
+                                  "hypothesis": "最低持有期长短。",
+                                  "reading": [
+                                    "C1 累计：341 / 311 / 718 / 435 / 278%",
+                                    "Sharpe：1.40 / 1.20 / 1.53 / 1.16 / 1.01",
+                                    "负现金日：30 日 6 天最低 −9572 万；40 日 5 天"
+                                  ],
+                                  "verdict": "20 日本次最高但集中 2024/25；描述性，不改默认，不追网格。",
+                                  "refs": [
+                                    {
+                                      "kind": "file",
+                                      "id": "research/superquants/reports/2026-09-07-s2-minimum-holding-sweep-result-report.md"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "key": "put",
+                                  "title": "卖 50Δ Put（HL/HH 首入）",
+                                  "stage": "tracking",
+                                  "decision": "kept",
+                                  "full_title": "高估状态卖 50Δ Put：DTE5 退出，高估高波续卖",
+                                  "date_label": "09-07",
+                                  "hypothesis": "正 Delta + 收权利金的另一种表达，与买 Call 敞口不同。",
+                                  "change": [
+                                    "首次进入 HL 或 HH（年龄 1）次日卖 50Δ Put，CTA 正 Delta 目标配仓",
+                                    "不随状态退出；DTE ≤5 平仓；平仓时若仍 HH 则续卖更晚到期",
+                                    "准备金 = 手数 × 乘数 × (期权价 + 锚 × 保证金率≥20%)，≤ 50% × min(1000 万, 权益)"
+                                  ],
+                                  "reading": [
+                                    "合并账户 C1 续卖 / 不续卖：+53.8% / +56.0%，回撤 −15.0% / −12.0%",
+                                    "拆开：HL 首入 / HH 首入：+50.8% / +48.6%，回撤 −14.2% / −23.4%",
+                                    "C2 续卖：+17.7%，回撤 −41%"
+                                  ],
+                                  "verdict": "描述性保留。承担左尾、封顶右尾，不与 HOLD 排名；美式提前指派与容量未模拟。",
+                                  "refs": [
+                                    {
+                                      "kind": "file",
+                                      "id": "research/superquants/reports/2026-09-07-high-valuation-short-put-roll-result-report.md"
+                                    },
+                                    {
+                                      "kind": "file",
+                                      "id": "research/superquants/reports/2026-09-07-high-valuation-short-put-separated-states-result-report.md"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "key": "hold",
+                                  "title": "HOLD（当前基准）",
+                                  "stage": "experiment",
+                                  "decision": "accepted",
+                                  "full_title": "HOLD：S2 入场 + 仅新全平规则，无最低持有期",
+                                  "date_label": "09-07 用户选定",
+                                  "hypothesis": "进入高估高波不退出，只在估值翻转或高估高波变老时离开，右尾能否完整保留？",
+                                  "change": [
+                                    {
+                                      "what": "退出规则",
+                                      "from": "S2：满 10 日后离开高估低波即请求退出",
+                                      "to": "只在估值翻转到低估、或高估高波段年龄 > 20 时全平，连续 3 日确认"
+                                    },
+                                    {
+                                      "what": "最低持有期",
+                                      "from": "10 个交易日",
+                                      "to": "无"
+                                    }
+                                  ],
+                                  "reading": [
+                                    "C1 累计 / 年化：772.69% / 65.01%",
+                                    "Sharpe / 最大回撤：1.55 / −29.85%",
+                                    "入场 / 持有中位：122 / 29 日"
+                                  ],
+                                  "verdict": "采纳为比较基准：不因波动膨胀退出，右尾完整保留；此后所有 S2 改法与它比较。",
+                                  "caveats": [
+                                    "2024/25 贡献集中，历史已反复观察，不是样本外",
+                                    "C2 成本情景敏感（452% vs 772%）",
+                                    "容量未验证：68 笔超全日量"
+                                  ],
+                                  "next": "HOLD 稳健性评审（未做）：先定目标是收益增强还是保护。",
+                                  "refs": [
+                                    {
+                                      "kind": "file",
+                                      "id": "configs/options_s2_research_baseline.json"
+                                    },
+                                    {
+                                      "kind": "file",
+                                      "id": "outputs/options_s2_dynamic_20260907_v2/（参考账本）"
+                                    },
+                                    {
+                                      "kind": "file",
+                                      "id": "outputs/options_s2_hold20_20260907/（独立重放）"
+                                    },
+                                    {
+                                      "kind": "file",
+                                      "id": "research/superquants/reports/2026-09-07-s2-dynamic-management-result-report.md"
+                                    },
+                                    {
+                                      "kind": "file",
+                                      "id": "research/superquants/specs/2026-09-07-s2-hold20-full-exit-research-spec.md"
+                                    }
+                                  ],
+                                  "children": [
+                                    {
+                                      "key": "dynm",
+                                      "title": "动态管理 M（A-E 全规则）",
+                                      "stage": "experiment",
+                                      "decision": "rejected",
+                                      "date_label": "09-07",
+                                      "hypothesis": "按状态 × 价格 × IV 情形持有 / 换 75Δ / E 止损。",
+                                      "change": [
+                                        "A/B 高估高波涨跌：持有",
+                                        "C 高波价平 IV 升、D 低波价涨 IV 降：换同到期 75Δ Call",
+                                        "E 低波价跌 IV 未升，或任一状态 ≤ −1ATR：退出",
+                                        "各谓词连续 3 日确认；退出优先于换仓"
+                                      ],
+                                      "reading": [
+                                        "M 累计 / Sharpe / 回撤：628% / 1.45 / −31.6%",
+                                        "仅换仓 SWAP_ONLY：513%",
+                                        "仅止损 STOP_ONLY：746%（77 次触发）"
+                                      ],
+                                      "verdict": "M 高于原 S2 但低于只改全平规则的 HOLD；换仓与止损无增量。HOLD 由此被选出。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/specs/2026-09-07-high-low-call-holding-management-research-spec.md"
+                                        },
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/reports/2026-09-07-s2-dynamic-management-result-report.md"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "h20",
+                                      "title": "HOLD20（至少 20 日）",
+                                      "stage": "experiment",
+                                      "decision": "rejected",
+                                      "date_label": "09-07",
+                                      "hypothesis": "加最低 20 交易日持有门槛能否防止早退？",
+                                      "change": [
+                                        {
+                                          "what": "最低持有期",
+                                          "from": "无",
+                                          "to": "20 个交易日"
+                                        }
+                                      ],
+                                      "reading": [
+                                        "C1 累计 / Sharpe / 回撤：453.6% / 1.29 / −30.1%",
+                                        "2025：78% vs HOLD 167%"
+                                      ],
+                                      "verdict": "否决：门槛没有改善，2025 显著落后；保留为对照。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/reports/2026-09-07-s2-hold20-full-exit-result-report.md"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "theta",
+                                      "title": "Theta 四变体",
+                                      "stage": "experiment",
+                                      "decision": "rejected",
+                                      "full_title": "HOLD 的 Theta 损耗：低 Δ 转期货 / 75Δ 入场 / 期货+10Δ Put / 约 90 日 Call",
+                                      "date_label": "09-07",
+                                      "hypothesis": "四种降低局部 Theta 的表达是否提高净收益。",
+                                      "reading": [
+                                        "低 Δ<0.3 转期货：589%，配对 −8bp 跨零；C2 略优于 HOLD 作线索",
+                                        "75Δ 入场：142%；同初始目标规则，实际资金准入与Delta路径不同",
+                                        "期货 + 10Δ Put：263%，Sharpe 1.76；实际平均Delta约HOLD一半，配对 −116bp；不是初始目标减半"
+                                      ],
+                                      "verdict": "HOLD_RETAINED：Theta 都降了，净配对差全部跨零。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/reports/2026-09-07-s2-theta-four-variants-result-report.md"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "roll",
+                                      "title": "ROLL95 换回 50Δ",
+                                      "stage": "experiment",
+                                      "decision": "rejected",
+                                      "date_label": "09-07",
+                                      "hypothesis": "Delta ≥0.95 时换回 50Δ 重置凸性，能否提高净收益？",
+                                      "change": [
+                                        {
+                                          "what": "高 Delta 处理",
+                                          "from": "持有到全平",
+                                          "to": "Delta ≥ 0.95 卖出，换回同到期 50Δ Call"
+                                        }
+                                      ],
+                                      "reading": [
+                                        "C1 累计 / 回撤：594.5% / −45.3%",
+                                        "配对 73 组：−35.6bp，区间跨零"
+                                      ],
+                                      "verdict": "否决：重置凸性没有可分辨的增益，回撤更深。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/reports/2026-09-07-s2-repeat-call-roll-result-report.md"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "tail",
+                                      "title": "HH退出接续 · 10Δ Put",
+                                      "stage": "validation",
+                                      "decision": "kept",
+                                      "full_title": "HOLD高估高波退出后：期货多头＋10Δ Put接续",
+                                      "date_label": "09-07 · 全窗完成",
+                                      "hypothesis": "退出信号日处于高估高波时继续参与右尾。已完成全23市场、2022-01-04—2026-07-07全窗口；只保留研究线索，不替换HOLD。",
+                                      "change": [
+                                        "原HOLD退出信号日为HH（含DTE5）；Call正常卖出，实际卖出前一完整日Delta金额用于新组合净Delta目标",
+                                        "商品主力月优先，前日合约链不合格再选次主力；ETF为全额出资现货＋Put",
+                                        "完整数量覆盖、整数取整；新Put DTE≤5请求退出，不续期；资金不足整单拒绝",
+                                        "主指标：已结接续阶段净PnL／接续前Call Delta金额；各账户共享初始1000万元，C1主"
+                                      ],
+                                      "reading": [
+                                        "C1累计 / 年化：796.16% / 66.03%",
+                                        "Sharpe / 最大回撤：1.53 / −30.30%（HOLD 1.55 / −29.85%）",
+                                        "接续成功 / 尝试：15 / 56，全部已结"
+                                      ],
+                                      "verdict": "全窗COMPLETE；仅保留研究线索。账户年化略升，Sharpe和最大回撤略差。阶段利润不能直接等同于账户增量；所有数值为隔离历史探索。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/reports/2026-09-07-s2-hh-exit-tail-result-report.md"
+                                        },
+                                        {
+                                          "kind": "file",
+                                          "id": "configs/options_s2_exit_tail_20260907.json"
+                                        },
+                                        {
+                                          "kind": "file",
+                                          "id": "outputs/options_s2_exit_tail_20260907/analysis/extension_stages.csv"
+                                        },
+                                        {
+                                          "kind": "file",
+                                          "id": "outputs/options_s2_exit_tail_20260907/figures/C1_hh_exit_tail.png"
+                                        }
+                                      ],
+                                      "children": [
+                                        {
+                                          "key": "taildiag",
+                                          "title": "10Δ保护为什么偏弱",
+                                          "stage": "experiment",
+                                          "decision": "kept",
+                                          "full_title": "10Delta Put保护诊断：距离远，固定执行价不锁定后续利润",
+                                          "date_label": "09-07 · 诊断完成",
+                                          "hypothesis": "将15次接续逐日拆为Put和线性腿，区分单位保护、最终损益与账户回撤。",
+                                          "reading": [
+                                            "执行价距离：低于接续价格4.0%—15.8%，中位10.19%",
+                                            "Put曾有浮盈 / 最终盈利：9 / 15；最终仅1笔略赚",
+                                            "白银下跌阶段：期货最差亏102.79万元，Put浮盈12.53万元"
+                                          ],
+                                          "verdict": "未发现漏记保护腿。若目标是限制普通回吐，10Δ偏虚；先指定损失上限及固定/移动保护，再比较成本。由此形成用户指定的25/50Δ试验。",
+                                          "refs": [
+                                            {
+                                              "kind": "file",
+                                              "id": "research/superquants/diagnoses/2026-09-07-s2-exit-put-protection-diagnosis-memo.md"
+                                            },
+                                            {
+                                              "kind": "file",
+                                              "id": "outputs/options_s2_exit_tail_20260907/diagnostics/put_protection/C1_put_protection.csv"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "key": "taildelta",
+                                          "title": "接续Put · 10 / 25 / 50Δ",
+                                          "stage": "experiment",
+                                          "decision": "rejected",
+                                          "full_title": "更近Put能否改善接续：两个固定目标25Δ、50Δ对照10Δ",
+                                          "date_label": "09-07 · 全窗完成",
+                                          "hypothesis": "保持退出前Call净Delta目标，比较保护、保费、线性数量和完整账户路径。不是固定合约数量的比较。",
+                                          "change": [
+                                            "仅新增−0.25/−0.50两个目标，容差均0.07；HOLD及−0.10为冻结参考",
+                                            "其余HH资格、主次力、DTE5及V5预算不变；全23市场，12账户×1090日",
+                                            "共同阶段须同初始入场、同日接续且双方已结，分别按各自退出前Call Delta归一"
+                                          ],
+                                          "reading": [
+                                            "HOLD / 10Δ / 25Δ / 50Δ年化：65.01% / 66.03% / 62.75% / 41.65%",
+                                            "执行价距离中位：10 / 25 / 50：10.19% / 5.42% / −0.24%（约平值）",
+                                            "保费／目标Delta中位：0.43% / 1.39% / 6.40%"
+                                          ],
+                                          "verdict": "DROP这两个固定替代候选，HOLD不变。更近执行价未带来更好的整体账户；25Δ无净配对优势，50Δ局部正差小且不稳定。原始成交、交割尾仓、前缀和资金审计通过；容量仍未验证。",
+                                          "refs": [
+                                            {
+                                              "kind": "file",
+                                              "id": "research/superquants/reports/2026-09-07-s2-hh-exit-tail-delta-result-report.md"
+                                            },
+                                            {
+                                              "kind": "file",
+                                              "id": "configs/options_s2_exit_tail_delta_20260907.json"
+                                            },
+                                            {
+                                              "kind": "file",
+                                              "id": "outputs/options_s2_exit_tail_delta_20260907/figures/C1_tail_put_delta.png"
+                                            },
+                                            {
+                                              "kind": "file",
+                                              "id": "outputs/options_s2_exit_tail_delta_20260907/analysis/paired_stages.csv"
+                                            }
+                                          ],
+                                          "children": [
+                                            {
+                                              "key": "tail25",
+                                              "title": "25Δ接续 · 不采用",
+                                              "stage": "experiment",
+                                              "decision": "rejected",
+                                              "date_label": "09-07",
+                                              "hypothesis": "执行价更接近标的，承担更高保费与线性数量。",
+                                              "reading": [
+                                                "C1累计 / 年化：722.06% / 62.75%",
+                                                "Sharpe / 最大回撤：1.47 / −30.11%",
+                                                "共同14阶段对10Δ净差：−27.91bp [−86.85, +33.09]"
+                                              ],
+                                              "verdict": "当前固定25Δ不采用；未改善净结果或共同阶段的最差损失。",
+                                              "refs": [
+                                                {
+                                                  "kind": "file",
+                                                  "id": "research/superquants/reports/2026-09-07-s2-hh-exit-tail-delta-result-report.md"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "key": "tail50",
+                                              "title": "50Δ接续 · 不采用",
+                                              "stage": "experiment",
+                                              "decision": "rejected",
+                                              "date_label": "09-07",
+                                              "hypothesis": "近乎平值保护；同净Delta需接近两倍线性名义，资金准入发生变化。",
+                                              "reading": [
+                                                "C1累计 / 年化：350.89% / 41.65%",
+                                                "Sharpe / 最大回撤：1.14 / −35.94%",
+                                                "共同9阶段对10Δ净差：+21.98bp [−143.95, +104.86]"
+                                              ],
+                                              "verdict": "当前固定50Δ不采用。保护曾兑现，但不足以证明整体更划算。AL零成交Put交割尾仓清理成本已计入，不能假设两腿总能同日退出。",
+                                              "refs": [
+                                                {
+                                                  "kind": "file",
+                                                  "id": "research/superquants/reports/2026-09-07-s2-hh-exit-tail-delta-result-report.md"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "ivrv",
+                                      "title": "IV−RV / Skew 成本门槛",
+                                      "stage": "hypothesis",
+                                      "date_label": "未立项",
+                                      "hypothesis": "只在 IV 未起、Call 不比 Put 贵太多时入场，能否降低 HOLD 的成本？",
+                                      "change": [
+                                        {
+                                          "what": "入场条件",
+                                          "from": "仅状态触发",
+                                          "to": "状态触发 且 gap = IV − RV20 未起 且 RR25 不高"
+                                        }
+                                      ],
+                                      "next": "先出 IV−RV 与 RR25 的分布图（规格中的图 B）。",
+                                      "refs": [
+                                        {
+                                          "kind": "file",
+                                          "id": "outputs/quadrant_option_payoff_map_20260906/figures/iv_rv_skew_prototype.png"
+                                        },
+                                        {
+                                          "kind": "file",
+                                          "id": "research/superquants/specs/2026-09-06-v5-quadrant-exposure-first-research-spec.md"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "key": "surv",
+                                      "title": "驻留生存 / 迁移曲线",
+                                      "stage": "hypothesis",
+                                      "date_label": "未运行",
+                                      "hypothesis": "已驻留 a 日后的条件剩余驻留 S(a+h)/S(a) 与迁移目的地。",
+                                      "change": [
+                                        "右删失、竞争风险、逐时点截断估计；禁止用平均段长减已驻留"
+                                      ],
+                                      "next": "运行规格 H4：条件剩余驻留与迁移目的地估计。"
+                                    },
+                                    {
+                                      "key": "robust",
+                                      "title": "HOLD 稳健性评审",
+                                      "stage": "idea",
+                                      "date_label": "未做",
+                                      "hypothesis": "年份集中、C2 敏感、容量未验证，HOLD 经得起稳健性评审吗？",
+                                      "change": [],
+                                      "next": "先定目标是收益增强还是保护，再进 superquants-robustness-review。"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

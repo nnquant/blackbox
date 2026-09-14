@@ -1,0 +1,349 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支" [active]:
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "WH-F2 强势股策略"
+    - generic: /
+    - button "WH-F2 历史回测、生产诊断与修复对照"
+    - generic: /
+    - button "Oaks Crosect 全量历史（不参与项目 Compare）"
+  - generic: Research / wh-f2-historical-audit-and-remediation
+  - heading "Oaks Crosect 全量历史（不参与项目 Compare）" [level=1]
+  - paragraph: WH-F2 全量历史审计分支；Run 已完成并保留，但不参与策略每日项目首页 Compare，代表曲线仍由日度跟踪分支提供。
+  - generic: 状态
+  - generic "已归档":
+    - generic: 已归档
+  - generic: Run
+  - generic "4":
+    - generic: "4"
+  - generic: 已完成
+  - generic "2":
+    - generic: "2"
+  - generic: 运行中
+  - generic "0":
+    - generic: "0"
+  - generic: 最新 Run
+  - generic "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826":
+    - generic: wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826
+    - button "展开"
+  - heading "Branch Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究分支 状态 创建者 Sharpe 耗时 更新时间":
+        - columnheader "Run"
+        - columnheader "研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "耗时"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826 oaks-crosect-full-history 已完成 agent / codex 2.34 55s 2026/8/26 22:52:07":
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826"
+        - cell "oaks-crosect-full-history":
+          - button "oaks-crosect-full-history"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.34"
+        - cell "55s"
+        - cell "2026/8/26 22:52:07"
+      - row "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826 oaks-crosect-full-history 已取消 agent / codex 2.34 2m 2026/8/26 22:51:00":
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826"
+        - cell "oaks-crosect-full-history":
+          - button "oaks-crosect-full-history"
+        - cell "已取消":
+          - generic: 已取消
+        - cell "agent / codex"
+        - cell "2.34"
+        - cell "2m"
+        - cell "2026/8/26 22:51:00"
+      - row "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826 oaks-crosect-full-history 已取消 agent / codex 2.34 3m 2026/8/26 22:47:21":
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826"
+        - cell "oaks-crosect-full-history":
+          - button "oaks-crosect-full-history"
+        - cell "已取消":
+          - generic: 已取消
+        - cell "agent / codex"
+        - cell "2.34"
+        - cell "3m"
+        - cell "2026/8/26 22:47:21"
+      - row "wh-f2-oaks-crosect-full-history-20230103-20260810 oaks-crosect-full-history 已完成 agent / codex 2.38 2m 2026/8/11 00:14:30":
+        - cell "wh-f2-oaks-crosect-full-history-20230103-20260810":
+          - button "wh-f2-oaks-crosect-full-history-20230103-20260810"
+        - cell "oaks-crosect-full-history":
+          - button "oaks-crosect-full-history"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.38"
+        - cell "2m"
+        - cell "2026/8/11 00:14:30"
+  - heading "Best Candidate" [level=2]
+  - button "wh-f2-oaks-crosect-full-history-20230103-20260810"
+  - generic: Sharpe
+  - generic "2.38":
+    - generic: "2.38"
+  - generic: 最大回撤
+  - generic "-29.88":
+    - generic: "-29.88"
+  - generic: 耗时
+  - generic "2m":
+    - generic: 2m
+  - generic: 更新时间
+  - generic "2026/8/11 00:14:30":
+    - generic: 2026/8/11 00:14:30
+  - heading "对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Toggle all compare series 目标 ↕ Run ↕ annual return ↕ annual volatility ↕ max drawdown ↕ sharpe ↕ sortino ↕ calmar ↕ turnover ↕":
+        - columnheader "Toggle all compare series":
+          - checkbox "Toggle all compare series" [checked]
+        - columnheader "目标 ↕":
+          - button "目标 ↕":
+            - generic: 目标
+            - generic: ↕
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "annual return ↕":
+          - button "annual return ↕":
+            - generic: annual return
+            - generic: ↕
+        - columnheader "annual volatility ↕":
+          - button "annual volatility ↕":
+            - generic: annual volatility
+            - generic: ↕
+        - columnheader "max drawdown ↕":
+          - button "max drawdown ↕":
+            - generic: max drawdown
+            - generic: ↕
+        - columnheader "sharpe ↕":
+          - button "sharpe ↕":
+            - generic: sharpe
+            - generic: ↕
+        - columnheader "sortino ↕":
+          - button "sortino ↕":
+            - generic: sortino
+            - generic: ↕
+        - columnheader "calmar ↕":
+          - button "calmar ↕":
+            - generic: calmar
+            - generic: ↕
+        - columnheader "turnover ↕":
+          - button "turnover ↕":
+            - generic: turnover
+            - generic: ↕
+    - rowgroup:
+      - row "Toggle wh-f2-oaks-crosect-full-history-20230103-20260810 wh-f2-oaks-crosect-full-history-20230103-20260810 run wh-f2-oaks-crosect-full-history-20230103-20260810 136.91% 39.58% -29.88% 2.38 3.93 4.58 4845.78":
+        - cell "Toggle wh-f2-oaks-crosect-full-history-20230103-20260810":
+          - checkbox "Toggle wh-f2-oaks-crosect-full-history-20230103-20260810" [checked]
+        - cell "wh-f2-oaks-crosect-full-history-20230103-20260810 run":
+          - generic: wh-f2-oaks-crosect-full-history-20230103-20260810
+          - generic: run
+        - cell "wh-f2-oaks-crosect-full-history-20230103-20260810":
+          - button "wh-f2-oaks-crosect-full-history-20230103-20260810"
+        - cell "136.91%"
+        - cell "39.58%"
+        - cell "-29.88%"
+        - cell "2.38"
+        - cell "3.93"
+        - cell "4.58"
+        - cell "4845.78"
+      - row "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826 wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826 run wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826 134.44% 39.78% -29.50% 2.34 3.86 4.56 --":
+        - cell "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826":
+          - checkbox "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826" [checked]
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826 run":
+          - generic: wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826
+          - generic: run
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-v1-20230103-20260826"
+        - cell "134.44%"
+        - cell "39.78%"
+        - cell "-29.50%"
+        - cell "2.34"
+        - cell "3.86"
+        - cell "4.56"
+        - cell "--"
+      - row "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826 wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826 run wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826 134.44% 39.78% -29.50% 2.34 3.86 4.56 --":
+        - cell "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826":
+          - checkbox "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826" [checked]
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826 run":
+          - generic: wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826
+          - generic: run
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-20230103-20260826"
+        - cell "134.44%"
+        - cell "39.78%"
+        - cell "-29.50%"
+        - cell "2.34"
+        - cell "3.86"
+        - cell "4.56"
+        - cell "--"
+      - row "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826 wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826 run wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826 134.44% 39.78% -29.50% 2.34 3.86 4.56 --":
+        - cell "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826":
+          - checkbox "Toggle wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826" [checked]
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826 run":
+          - generic: wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826
+          - generic: run
+        - cell "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826":
+          - button "wh-f2-oaks-crosect-full-history-open-auction-fill-contract-v1-final-20230103-20260826"
+        - cell "134.44%"
+        - cell "39.78%"
+        - cell "-29.50%"
+        - cell "2.34"
+        - cell "3.86"
+        - cell "4.56"
+        - cell "--"
+  - generic "Branch Context":
+    - generic: Branch Context

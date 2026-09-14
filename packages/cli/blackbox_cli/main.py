@@ -202,6 +202,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_start.add_argument("--context", default="{}")
     run_start.add_argument("--tags", default="[]")
     run_start.add_argument("--source-run-id")
+    run_start.add_argument("--mode", choices=["backtest", "paper", "sim", "live"], help="run mode (default backtest)")
     run_start.add_argument("--created-by-type")
     run_start.add_argument("--created-by-id")
     run_start.add_argument("--idempotency-key")
@@ -224,6 +225,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_update.add_argument("--config-file")
     run_update.add_argument("--context")
     run_update.add_argument("--tags")
+    run_update.add_argument("--mode", choices=["backtest", "paper", "sim", "live"])
     run_clone = run_sub.add_parser("clone")
     run_clone.add_argument("--run-id", required=True)
     run_clone.add_argument("--name")
@@ -493,6 +495,113 @@ def build_parser() -> argparse.ArgumentParser:
     compare_set_run.add_argument("--with-config-diff", action="store_true", default=True)
     compare_set_run.add_argument("--no-config-diff", action="store_false", dest="with_config_diff")
 
+    research_map = sub.add_parser("map", help="Manually maintained research maps: stage + decision per node, evidence read from bound entities.")
+    research_map_sub = research_map.add_subparsers(dest="action", required=True)
+    for name in ("init", "create"):
+        map_create = research_map_sub.add_parser(name)
+        map_create.add_argument("--project", required=True, help="project key or id")
+        map_create.add_argument("--research", help="research key or id inside the project (optional)")
+        map_create.add_argument("--key", required=True)
+        map_create.add_argument("--title", required=True)
+        add_map_field_arguments(map_create)
+        add_actor_arguments(map_create)
+    map_list = research_map_sub.add_parser("list")
+    map_list.add_argument("--project", help="project key or id")
+    map_list.add_argument("--research", help="research key or id")
+    map_list.add_argument("--status")
+    map_get = research_map_sub.add_parser("get")
+    add_map_ref_argument(map_get)
+    map_update = research_map_sub.add_parser("update")
+    add_map_ref_argument(map_update)
+    map_update.add_argument("--title")
+    map_update.add_argument("--research", help="research key or id; pass an empty string to detach")
+    add_map_field_arguments(map_update)
+    add_actor_arguments(map_update)
+    map_baseline = research_map_sub.add_parser("baseline")
+    add_map_ref_argument(map_baseline)
+    map_baseline.add_argument("--key", required=True, help="node key; pass an empty string to clear the baseline")
+    map_baseline.add_argument("--reason")
+    add_actor_arguments(map_baseline)
+    for name in ("status", "lint"):
+        sub_parser = research_map_sub.add_parser(name)
+        add_map_ref_argument(sub_parser)
+    map_revisions = research_map_sub.add_parser("revisions")
+    add_map_ref_argument(map_revisions)
+    map_revisions.add_argument("--key", help="only revisions of this node")
+    map_revisions.add_argument("--limit", type=int, default=50)
+    map_export = research_map_sub.add_parser("export")
+    add_map_ref_argument(map_export)
+    map_export.add_argument("--output-file", help="write the document to this path (.json or .yaml)")
+    map_import = research_map_sub.add_parser("import")
+    map_import.add_argument("--file", required=True, help="JSON or YAML research map document")
+    map_import.add_argument("--project", help="override the document project key or id")
+    map_import.add_argument("--research", help="override the document research key or id")
+    map_import.add_argument("--key", help="override the document map key")
+    map_import.add_argument("--replace", action="store_true", help="delete nodes that are not in the document")
+    add_actor_arguments(map_import)
+    map_node = research_map_sub.add_parser("node")
+    map_node_sub = map_node.add_subparsers(dest="node_action", required=True)
+    for node_action in ("add", "set", "update"):
+        node_parser = map_node_sub.add_parser(node_action)
+        add_map_ref_argument(node_parser)
+        node_parser.add_argument("--key", required=True)
+        node_parser.add_argument("--title", required=node_action == "add")
+        node_parser.add_argument("--parent", help="parent node key; pass an empty string for a root node")
+        node_parser.add_argument("--position", type=int)
+        node_parser.add_argument("--full-title")
+        node_parser.add_argument("--date", dest="date_label", help="short date label shown on the card (≤ 12 chars)")
+        node_parser.add_argument("--stage", choices=["idea", "hypothesis", "experiment", "validation", "tracking", "simulation", "live", "retired"])
+        node_parser.add_argument("--decision", choices=["pending", "kept", "accepted", "rejected", "superseded", "none"], help="'none' clears the decision")
+        node_parser.add_argument("--hypothesis", help="one sentence: the single thing this node tests")
+        node_parser.add_argument("--change", dest="change", action="append", help="repeatable 'what|from|to' (or 'what|to', or free text)")
+        node_parser.add_argument("--reading", dest="reading", action="append", help="repeatable fact with numbers")
+        node_parser.add_argument("--verdict", help="one sentence starting with the decision verb")
+        node_parser.add_argument("--caveat", dest="caveats", action="append", help="repeatable unverified item")
+        node_parser.add_argument("--next", dest="next_step", help="one sentence: what happens next")
+        node_parser.add_argument("--run", dest="bind_run", help="bind a run id")
+        node_parser.add_argument("--branch", dest="bind_branch", help="bind a branch id")
+        node_parser.add_argument("--compare-set", dest="bind_compare_set", help="bind a compare set id")
+        node_parser.add_argument("--research-binding", dest="bind_research", help="bind a research id")
+        node_parser.add_argument("--unbind", action="store_true", help="remove the binding")
+        node_parser.add_argument("--ref", dest="refs", action="append", help="repeatable kind:id[:label] or url:https://...|label")
+        node_parser.add_argument("--meta", help="JSON object with extra fields")
+        node_parser.add_argument("--fields-file", help="JSON or YAML file with node fields; CLI flags override it")
+        node_parser.add_argument("--reason", help="required when moving the stage backwards")
+        add_actor_arguments(node_parser)
+    map_node_decide = map_node_sub.add_parser("decide")
+    add_map_ref_argument(map_node_decide)
+    map_node_decide.add_argument("--key", required=True)
+    map_node_decide.add_argument("--decision", required=True, choices=["pending", "kept", "accepted", "rejected", "superseded"])
+    map_node_decide.add_argument("--reading", dest="reading", action="append")
+    map_node_decide.add_argument("--verdict")
+    map_node_decide.add_argument("--caveat", dest="caveats", action="append")
+    map_node_decide.add_argument("--next", dest="next_step")
+    map_node_decide.add_argument("--note", action="store_true", help="also write a decision note on the bound run")
+    add_actor_arguments(map_node_decide)
+    map_node_advance = map_node_sub.add_parser("advance")
+    add_map_ref_argument(map_node_advance)
+    map_node_advance.add_argument("--key", required=True)
+    map_node_advance.add_argument("--stage", required=True, choices=["idea", "hypothesis", "experiment", "validation", "tracking", "simulation", "live", "retired"])
+    map_node_advance.add_argument("--reason", help="required when moving backwards")
+    map_node_advance.add_argument("--date", dest="date_label")
+    add_actor_arguments(map_node_advance)
+    map_node_move = map_node_sub.add_parser("move")
+    add_map_ref_argument(map_node_move)
+    map_node_move.add_argument("--key", required=True)
+    map_node_move.add_argument("--parent", required=True, help="new parent key; empty string for root")
+    map_node_move.add_argument("--position", type=int)
+    add_actor_arguments(map_node_move)
+    map_node_get = map_node_sub.add_parser("get")
+    add_map_ref_argument(map_node_get)
+    map_node_get.add_argument("--key", required=True)
+    map_node_list = map_node_sub.add_parser("list")
+    add_map_ref_argument(map_node_list)
+    map_node_delete = map_node_sub.add_parser("delete")
+    add_map_ref_argument(map_node_delete)
+    map_node_delete.add_argument("--key", required=True)
+    map_node_delete.add_argument("--cascade", action="store_true", help="also delete descendant nodes")
+    add_actor_arguments(map_node_delete)
+
     batch = sub.add_parser("batch")
     batch_sub = batch.add_subparsers(dest="action", required=True)
     batch_note = batch_sub.add_parser("add-note")
@@ -631,6 +740,7 @@ def dispatch(args: argparse.Namespace) -> Any:
                 "name": args.name,
                 "title": args.title,
                 "source_run_id": args.source_run_id,
+                **({"mode": args.mode} if args.mode else {}),
                 "config": config,
                 "context": parse_json(args.context),
                 "tags": parse_json(args.tags),
@@ -651,7 +761,8 @@ def dispatch(args: argparse.Namespace) -> Any:
         return {"run_id": args.run_id, **report}
     if args.group == "run" and args.action == "update":
         config = parse_structured_file(args.config_file, "config file") if args.config_file else (parse_json(args.config) if args.config is not None else None)
-        return request(args, "PATCH", f"/api/v1/runs/{args.run_id}", json=compact_payload({"name": args.name, "title": args.title, "source_run_id": args.source_run_id, "config": config, "context": parse_json(args.context) if args.context is not None else None, "tags": parse_json(args.tags) if args.tags is not None else None}))
+        return request(args, "PATCH", f"/api/v1/runs/{args.run_id}", json=compact_payload({"name": args.name, "title": args.title, "source_run_id": args.source_run_id, "config": config, "context": parse_json(args.context) if args.context is not None else None, "mode": args.mode,
+                    "tags": parse_json(args.tags) if args.tags is not None else None}))
     if args.group == "run" and args.action == "clone":
         config_overrides = parse_structured_file(args.config_overrides_file, "config overrides file") if args.config_overrides_file else parse_json(args.config_overrides)
         headers = {"Idempotency-Key": args.idempotency_key} if args.idempotency_key else {}
@@ -950,6 +1061,8 @@ def dispatch(args: argparse.Namespace) -> Any:
                 "with_config_diff": args.with_config_diff,
             },
         )
+    if args.group == "map":
+        return dispatch_map(args)
     if args.group == "batch" and args.action == "add-note":
         run_ids = parse_id_list(args.run_ids, args.run_ids_file, "run_ids")
         items = [
@@ -1032,6 +1145,224 @@ CANONICAL_PERFORMANCE_KEYS = {
     "total_pnl",
     "annualized_pnl",
 }
+
+
+def add_map_ref_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--map", required=True, help="research map id (rmap_...) or <project-key>/<map-key>")
+
+
+def add_actor_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--created-by-type", choices=["human", "agent"])
+    parser.add_argument("--created-by-id")
+
+
+def add_map_field_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--subtitle")
+    parser.add_argument("--description")
+    parser.add_argument("--status", choices=["active", "archived"])
+    parser.add_argument("--primary-metric", help="metric shown on cards and used to pick branch champions, default strategy.summary.sharpe")
+    parser.add_argument("--settings", help='JSON object, for example {"collapsed":["exec"],"file_base_url":"https://..."}')
+
+
+def resolve_map_id(args: argparse.Namespace) -> str:
+    ref = str(args.map or "").strip()
+    if not ref:
+        raise CliError("VALIDATION_ERROR", "--map is required")
+    if "/" not in ref:
+        return ref
+    project_ref, _, map_key = ref.partition("/")
+    if not project_ref or not map_key:
+        raise CliError("VALIDATION_ERROR", "--map must be a map id or <project-key>/<map-key>")
+    matches = request(args, "GET", "/api/v1/research-maps", params={"project": project_ref, "key": map_key})
+    if not matches:
+        raise CliError("NOT_FOUND", f"research map {ref} not found", 3, "create it with bbox map init or bbox map import")
+    return matches[0]["id"]
+
+
+def actor_payload(args: argparse.Namespace) -> dict[str, Any]:
+    created_by_type = getattr(args, "created_by_type", None)
+    created_by_id = getattr(args, "created_by_id", None)
+    if created_by_id and not created_by_type:
+        created_by_type = "agent"
+    return compact_payload({"created_by_type": created_by_type, "created_by_id": created_by_id})
+
+
+def map_fields_payload(args: argparse.Namespace) -> dict[str, Any]:
+    payload: dict[str, Any] = compact_payload(
+        {
+            "title": getattr(args, "title", None),
+            "subtitle": args.subtitle,
+            "description": args.description,
+            "status": args.status,
+            "primary_metric": args.primary_metric,
+        }
+    )
+    if args.settings is not None:
+        payload["settings"] = parse_json_object_arg(args.settings, "settings")
+    return payload
+
+
+def parse_change_item(value: str) -> Any:
+    text = value.strip()
+    if "|" not in text:
+        return text
+    parts = [part.strip() for part in text.split("|")]
+    if len(parts) == 2:
+        return {"what": parts[0], "to": parts[1]}
+    what, frm, to = parts[0], parts[1], "|".join(parts[2:])
+    row: dict[str, str] = {"what": what, "to": to}
+    if frm:
+        row["from"] = frm
+    return row
+
+
+def parse_map_ref(value: str) -> dict[str, Any]:
+    text = value.strip()
+    kind, sep, rest = text.partition(":")
+    if not sep or not rest:
+        raise CliError("VALIDATION_ERROR", f"--ref must look like kind:id[:label] or url:https://...|label: {text}")
+    kind = kind.strip().lower()
+    if kind in {"url", "file"}:
+        href, label = rest, None
+        if "|" in rest:
+            href, _, label = rest.partition("|")
+        return compact_payload({"kind": kind, "href": href.strip(), "label": label.strip() if label else None})
+    target, _, label = rest.partition(":")
+    return compact_payload({"kind": kind, "id": target.strip(), "label": label.strip() or None})
+
+
+def binding_payload(args: argparse.Namespace) -> dict[str, Any]:
+    if getattr(args, "unbind", False):
+        return {"binding": None}
+    for attr, kind in (("bind_run", "run"), ("bind_branch", "branch"), ("bind_compare_set", "compare_set"), ("bind_research", "research")):
+        value = getattr(args, attr, None)
+        if value:
+            return {"binding": {"kind": kind, "id": value.strip()}}
+    return {}
+
+
+def node_fields_payload(args: argparse.Namespace) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    if getattr(args, "fields_file", None):
+        payload.update(parse_structured_object_file(args.fields_file, "node fields file"))
+    payload.update(
+        compact_payload(
+            {
+                "title": getattr(args, "title", None),
+                "full_title": getattr(args, "full_title", None),
+                "date_label": getattr(args, "date_label", None),
+                "stage": getattr(args, "stage", None),
+                "hypothesis": getattr(args, "hypothesis", None),
+                "verdict": getattr(args, "verdict", None),
+                "next": getattr(args, "next_step", None),
+                "position": getattr(args, "position", None),
+                "reason": getattr(args, "reason", None),
+            }
+        )
+    )
+    decision = getattr(args, "decision", None)
+    if decision is not None:
+        payload["decision"] = None if decision == "none" else decision
+    if getattr(args, "parent", None) is not None:
+        payload["parent_key"] = args.parent.strip() or None
+    if getattr(args, "change", None) is not None:
+        payload["change"] = [parse_change_item(item) for item in args.change]
+    if getattr(args, "reading", None) is not None:
+        payload["reading"] = list(args.reading)
+    if getattr(args, "caveats", None) is not None:
+        payload["caveats"] = list(args.caveats)
+    if getattr(args, "refs", None) is not None:
+        payload["refs"] = [parse_map_ref(item) for item in args.refs]
+    if getattr(args, "meta", None) is not None:
+        payload["meta"] = parse_json_object_arg(args.meta, "meta")
+    payload.update(binding_payload(args))
+    return payload
+
+
+def dispatch_map(args: argparse.Namespace) -> Any:
+    if args.action in {"init", "create"}:
+        payload = {"project": args.project, "key": args.key, **map_fields_payload(args), **actor_payload(args)}
+        if args.research:
+            payload["research"] = args.research
+        return request(args, "POST", "/api/v1/research-maps", json=payload)
+    if args.action == "list":
+        return request(args, "GET", "/api/v1/research-maps", params=compact_payload({"project": args.project, "research": args.research, "status": args.status}))
+    if args.action == "get":
+        return request(args, "GET", f"/api/v1/research-maps/{resolve_map_id(args)}")
+    if args.action == "update":
+        payload = {**map_fields_payload(args), **actor_payload(args)}
+        if args.research is not None:
+            payload["research_id"] = None if not args.research.strip() else args.research.strip()
+        return request(args, "PATCH", f"/api/v1/research-maps/{resolve_map_id(args)}", json=payload)
+    if args.action == "baseline":
+        return request(args, "POST", f"/api/v1/research-maps/{resolve_map_id(args)}/baseline", json={"node_key": args.key.strip() or None, "reason": args.reason, **actor_payload(args)})
+    if args.action in {"status", "lint"}:
+        return request(args, "GET", f"/api/v1/research-maps/{resolve_map_id(args)}/{args.action}")
+    if args.action == "revisions":
+        return request(args, "GET", f"/api/v1/research-maps/{resolve_map_id(args)}/revisions", params=compact_payload({"node_key": args.key, "limit": args.limit}))
+    if args.action == "export":
+        document = request(args, "GET", f"/api/v1/research-maps/{resolve_map_id(args)}/export")
+        if args.output_file:
+            write_document_file(args.output_file, document)
+        return document
+    if args.action == "import":
+        document = parse_structured_object_file(args.file, "research map document")
+        if args.project:
+            document.pop("project_id", None)
+            document.pop("project_key", None)
+            document["project"] = args.project
+        if args.research:
+            document.pop("research_id", None)
+            document.pop("research_key", None)
+            document["research"] = args.research
+        if args.key:
+            document["key"] = args.key
+        if args.replace:
+            document["mode"] = "replace"
+        document.update(actor_payload(args))
+        return request(args, "POST", "/api/v1/research-maps/import", json=document)
+    if args.action == "node":
+        map_id = resolve_map_id(args)
+        base = f"/api/v1/research-maps/{map_id}/nodes"
+        if args.node_action == "list":
+            return request(args, "GET", base)
+        if args.node_action == "get":
+            return request(args, "GET", f"{base}/{args.key}")
+        if args.node_action == "delete":
+            return request(args, "DELETE", f"{base}/{args.key}", params={"cascade": "true" if args.cascade else "false", **actor_payload(args)})
+        if args.node_action == "decide":
+            payload = compact_payload({"decision": args.decision, "verdict": args.verdict, "next": args.next_step})
+            if args.reading is not None:
+                payload["reading"] = list(args.reading)
+            if args.caveats is not None:
+                payload["caveats"] = list(args.caveats)
+            payload["note"] = bool(args.note)
+            return request(args, "POST", f"{base}/{args.key}/decide", json={**payload, **actor_payload(args)})
+        if args.node_action == "advance":
+            return request(args, "POST", f"{base}/{args.key}/advance", json=compact_payload({"stage": args.stage, "reason": args.reason, "date_label": args.date_label, **actor_payload(args)}))
+        if args.node_action == "move":
+            return request(args, "PATCH", f"{base}/{args.key}", json={"parent_key": args.parent.strip() or None, **compact_payload({"position": args.position}), **actor_payload(args)})
+        payload = node_fields_payload(args)
+        if args.node_action == "add":
+            return request(args, "POST", base, json={"key": args.key, **payload, **actor_payload(args)})
+        if args.node_action == "set":
+            return request(args, "PUT", f"{base}/{args.key}", json={**payload, **actor_payload(args)})
+        if args.node_action == "update":
+            return request(args, "PATCH", f"{base}/{args.key}", json={**payload, **actor_payload(args)})
+    raise CliError("VALIDATION_ERROR", f"unsupported map action: {args.action}")
+
+
+def write_document_file(path_value: str, document: dict[str, Any]) -> None:
+    path = Path(path_value).expanduser()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.suffix.lower() in {".yaml", ".yml"}:
+        try:
+            import yaml
+        except ImportError as exc:
+            raise CliError("VALIDATION_ERROR", "cannot write YAML: PyYAML is not installed") from exc
+        path.write_text(yaml.safe_dump(document, allow_unicode=True, sort_keys=False), encoding="utf-8")
+        return
+    path.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def publish_performance(args: argparse.Namespace) -> dict[str, Any]:

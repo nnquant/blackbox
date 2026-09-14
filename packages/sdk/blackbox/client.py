@@ -228,6 +228,89 @@ class BlackboxClient:
     def run_search_view(self, view_id: str, overrides: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         return self.request("POST", f"/api/v1/search-views/{view_id}/run", json=overrides or {})
 
+    # ------------------------------------------------------------------
+    # Research maps: hand-maintained research trees (stage + decision per node).
+    # Evidence is read from the bound entity; nothing here derives nodes from runs.
+    # ------------------------------------------------------------------
+
+    def create_research_map(self, *, key: str, title: str, project: str, research: str | None = None, **fields: Any) -> dict[str, Any]:
+        payload = {"project": project, "key": key, "title": title, **compact_payload({"research": research, **fields})}
+        return self.request("POST", "/api/v1/research-maps", json=payload)
+
+    def list_research_maps(self, *, project: str | None = None, research: str | None = None, key: str | None = None, status: str | None = None) -> list[dict[str, Any]]:
+        return self.request("GET", "/api/v1/research-maps", params=compact_payload({"project": project, "research": research, "key": key, "status": status}))
+
+    def resolve_research_map_id(self, map_ref: str) -> str:
+        """Accept a map id or ``<project-key>/<map-key>`` and return the map id."""
+        if "/" not in map_ref:
+            return map_ref
+        project_ref, _, map_key = map_ref.partition("/")
+        matches = self.list_research_maps(project=project_ref, key=map_key)
+        if not matches:
+            raise RuntimeError(f"NOT_FOUND: research map {map_ref} not found")
+        return matches[0]["id"]
+
+    def get_research_map(self, map_ref: str) -> dict[str, Any]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}")
+
+    def update_research_map(self, map_ref: str, **fields: Any) -> dict[str, Any]:
+        return self.request("PATCH", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}", json=compact_payload(fields))
+
+    def set_research_map_baseline(self, map_ref: str, node_key: str | None, *, reason: str | None = None, created_by_type: str | None = None, created_by_id: str | None = None) -> dict[str, Any]:
+        return self.request("POST", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/baseline", json={"node_key": node_key, **compact_payload({"reason": reason, "created_by_type": created_by_type, "created_by_id": created_by_id})})
+
+    def research_map_status(self, map_ref: str) -> dict[str, Any]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/status")
+
+    def lint_research_map(self, map_ref: str) -> dict[str, Any]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/lint")
+
+    def research_map_revisions(self, map_ref: str, *, node_key: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/revisions", params=compact_payload({"node_key": node_key, "limit": limit}))
+
+    def export_research_map(self, map_ref: str) -> dict[str, Any]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/export")
+
+    def import_research_map(self, document: dict[str, Any], *, mode: str | None = None, created_by_type: str | None = None, created_by_id: str | None = None) -> dict[str, Any]:
+        """Create-or-update a whole map from a document (same shape as ``bbox map export``)."""
+        payload = dict(document)
+        payload.update(compact_payload({"mode": mode, "created_by_type": created_by_type, "created_by_id": created_by_id}))
+        if created_by_id and not payload.get("created_by_type"):
+            payload["created_by_type"] = "agent"
+        return self.request("POST", "/api/v1/research-maps/import", json=payload)
+
+    def list_research_map_nodes(self, map_ref: str) -> list[dict[str, Any]]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes")
+
+    def get_research_map_node(self, map_ref: str, key: str) -> dict[str, Any]:
+        return self.request("GET", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}")
+
+    def set_research_map_node(self, map_ref: str, key: str, **fields: Any) -> dict[str, Any]:
+        """Upsert one node. Pass ``parent_key=None`` or ``binding=None`` explicitly to clear them."""
+        payload = {name: value for name, value in fields.items() if value is not None or name in {"parent_key", "binding", "decision"}}
+        if payload.get("created_by_id") and not payload.get("created_by_type"):
+            payload["created_by_type"] = "agent"
+        return self.request("PUT", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}", json=payload)
+
+    def update_research_map_node(self, map_ref: str, key: str, **fields: Any) -> dict[str, Any]:
+        payload = {name: value for name, value in fields.items() if value is not None or name in {"parent_key", "binding", "decision"}}
+        return self.request("PATCH", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}", json=payload)
+
+    def decide_research_map_node(self, map_ref: str, key: str, decision: str, *, verdict: str | None = None, reading: list[str] | None = None, caveats: list[str] | None = None, next: str | None = None, note: bool = False, created_by_type: str | None = None, created_by_id: str | None = None) -> dict[str, Any]:
+        payload = {"decision": decision, "note": note, **compact_payload({"verdict": verdict, "reading": reading, "caveats": caveats, "next": next, "created_by_type": created_by_type, "created_by_id": created_by_id})}
+        if created_by_id and not created_by_type:
+            payload["created_by_type"] = "agent"
+        return self.request("POST", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}/decide", json=payload)
+
+    def advance_research_map_node(self, map_ref: str, key: str, stage: str, *, reason: str | None = None, date_label: str | None = None, created_by_type: str | None = None, created_by_id: str | None = None) -> dict[str, Any]:
+        payload = {"stage": stage, **compact_payload({"reason": reason, "date_label": date_label, "created_by_type": created_by_type, "created_by_id": created_by_id})}
+        if created_by_id and not created_by_type:
+            payload["created_by_type"] = "agent"
+        return self.request("POST", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}/advance", json=payload)
+
+    def delete_research_map_node(self, map_ref: str, key: str, *, cascade: bool = False) -> dict[str, Any]:
+        return self.request("DELETE", f"/api/v1/research-maps/{self.resolve_research_map_id(map_ref)}/nodes/{key}", params={"cascade": "true" if cascade else "false"})
+
     def research_lineage(self, research_id: str) -> dict[str, Any]:
         return self.request("GET", f"/api/v1/lineage/researches/{research_id}")
 
@@ -972,6 +1055,13 @@ def parse_int_env(name: str, default: int) -> int:
         return max(0, int(os.getenv(name, str(default))))
     except ValueError:
         return default
+
+
+def scope_ref_payload(value: str | None, id_prefix: str, id_field: str, key_field: str) -> dict[str, Any]:
+    if not value:
+        return {}
+    text = value.strip()
+    return {id_field: text} if text.startswith(id_prefix) else {key_field: text}
 
 
 def compact_payload(payload: dict[str, Any]) -> dict[str, Any]:

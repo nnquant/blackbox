@@ -1,0 +1,1100 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览" [active]:
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - generic: 工作区
+  - generic: "1"
+  - generic: 项目
+  - generic: "22"
+  - generic: 今日 Run
+  - generic: "8"
+  - generic: 运行中
+  - generic: "41"
+  - generic: 24h 失败
+  - generic: "0"
+  - generic: 新增研究分支
+  - generic: "4"
+  - generic: Run
+  - generic: "12840"
+  - generic: 对比集
+  - generic: "17"
+  - generic: 搜索视图
+  - generic: "0"
+  - heading "项目" [level=2]
+  - table:
+    - rowgroup:
+      - row "项目 键 工作区 研究线 Run 更新时间":
+        - columnheader "项目"
+        - columnheader "键"
+        - columnheader "工作区"
+        - columnheader "研究线"
+        - columnheader "Run"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "WH-F2 强势股策略 wh-f2 local 16 63 2026/8/16 18:19:47":
+        - cell "WH-F2 强势股策略"
+        - cell "wh-f2"
+        - cell "local"
+        - cell "16"
+        - cell "63"
+        - cell "2026/8/16 18:19:47"
+      - row "WH-Pool 自建强势股池 wh-pool local 8 47 2026/9/8 15:55:14":
+        - cell "WH-Pool 自建强势股池"
+        - cell "wh-pool"
+        - cell "local"
+        - cell "8"
+        - cell "47"
+        - cell "2026/9/8 15:55:14"
+      - row "策略每日回测结果 strategy-daily-backtests local 3 136 2026/7/6 22:58:11":
+        - cell "策略每日回测结果"
+        - cell "strategy-daily-backtests"
+        - cell "local"
+        - cell "3"
+        - cell "136"
+        - cell "2026/7/6 22:58:11"
+      - row "WH 多因子模型研究 wh-multi-factor-v2 local 3 11 2026/7/3 00:39:51":
+        - cell "WH 多因子模型研究"
+        - cell "wh-multi-factor-v2"
+        - cell "local"
+        - cell "3"
+        - cell "11"
+        - cell "2026/7/3 00:39:51"
+      - row "WH-A1 强势股路径效用与动态退出 wh-a1 local 7 512 2026/9/5 12:50:51":
+        - cell "WH-A1 强势股路径效用与动态退出"
+        - cell "wh-a1"
+        - cell "local"
+        - cell "7"
+        - cell "512"
+        - cell "2026/9/5 12:50:51"
+      - row "WH-A2 继承F2优势的改进策略 wh-a2 local 2 15 2026/9/6 00:25:53":
+        - cell "WH-A2 继承F2优势的改进策略"
+        - cell "wh-a2"
+        - cell "local"
+        - cell "2"
+        - cell "15"
+        - cell "2026/9/6 00:25:53"
+      - row "WH-N3 强势行业 SIR 参数应用价值 wh-n3 local 2 2 2026/9/2 15:40:11":
+        - cell "WH-N3 强势行业 SIR 参数应用价值"
+        - cell "wh-n3"
+        - cell "local"
+        - cell "2"
+        - cell "2"
+        - cell "2026/9/2 15:40:11"
+      - row "WH策略族择时门控研究 wh-strategy-timing-overlays local 4 13 2026/9/1 14:09:52":
+        - cell "WH策略族择时门控研究"
+        - cell "wh-strategy-timing-overlays"
+        - cell "local"
+        - cell "4"
+        - cell "13"
+        - cell "2026/9/1 14:09:52"
+      - row "WH-N2 资金注意力传染模型 wh-n2 local 1 8 2026/9/1 09:02:59":
+        - cell "WH-N2 资金注意力传染模型"
+        - cell "wh-n2"
+        - cell "local"
+        - cell "1"
+        - cell "8"
+        - cell "2026/9/1 09:02:59"
+      - row "WH-N1 叙事传染线 wh-n1 local 2 20 2026/8/25 19:30:42":
+        - cell "WH-N1 叙事传染线"
+        - cell "wh-n1"
+        - cell "local"
+        - cell "2"
+        - cell "20"
+        - cell "2026/8/25 19:30:42"
+      - row "强势股个股网络机制研究 stock-pyramid-stock-network-mechanism local 1 3 2026/7/23 17:22:08":
+        - cell "强势股个股网络机制研究"
+        - cell "stock-pyramid-stock-network-mechanism"
+        - cell "local"
+        - cell "1"
+        - cell "3"
+        - cell "2026/7/23 17:22:08"
+      - row "强势股行业网络轮动 stock-pyramid-industry-network local 1 3 2026/7/23 00:01:19":
+        - cell "强势股行业网络轮动"
+        - cell "stock-pyramid-industry-network"
+        - cell "local"
+        - cell "1"
+        - cell "3"
+        - cell "2026/7/23 00:01:19"
+      - row "WH策略分钟级择时研究 wh-intraday-timing-research local 5 51 2026/7/12 22:58:28":
+        - cell "WH策略分钟级择时研究"
+        - cell "wh-intraday-timing-research"
+        - cell "local"
+        - cell "5"
+        - cell "51"
+        - cell "2026/7/12 22:58:28"
+      - row "暂停跟踪策略回测归档 strategy-paused-backtests local 1 4 2026/7/6 22:58:11":
+        - cell "暂停跟踪策略回测归档"
+        - cell "strategy-paused-backtests"
+        - cell "local"
+        - cell "1"
+        - cell "4"
+        - cell "2026/7/6 22:58:11"
+      - row "策略组合回测归档 strategy-combination-backtests local 3 4 2026/7/3 20:24:00":
+        - cell "策略组合回测归档"
+        - cell "strategy-combination-backtests"
+        - cell "local"
+        - cell "3"
+        - cell "4"
+        - cell "2026/7/3 20:24:00"
+      - row "WH Minions 微盘股策略 wh-minions local 16 23 2026/7/2 00:39:34":
+        - cell "WH Minions 微盘股策略"
+        - cell "wh-minions"
+        - cell "local"
+        - cell "16"
+        - cell "23"
+        - cell "2026/7/2 00:39:34"
+      - row "Bond ETF T0 bond-etf-t0 local 1 20 2026/6/30 14:29:08":
+        - cell "Bond ETF T0"
+        - cell "bond-etf-t0"
+        - cell "local"
+        - cell "1"
+        - cell "20"
+        - cell "2026/6/30 14:29:08"
+      - row "WH Strategy 3D wh-strategy-3d local 4 48 2026/6/29 15:55:12":
+        - cell "WH Strategy 3D"
+        - cell "wh-strategy-3d"
+        - cell "local"
+        - cell "4"
+        - cell "48"
+        - cell "2026/6/29 15:55:12"
+      - row "WH Events V1 wh-events-v1 local 4 100 2026/6/26 21:27:20":
+        - cell "WH Events V1"
+        - cell "wh-events-v1"
+        - cell "local"
+        - cell "4"
+        - cell "100"
+        - cell "2026/6/26 21:27:20"
+      - row "Convertible T0 Factor Research cbt0-factor-research local 2 30 2026/6/14 21:08:37":
+        - cell "Convertible T0 Factor Research"
+        - cell "cbt0-factor-research"
+        - cell "local"
+        - cell "2"
+        - cell "30"
+        - cell "2026/6/14 21:08:37"
+      - row "wh-strategy-v1 wh-strategy-v1 local 10 74 2026/6/9 17:04:31":
+        - cell "wh-strategy-v1"
+        - cell "wh-strategy-v1"
+        - cell "local"
+        - cell "10"
+        - cell "74"
+        - cell "2026/6/9 17:04:31"
+      - row "WH Strategy V2 wh-strategy-v2 local 149 11653 2026/6/1 22:02:20":
+        - cell "WH Strategy V2"
+        - cell "wh-strategy-v2"
+        - cell "local"
+        - cell "149"
+        - cell "11653"
+        - cell "2026/6/1 22:02:20"
+  - heading "活动历史" [level=2]
+  - generic: "2026"
+  - generic: Jun
+  - generic: Jul
+  - generic: Aug
+  - generic: Sep
+  - generic: Oct
+  - generic: Nov
+  - generic: Dec
+  - generic: Jan
+  - generic: Feb
+  - generic: Mar
+  - generic: Apr
+  - generic: May
+  - generic: Jun
+  - generic: Jul
+  - generic: Aug
+  - generic: Sep
+  - generic: Mon
+  - 'generic "5/26/2025: 0 runs"'
+  - 'generic "6/2/2025: 0 runs"'
+  - 'generic "6/9/2025: 0 runs"'
+  - 'generic "6/16/2025: 0 runs"'
+  - 'generic "6/23/2025: 0 runs"'
+  - 'generic "6/30/2025: 0 runs"'
+  - 'generic "7/7/2025: 0 runs"'
+  - 'generic "7/14/2025: 0 runs"'
+  - 'generic "7/21/2025: 0 runs"'
+  - 'generic "7/28/2025: 0 runs"'
+  - 'generic "8/4/2025: 0 runs"'
+  - 'generic "8/11/2025: 0 runs"'
+  - 'generic "8/18/2025: 0 runs"'
+  - 'generic "8/25/2025: 0 runs"'
+  - 'generic "9/1/2025: 0 runs"'
+  - 'generic "9/8/2025: 0 runs"'
+  - 'generic "9/15/2025: 0 runs"'
+  - 'generic "9/22/2025: 0 runs"'
+  - 'generic "9/29/2025: 0 runs"'
+  - 'generic "10/6/2025: 0 runs"'
+  - 'generic "10/13/2025: 0 runs"'
+  - 'generic "10/20/2025: 0 runs"'
+  - 'generic "10/27/2025: 0 runs"'
+  - 'generic "11/3/2025: 0 runs"'
+  - 'generic "11/10/2025: 0 runs"'
+  - 'generic "11/17/2025: 0 runs"'
+  - 'generic "11/24/2025: 0 runs"'
+  - 'generic "12/1/2025: 0 runs"'
+  - 'generic "12/8/2025: 0 runs"'
+  - 'generic "12/15/2025: 0 runs"'
+  - 'generic "12/22/2025: 0 runs"'
+  - 'generic "12/29/2025: 0 runs"'
+  - 'generic "1/5/2026: 0 runs"'
+  - 'generic "1/12/2026: 0 runs"'
+  - 'generic "1/19/2026: 0 runs"'
+  - 'generic "1/26/2026: 0 runs"'
+  - 'generic "2/2/2026: 0 runs"'
+  - 'generic "2/9/2026: 0 runs"'
+  - 'generic "2/16/2026: 0 runs"'
+  - 'generic "2/23/2026: 0 runs"'
+  - 'generic "3/2/2026: 0 runs"'
+  - 'generic "3/9/2026: 0 runs"'
+  - 'generic "3/16/2026: 0 runs"'
+  - 'generic "3/23/2026: 0 runs"'
+  - 'generic "3/30/2026: 0 runs"'
+  - 'generic "4/6/2026: 0 runs"'
+  - 'generic "4/13/2026: 0 runs"'
+  - 'generic "4/20/2026: 0 runs"'
+  - 'generic "4/27/2026: 0 runs"'
+  - 'generic "5/4/2026: 0 runs"'
+  - 'generic "5/11/2026: 0 runs"'
+  - 'generic "5/18/2026: 0 runs"'
+  - 'generic "5/25/2026: 0 runs"'
+  - 'generic "6/1/2026: 492 runs"'
+  - 'generic "6/8/2026: 2859 runs"'
+  - 'generic "6/15/2026: 1 runs"'
+  - 'generic "6/22/2026: 8 runs"'
+  - 'generic "6/29/2026: 29 runs"'
+  - 'generic "7/6/2026: 13 runs"'
+  - 'generic "7/13/2026: 20 runs"'
+  - 'generic "7/20/2026: 25 runs"'
+  - 'generic "7/27/2026: 2 runs"'
+  - 'generic "8/3/2026: 0 runs"'
+  - 'generic "8/10/2026: 37 runs"'
+  - 'generic "8/17/2026: 12 runs"'
+  - 'generic "8/24/2026: 3 runs"'
+  - 'generic "8/31/2026: 10 runs"'
+  - 'generic "9/7/2026: 7 runs"'
+  - 'generic "9/14/2026: 8 runs"'
+  - 'generic "5/27/2025: 0 runs"'
+  - 'generic "6/3/2025: 0 runs"'
+  - 'generic "6/10/2025: 0 runs"'
+  - 'generic "6/17/2025: 0 runs"'
+  - 'generic "6/24/2025: 0 runs"'
+  - 'generic "7/1/2025: 0 runs"'
+  - 'generic "7/8/2025: 0 runs"'
+  - 'generic "7/15/2025: 0 runs"'
+  - 'generic "7/22/2025: 0 runs"'
+  - 'generic "7/29/2025: 0 runs"'
+  - 'generic "8/5/2025: 0 runs"'
+  - 'generic "8/12/2025: 0 runs"'
+  - 'generic "8/19/2025: 0 runs"'
+  - 'generic "8/26/2025: 0 runs"'
+  - 'generic "9/2/2025: 0 runs"'
+  - 'generic "9/9/2025: 0 runs"'
+  - 'generic "9/16/2025: 0 runs"'
+  - 'generic "9/23/2025: 0 runs"'
+  - 'generic "9/30/2025: 0 runs"'
+  - 'generic "10/7/2025: 0 runs"'
+  - 'generic "10/14/2025: 0 runs"'
+  - 'generic "10/21/2025: 0 runs"'
+  - 'generic "10/28/2025: 0 runs"'
+  - 'generic "11/4/2025: 0 runs"'
+  - 'generic "11/11/2025: 0 runs"'
+  - 'generic "11/18/2025: 0 runs"'
+  - 'generic "11/25/2025: 0 runs"'
+  - 'generic "12/2/2025: 0 runs"'
+  - 'generic "12/9/2025: 0 runs"'
+  - 'generic "12/16/2025: 0 runs"'
+  - 'generic "12/23/2025: 0 runs"'
+  - 'generic "12/30/2025: 0 runs"'
+  - 'generic "1/6/2026: 0 runs"'
+  - 'generic "1/13/2026: 0 runs"'
+  - 'generic "1/20/2026: 0 runs"'
+  - 'generic "1/27/2026: 0 runs"'
+  - 'generic "2/3/2026: 0 runs"'
+  - 'generic "2/10/2026: 0 runs"'
+  - 'generic "2/17/2026: 0 runs"'
+  - 'generic "2/24/2026: 0 runs"'
+  - 'generic "3/3/2026: 0 runs"'
+  - 'generic "3/10/2026: 0 runs"'
+  - 'generic "3/17/2026: 0 runs"'
+  - 'generic "3/24/2026: 0 runs"'
+  - 'generic "3/31/2026: 0 runs"'
+  - 'generic "4/7/2026: 0 runs"'
+  - 'generic "4/14/2026: 0 runs"'
+  - 'generic "4/21/2026: 0 runs"'
+  - 'generic "4/28/2026: 0 runs"'
+  - 'generic "5/5/2026: 0 runs"'
+  - 'generic "5/12/2026: 0 runs"'
+  - 'generic "5/19/2026: 0 runs"'
+  - 'generic "5/26/2026: 0 runs"'
+  - 'generic "6/2/2026: 912 runs"'
+  - 'generic "6/9/2026: 1614 runs"'
+  - 'generic "6/16/2026: 7 runs"'
+  - 'generic "6/23/2026: 12 runs"'
+  - 'generic "6/30/2026: 31 runs"'
+  - 'generic "7/7/2026: 10 runs"'
+  - 'generic "7/14/2026: 9 runs"'
+  - 'generic "7/21/2026: 5 runs"'
+  - 'generic "7/28/2026: 3 runs"'
+  - 'generic "8/4/2026: 3 runs"'
+  - 'generic "8/11/2026: 13 runs"'
+  - 'generic "8/18/2026: 12 runs"'
+  - 'generic "8/25/2026: 18 runs"'
+  - 'generic "9/1/2026: 29 runs"'
+  - 'generic "9/8/2026: 45 runs"'
+  - 'generic "9/15/2026: 0 runs"'
+  - generic: Wed
+  - 'generic "5/28/2025: 0 runs"'
+  - 'generic "6/4/2025: 0 runs"'
+  - 'generic "6/11/2025: 0 runs"'
+  - 'generic "6/18/2025: 0 runs"'
+  - 'generic "6/25/2025: 0 runs"'
+  - 'generic "7/2/2025: 0 runs"'
+  - 'generic "7/9/2025: 0 runs"'
+  - 'generic "7/16/2025: 0 runs"'
+  - 'generic "7/23/2025: 0 runs"'
+  - 'generic "7/30/2025: 0 runs"'
+  - 'generic "8/6/2025: 0 runs"'
+  - 'generic "8/13/2025: 0 runs"'
+  - 'generic "8/20/2025: 0 runs"'
+  - 'generic "8/27/2025: 0 runs"'
+  - 'generic "9/3/2025: 0 runs"'
+  - 'generic "9/10/2025: 0 runs"'
+  - 'generic "9/17/2025: 0 runs"'
+  - 'generic "9/24/2025: 0 runs"'
+  - 'generic "10/1/2025: 0 runs"'
+  - 'generic "10/8/2025: 0 runs"'
+  - 'generic "10/15/2025: 0 runs"'
+  - 'generic "10/22/2025: 0 runs"'
+  - 'generic "10/29/2025: 0 runs"'
+  - 'generic "11/5/2025: 0 runs"'
+  - 'generic "11/12/2025: 0 runs"'
+  - 'generic "11/19/2025: 0 runs"'
+  - 'generic "11/26/2025: 0 runs"'
+  - 'generic "12/3/2025: 0 runs"'
+  - 'generic "12/10/2025: 0 runs"'
+  - 'generic "12/17/2025: 0 runs"'
+  - 'generic "12/24/2025: 0 runs"'
+  - 'generic "12/31/2025: 0 runs"'
+  - 'generic "1/7/2026: 0 runs"'
+  - 'generic "1/14/2026: 0 runs"'
+  - 'generic "1/21/2026: 0 runs"'
+  - 'generic "1/28/2026: 0 runs"'
+  - 'generic "2/4/2026: 0 runs"'
+  - 'generic "2/11/2026: 0 runs"'
+  - 'generic "2/18/2026: 0 runs"'
+  - 'generic "2/25/2026: 0 runs"'
+  - 'generic "3/4/2026: 0 runs"'
+  - 'generic "3/11/2026: 0 runs"'
+  - 'generic "3/18/2026: 0 runs"'
+  - 'generic "3/25/2026: 0 runs"'
+  - 'generic "4/1/2026: 0 runs"'
+  - 'generic "4/8/2026: 0 runs"'
+  - 'generic "4/15/2026: 0 runs"'
+  - 'generic "4/22/2026: 0 runs"'
+  - 'generic "4/29/2026: 0 runs"'
+  - 'generic "5/6/2026: 0 runs"'
+  - 'generic "5/13/2026: 0 runs"'
+  - 'generic "5/20/2026: 0 runs"'
+  - 'generic "5/27/2026: 0 runs"'
+  - 'generic "6/3/2026: 45 runs"'
+  - 'generic "6/10/2026: 90 runs"'
+  - 'generic "6/17/2026: 0 runs"'
+  - 'generic "6/24/2026: 15 runs"'
+  - 'generic "7/1/2026: 7 runs"'
+  - 'generic "7/8/2026: 3 runs"'
+  - 'generic "7/15/2026: 19 runs"'
+  - 'generic "7/22/2026: 15 runs"'
+  - 'generic "7/29/2026: 10 runs"'
+  - 'generic "8/5/2026: 0 runs"'
+  - 'generic "8/12/2026: 16 runs"'
+  - 'generic "8/19/2026: 6 runs"'
+  - 'generic "8/26/2026: 7 runs"'
+  - 'generic "9/2/2026: 5 runs"'
+  - 'generic "9/9/2026: 6 runs"'
+  - 'generic "9/16/2026: 0 runs"'
+  - 'generic "5/29/2025: 0 runs"'
+  - 'generic "6/5/2025: 0 runs"'
+  - 'generic "6/12/2025: 0 runs"'
+  - 'generic "6/19/2025: 0 runs"'
+  - 'generic "6/26/2025: 0 runs"'
+  - 'generic "7/3/2025: 0 runs"'
+  - 'generic "7/10/2025: 0 runs"'
+  - 'generic "7/17/2025: 0 runs"'
+  - 'generic "7/24/2025: 0 runs"'
+  - 'generic "7/31/2025: 0 runs"'
+  - 'generic "8/7/2025: 0 runs"'
+  - 'generic "8/14/2025: 0 runs"'
+  - 'generic "8/21/2025: 0 runs"'
+  - 'generic "8/28/2025: 0 runs"'
+  - 'generic "9/4/2025: 0 runs"'
+  - 'generic "9/11/2025: 0 runs"'
+  - 'generic "9/18/2025: 0 runs"'
+  - 'generic "9/25/2025: 0 runs"'
+  - 'generic "10/2/2025: 0 runs"'
+  - 'generic "10/9/2025: 0 runs"'
+  - 'generic "10/16/2025: 0 runs"'
+  - 'generic "10/23/2025: 0 runs"'
+  - 'generic "10/30/2025: 0 runs"'
+  - 'generic "11/6/2025: 0 runs"'
+  - 'generic "11/13/2025: 0 runs"'
+  - 'generic "11/20/2025: 0 runs"'
+  - 'generic "11/27/2025: 0 runs"'
+  - 'generic "12/4/2025: 0 runs"'
+  - 'generic "12/11/2025: 0 runs"'
+  - 'generic "12/18/2025: 0 runs"'
+  - 'generic "12/25/2025: 0 runs"'
+  - 'generic "1/1/2026: 0 runs"'
+  - 'generic "1/8/2026: 0 runs"'
+  - 'generic "1/15/2026: 0 runs"'
+  - 'generic "1/22/2026: 0 runs"'
+  - 'generic "1/29/2026: 0 runs"'
+  - 'generic "2/5/2026: 0 runs"'
+  - 'generic "2/12/2026: 0 runs"'
+  - 'generic "2/19/2026: 0 runs"'
+  - 'generic "2/26/2026: 0 runs"'
+  - 'generic "3/5/2026: 0 runs"'
+  - 'generic "3/12/2026: 0 runs"'
+  - 'generic "3/19/2026: 0 runs"'
+  - 'generic "3/26/2026: 0 runs"'
+  - 'generic "4/2/2026: 0 runs"'
+  - 'generic "4/9/2026: 0 runs"'
+  - 'generic "4/16/2026: 0 runs"'
+  - 'generic "4/23/2026: 0 runs"'
+  - 'generic "4/30/2026: 0 runs"'
+  - 'generic "5/7/2026: 0 runs"'
+  - 'generic "5/14/2026: 0 runs"'
+  - 'generic "5/21/2026: 0 runs"'
+  - 'generic "5/28/2026: 0 runs"'
+  - 'generic "6/4/2026: 1402 runs"'
+  - 'generic "6/11/2026: 2 runs"'
+  - 'generic "6/18/2026: 8 runs"'
+  - 'generic "6/25/2026: 19 runs"'
+  - 'generic "7/2/2026: 22 runs"'
+  - 'generic "7/9/2026: 6 runs"'
+  - 'generic "7/16/2026: 15 runs"'
+  - 'generic "7/23/2026: 17 runs"'
+  - 'generic "7/30/2026: 3 runs"'
+  - 'generic "8/6/2026: 0 runs"'
+  - 'generic "8/13/2026: 0 runs"'
+  - 'generic "8/20/2026: 3 runs"'
+  - 'generic "8/27/2026: 0 runs"'
+  - 'generic "9/3/2026: 12 runs"'
+  - 'generic "9/10/2026: 16 runs"'
+  - 'generic "9/17/2026: 0 runs"'
+  - generic: Fri
+  - 'generic "5/30/2025: 0 runs"'
+  - 'generic "6/6/2025: 0 runs"'
+  - 'generic "6/13/2025: 0 runs"'
+  - 'generic "6/20/2025: 0 runs"'
+  - 'generic "6/27/2025: 0 runs"'
+  - 'generic "7/4/2025: 0 runs"'
+  - 'generic "7/11/2025: 0 runs"'
+  - 'generic "7/18/2025: 0 runs"'
+  - 'generic "7/25/2025: 0 runs"'
+  - 'generic "8/1/2025: 0 runs"'
+  - 'generic "8/8/2025: 0 runs"'
+  - 'generic "8/15/2025: 0 runs"'
+  - 'generic "8/22/2025: 0 runs"'
+  - 'generic "8/29/2025: 0 runs"'
+  - 'generic "9/5/2025: 0 runs"'
+  - 'generic "9/12/2025: 0 runs"'
+  - 'generic "9/19/2025: 0 runs"'
+  - 'generic "9/26/2025: 0 runs"'
+  - 'generic "10/3/2025: 0 runs"'
+  - 'generic "10/10/2025: 0 runs"'
+  - 'generic "10/17/2025: 0 runs"'
+  - 'generic "10/24/2025: 0 runs"'
+  - 'generic "10/31/2025: 0 runs"'
+  - 'generic "11/7/2025: 0 runs"'
+  - 'generic "11/14/2025: 0 runs"'
+  - 'generic "11/21/2025: 0 runs"'
+  - 'generic "11/28/2025: 0 runs"'
+  - 'generic "12/5/2025: 0 runs"'
+  - 'generic "12/12/2025: 0 runs"'
+  - 'generic "12/19/2025: 0 runs"'
+  - 'generic "12/26/2025: 0 runs"'
+  - 'generic "1/2/2026: 0 runs"'
+  - 'generic "1/9/2026: 0 runs"'
+  - 'generic "1/16/2026: 0 runs"'
+  - 'generic "1/23/2026: 0 runs"'
+  - 'generic "1/30/2026: 0 runs"'
+  - 'generic "2/6/2026: 0 runs"'
+  - 'generic "2/13/2026: 0 runs"'
+  - 'generic "2/20/2026: 0 runs"'
+  - 'generic "2/27/2026: 0 runs"'
+  - 'generic "3/6/2026: 0 runs"'
+  - 'generic "3/13/2026: 0 runs"'
+  - 'generic "3/20/2026: 0 runs"'
+  - 'generic "3/27/2026: 0 runs"'
+  - 'generic "4/3/2026: 0 runs"'
+  - 'generic "4/10/2026: 0 runs"'
+  - 'generic "4/17/2026: 0 runs"'
+  - 'generic "4/24/2026: 0 runs"'
+  - 'generic "5/1/2026: 0 runs"'
+  - 'generic "5/8/2026: 0 runs"'
+  - 'generic "5/15/2026: 0 runs"'
+  - 'generic "5/22/2026: 0 runs"'
+  - 'generic "5/29/2026: 0 runs"'
+  - 'generic "6/5/2026: 1810 runs"'
+  - 'generic "6/12/2026: 3 runs"'
+  - 'generic "6/19/2026: 17 runs"'
+  - 'generic "6/26/2026: 55 runs"'
+  - 'generic "7/3/2026: 15 runs"'
+  - 'generic "7/10/2026: 2 runs"'
+  - 'generic "7/17/2026: 74 runs"'
+  - 'generic "7/24/2026: 35 runs"'
+  - 'generic "7/31/2026: 0 runs"'
+  - 'generic "8/7/2026: 8 runs"'
+  - 'generic "8/14/2026: 6 runs"'
+  - 'generic "8/21/2026: 3 runs"'
+  - 'generic "8/28/2026: 6 runs"'
+  - 'generic "9/4/2026: 5 runs"'
+  - 'generic "9/11/2026: 15 runs"'
+  - 'generic "9/18/2026: 0 runs"'
+  - 'generic "5/31/2025: 0 runs"'
+  - 'generic "6/7/2025: 0 runs"'
+  - 'generic "6/14/2025: 0 runs"'
+  - 'generic "6/21/2025: 0 runs"'
+  - 'generic "6/28/2025: 0 runs"'
+  - 'generic "7/5/2025: 0 runs"'
+  - 'generic "7/12/2025: 0 runs"'
+  - 'generic "7/19/2025: 0 runs"'
+  - 'generic "7/26/2025: 0 runs"'
+  - 'generic "8/2/2025: 0 runs"'
+  - 'generic "8/9/2025: 0 runs"'
+  - 'generic "8/16/2025: 0 runs"'
+  - 'generic "8/23/2025: 0 runs"'
+  - 'generic "8/30/2025: 0 runs"'
+  - 'generic "9/6/2025: 0 runs"'
+  - 'generic "9/13/2025: 0 runs"'
+  - 'generic "9/20/2025: 0 runs"'
+  - 'generic "9/27/2025: 0 runs"'
+  - 'generic "10/4/2025: 0 runs"'
+  - 'generic "10/11/2025: 0 runs"'
+  - 'generic "10/18/2025: 0 runs"'
+  - 'generic "10/25/2025: 0 runs"'
+  - 'generic "11/1/2025: 0 runs"'
+  - 'generic "11/8/2025: 0 runs"'
+  - 'generic "11/15/2025: 0 runs"'
+  - 'generic "11/22/2025: 0 runs"'
+  - 'generic "11/29/2025: 0 runs"'
+  - 'generic "12/6/2025: 0 runs"'
+  - 'generic "12/13/2025: 0 runs"'
+  - 'generic "12/20/2025: 0 runs"'
+  - 'generic "12/27/2025: 0 runs"'
+  - 'generic "1/3/2026: 0 runs"'
+  - 'generic "1/10/2026: 0 runs"'
+  - 'generic "1/17/2026: 0 runs"'
+  - 'generic "1/24/2026: 0 runs"'
+  - 'generic "1/31/2026: 0 runs"'
+  - 'generic "2/7/2026: 0 runs"'
+  - 'generic "2/14/2026: 0 runs"'
+  - 'generic "2/21/2026: 0 runs"'
+  - 'generic "2/28/2026: 0 runs"'
+  - 'generic "3/7/2026: 0 runs"'
+  - 'generic "3/14/2026: 0 runs"'
+  - 'generic "3/21/2026: 0 runs"'
+  - 'generic "3/28/2026: 0 runs"'
+  - 'generic "4/4/2026: 0 runs"'
+  - 'generic "4/11/2026: 0 runs"'
+  - 'generic "4/18/2026: 0 runs"'
+  - 'generic "4/25/2026: 0 runs"'
+  - 'generic "5/2/2026: 0 runs"'
+  - 'generic "5/9/2026: 0 runs"'
+  - 'generic "5/16/2026: 0 runs"'
+  - 'generic "5/23/2026: 0 runs"'
+  - 'generic "5/30/2026: 0 runs"'
+  - 'generic "6/6/2026: 307 runs"'
+  - 'generic "6/13/2026: 2 runs"'
+  - 'generic "6/20/2026: 7 runs"'
+  - 'generic "6/27/2026: 31 runs"'
+  - 'generic "7/4/2026: 0 runs"'
+  - 'generic "7/11/2026: 14 runs"'
+  - 'generic "7/18/2026: 36 runs"'
+  - 'generic "7/25/2026: 10 runs"'
+  - 'generic "8/1/2026: 3 runs"'
+  - 'generic "8/8/2026: 64 runs"'
+  - 'generic "8/15/2026: 3 runs"'
+  - 'generic "8/22/2026: 0 runs"'
+  - 'generic "8/29/2026: 7 runs"'
+  - 'generic "9/5/2026: 337 runs"'
+  - 'generic "9/12/2026: 2 runs"'
+  - 'generic "9/19/2026: 0 runs"'
+  - 'generic "6/1/2025: 0 runs"'
+  - 'generic "6/8/2025: 0 runs"'
+  - 'generic "6/15/2025: 0 runs"'
+  - 'generic "6/22/2025: 0 runs"'
+  - 'generic "6/29/2025: 0 runs"'
+  - 'generic "7/6/2025: 0 runs"'
+  - 'generic "7/13/2025: 0 runs"'
+  - 'generic "7/20/2025: 0 runs"'
+  - 'generic "7/27/2025: 0 runs"'
+  - 'generic "8/3/2025: 0 runs"'
+  - 'generic "8/10/2025: 0 runs"'
+  - 'generic "8/17/2025: 0 runs"'
+  - 'generic "8/24/2025: 0 runs"'
+  - 'generic "8/31/2025: 0 runs"'
+  - 'generic "9/7/2025: 0 runs"'
+  - 'generic "9/14/2025: 0 runs"'
+  - 'generic "9/21/2025: 0 runs"'
+  - 'generic "9/28/2025: 0 runs"'
+  - 'generic "10/5/2025: 0 runs"'
+  - 'generic "10/12/2025: 0 runs"'
+  - 'generic "10/19/2025: 0 runs"'
+  - 'generic "10/26/2025: 0 runs"'
+  - 'generic "11/2/2025: 0 runs"'
+  - 'generic "11/9/2025: 0 runs"'
+  - 'generic "11/16/2025: 0 runs"'
+  - 'generic "11/23/2025: 0 runs"'
+  - 'generic "11/30/2025: 0 runs"'
+  - 'generic "12/7/2025: 0 runs"'
+  - 'generic "12/14/2025: 0 runs"'
+  - 'generic "12/21/2025: 0 runs"'
+  - 'generic "12/28/2025: 0 runs"'
+  - 'generic "1/4/2026: 0 runs"'
+  - 'generic "1/11/2026: 0 runs"'
+  - 'generic "1/18/2026: 0 runs"'
+  - 'generic "1/25/2026: 0 runs"'
+  - 'generic "2/1/2026: 0 runs"'
+  - 'generic "2/8/2026: 0 runs"'
+  - 'generic "2/15/2026: 0 runs"'
+  - 'generic "2/22/2026: 0 runs"'
+  - 'generic "3/1/2026: 0 runs"'
+  - 'generic "3/8/2026: 0 runs"'
+  - 'generic "3/15/2026: 0 runs"'
+  - 'generic "3/22/2026: 0 runs"'
+  - 'generic "3/29/2026: 0 runs"'
+  - 'generic "4/5/2026: 0 runs"'
+  - 'generic "4/12/2026: 0 runs"'
+  - 'generic "4/19/2026: 0 runs"'
+  - 'generic "4/26/2026: 0 runs"'
+  - 'generic "5/3/2026: 0 runs"'
+  - 'generic "5/10/2026: 0 runs"'
+  - 'generic "5/17/2026: 0 runs"'
+  - 'generic "5/24/2026: 0 runs"'
+  - 'generic "5/31/2026: 0 runs"'
+  - 'generic "6/7/2026: 1589 runs"'
+  - 'generic "6/14/2026: 25 runs"'
+  - 'generic "6/21/2026: 5 runs"'
+  - 'generic "6/28/2026: 3 runs"'
+  - 'generic "7/5/2026: 16 runs"'
+  - 'generic "7/12/2026: 42 runs"'
+  - 'generic "7/19/2026: 23 runs"'
+  - 'generic "7/26/2026: 22 runs"'
+  - 'generic "8/2/2026: 0 runs"'
+  - 'generic "8/9/2026: 11 runs"'
+  - 'generic "8/16/2026: 19 runs"'
+  - 'generic "8/23/2026: 0 runs"'
+  - 'generic "8/30/2026: 0 runs"'
+  - 'generic "9/6/2026: 190 runs"'
+  - 'generic "9/13/2026: 0 runs"'
+  - 'generic "9/20/2026: 0 runs"'
+  - generic: Less
+  - generic: More
+  - heading "最近结果" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究分支 状态 创建者 Sharpe 耗时 更新时间":
+        - columnheader "Run"
+        - columnheader "研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "耗时"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "f2-gap-thresholds-G7-20260914 four-cumulative-thresholds 已完成 agent / codex 1.40 4m 2026/9/14 14:05:19":
+        - cell "f2-gap-thresholds-G7-20260914":
+          - button "f2-gap-thresholds-G7-20260914"
+        - cell "four-cumulative-thresholds":
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.40"
+        - cell "4m"
+        - cell "2026/9/14 14:05:19"
+      - row "f2-gap-thresholds-G5-20260914 four-cumulative-thresholds 已完成 agent / codex 2.31 4m 2026/9/14 14:05:18":
+        - cell "f2-gap-thresholds-G5-20260914":
+          - button "f2-gap-thresholds-G5-20260914"
+        - cell "four-cumulative-thresholds":
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.31"
+        - cell "4m"
+        - cell "2026/9/14 14:05:18"
+      - row "f2-gap-thresholds-G3-20260914 four-cumulative-thresholds 已完成 agent / codex 2.19 4m 2026/9/14 14:05:17":
+        - cell "f2-gap-thresholds-G3-20260914":
+          - button "f2-gap-thresholds-G3-20260914"
+        - cell "four-cumulative-thresholds":
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.19"
+        - cell "4m"
+        - cell "2026/9/14 14:05:17"
+      - row "f2-gap-thresholds-G1-20260914 four-cumulative-thresholds 已完成 agent / codex 3.24 4m 2026/9/14 14:05:17":
+        - cell "f2-gap-thresholds-G1-20260914":
+          - button "f2-gap-thresholds-G1-20260914"
+        - cell "four-cumulative-thresholds":
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.24"
+        - cell "4m"
+        - cell "2026/9/14 14:05:17"
+      - row "f2-gap-thresholds-B0-20260914 four-cumulative-thresholds 已完成 agent / codex 2.00 4m 2026/9/14 14:05:16":
+        - cell "f2-gap-thresholds-B0-20260914":
+          - button "f2-gap-thresholds-B0-20260914"
+        - cell "four-cumulative-thresholds":
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "4m"
+        - cell "2026/9/14 14:05:16"
+      - row "wh-pool-v5-20260914 frozen-v5 运行中 agent / codex -- 0s 2026/9/14 13:55:54":
+        - cell "wh-pool-v5-20260914":
+          - button "wh-pool-v5-20260914"
+        - cell "frozen-v5":
+          - button "frozen-v5"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "agent / codex"
+        - cell "--"
+        - cell "0s"
+        - cell "2026/9/14 13:55:54"
+      - row "f2-limit-down-open-LD-20260914 fixed-limit-down-open 已完成 agent / codex -0.59 4m 2026/9/14 13:54:13":
+        - cell "f2-limit-down-open-LD-20260914":
+          - button "f2-limit-down-open-LD-20260914"
+        - cell "fixed-limit-down-open":
+          - button "fixed-limit-down-open"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-0.59"
+        - cell "4m"
+        - cell "2026/9/14 13:54:13"
+      - row "f2-limit-down-open-B0-20260914 fixed-limit-down-open 已完成 agent / codex 2.00 4m 2026/9/14 13:54:12":
+        - cell "f2-limit-down-open-B0-20260914":
+          - button "f2-limit-down-open-B0-20260914"
+        - cell "fixed-limit-down-open":
+          - button "fixed-limit-down-open"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "4m"
+        - cell "2026/9/14 13:54:12"
+      - row "f2-low-open-oracle-LOW-20260912 fixed-gap-lt-zero 已完成 agent / codex 3.02 6m 2026/9/12 18:52:08":
+        - cell "f2-low-open-oracle-LOW-20260912":
+          - button "f2-low-open-oracle-LOW-20260912"
+        - cell "fixed-gap-lt-zero":
+          - button "fixed-gap-lt-zero"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.02"
+        - cell "6m"
+        - cell "2026/9/12 18:52:08"
+      - row "f2-low-open-oracle-B0-20260912 fixed-gap-lt-zero 已完成 agent / codex 2.00 6m 2026/9/12 18:52:06":
+        - cell "f2-low-open-oracle-B0-20260912":
+          - button "f2-low-open-oracle-B0-20260912"
+        - cell "fixed-gap-lt-zero":
+          - button "fixed-gap-lt-zero"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "6m"
+        - cell "2026/9/12 18:52:06"
+  - heading "活跃研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "研究线 7日 Run 失败率 研究分支 最优候选 Sharpe 最近 Run":
+        - columnheader "研究线"
+        - columnheader "7日 Run"
+        - columnheader "失败率"
+        - columnheader "研究分支"
+        - columnheader "最优候选"
+        - columnheader "Sharpe"
+        - columnheader "最近 Run"
+    - rowgroup:
+      - row "F2低开四阈值全样本2023至2026 0 0% 1 -- -- 2026/9/14 14:17:16":
+        - cell "F2低开四阈值全样本2023至2026":
+          - button "F2低开四阈值全样本2023至2026"
+        - cell "0"
+        - cell "0%"
+        - cell "1"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 14:17:16"
+      - row "F2低开四累计阈值对照 5 0% 1 f2-gap-thresholds-G1-20260914 3.24 2026/9/14 14:05:19":
+        - cell "F2低开四累计阈值对照":
+          - button "F2低开四累计阈值对照"
+        - cell "5"
+        - cell "0%"
+        - cell "1"
+        - cell "f2-gap-thresholds-G1-20260914":
+          - button "f2-gap-thresholds-G1-20260914"
+        - cell "3.24"
+        - cell "2026/9/14 14:05:19"
+      - row "V5 状态定义与忠实性验收 1 0% 1 -- -- 2026/9/14 13:55:54":
+        - cell "V5 状态定义与忠实性验收":
+          - button "V5 状态定义与忠实性验收"
+        - cell "1"
+        - cell "0%"
+        - cell "1"
+        - cell "--"
+        - cell "--"
+        - cell "2026/9/14 13:55:54"
+      - row "F2只买跌停开盘对照 2 0% 1 f2-limit-down-open-B0-20260914 2.00 2026/9/14 13:54:13":
+        - cell "F2只买跌停开盘对照":
+          - button "F2只买跌停开盘对照"
+        - cell "2"
+        - cell "0%"
+        - cell "1"
+        - cell "f2-limit-down-open-B0-20260914":
+          - button "f2-limit-down-open-B0-20260914"
+        - cell "2.00"
+        - cell "2026/9/14 13:54:13"
+      - row "F2只买低开后视镜对照 2 0% 1 f2-low-open-oracle-LOW-20260912 3.02 2026/9/12 18:52:08":
+        - cell "F2只买低开后视镜对照":
+          - button "F2只买低开后视镜对照"
+        - cell "2"
+        - cell "0%"
+        - cell "1"
+        - cell "f2-low-open-oracle-LOW-20260912":
+          - button "f2-low-open-oracle-LOW-20260912"
+        - cell "3.02"
+        - cell "2026/9/12 18:52:08"
+      - row "wh-f2 5 0% 1 wh-f2-oaks-crosect-2026-20260817-performance-v1 2.52 2026/9/11 21:08:45":
+        - cell "wh-f2":
+          - button "wh-f2"
+        - cell "5"
+        - cell "0%"
+        - cell "1"
+        - cell "wh-f2-oaks-crosect-2026-20260817-performance-v1":
+          - button "wh-f2-oaks-crosect-2026-20260817-performance-v1"
+        - cell "2.52"
+        - cell "2026/9/11 21:08:45"
+      - row "wh-v2-2025 每日 oaks_crosect 回测 5 0% 1 wh-v2-2025-oaks-crosect-2026-20260706 4.33 2026/9/11 21:08:45":
+        - cell "wh-v2-2025 每日 oaks_crosect 回测":
+          - button "wh-v2-2025 每日 oaks_crosect 回测"
+        - cell "5"
+        - cell "0%"
+        - cell "1"
+        - cell "wh-v2-2025-oaks-crosect-2026-20260706":
+          - button "wh-v2-2025-oaks-crosect-2026-20260706"
+        - cell "4.33"
+        - cell "2026/9/11 21:08:45"
+      - row "wh-v1 每日 oaks_crosect 回测 5 0% 1 wh-v1-oaks-crosect-2026-20260706 5.06 2026/9/11 21:08:45":
+        - cell "wh-v1 每日 oaks_crosect 回测":
+          - button "wh-v1 每日 oaks_crosect 回测"
+        - cell "5"
+        - cell "0%"
+        - cell "1"
+        - cell "wh-v1-oaks-crosect-2026-20260706":
+          - button "wh-v1-oaks-crosect-2026-20260706"
+        - cell "5.06"
+        - cell "2026/9/11 21:08:45"
+  - heading "待复核 Run" [level=2]
+  - button "smoke-py_b fixed-four-arm-v1 · 失败 失败":
+    - generic: smoke-py_b
+    - generic: fixed-four-arm-v1 · 失败
+    - generic: 失败
+  - button "wh-f2-stock-continuation-60d-20260909 frozen60-triage · 已取消 已取消":
+    - generic: wh-f2-stock-continuation-60d-20260909
+    - generic: frozen60-triage · 已取消
+    - generic: 已取消
+  - heading "决策候选" [level=2]
+  - button "f2-gap-thresholds-G1-20260914 Sharpe 3.24 DD -7.58 4m":
+    - generic: f2-gap-thresholds-G1-20260914
+    - generic: Sharpe 3.24
+    - generic: DD -7.58
+    - generic: 4m
+  - button "f2-low-open-oracle-LOW-20260912 Sharpe 3.02 DD -10.53 6m":
+    - generic: f2-low-open-oracle-LOW-20260912
+    - generic: Sharpe 3.02
+    - generic: DD -10.53
+    - generic: 6m
+  - button "r13-v1-0-observed_2026-base Sharpe 2.83 DD -15.98 2s":
+    - generic: r13-v1-0-observed_2026-base
+    - generic: Sharpe 2.83
+    - generic: DD -15.98
+    - generic: 2s
+  - button "r11-v1-0-observed_2026-base Sharpe 2.83 DD -15.98 4s":
+    - generic: r11-v1-0-observed_2026-base
+    - generic: Sharpe 2.83
+    - generic: DD -15.98
+    - generic: 4s
+  - button "r10-v1-0-observed_2026-base Sharpe 2.83 DD -15.98 2s":
+    - generic: r10-v1-0-observed_2026-base
+    - generic: Sharpe 2.83
+    - generic: DD -15.98
+    - generic: 2s
+  - button "r11-development-context38-base Sharpe 2.50 DD -22.86 28m":
+    - generic: r11-development-context38-base
+    - generic: Sharpe 2.50
+    - generic: DD -22.86
+    - generic: 28m
+  - button "r11-old-r02-account-base Sharpe 2.48 DD -22.54 3s":
+    - generic: r11-old-r02-account-base
+    - generic: Sharpe 2.48
+    - generic: DD -22.54
+    - generic: 3s
+  - button "R Sharpe 2.41 DD -29.42 9m":
+    - generic: R
+    - generic: Sharpe 2.41
+    - generic: DD -29.42
+    - generic: 9m
+  - generic "System Overview":
+    - generic: System Overview

@@ -5,7 +5,7 @@ from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .enums import BranchStatus, EventType, NoteKind, RunStatus
+from .enums import BranchStatus, EventType, NoteKind, ResearchMapDecision, ResearchMapStage, ResearchMapStatus, RunMode, RunStatus
 
 T = TypeVar("T")
 
@@ -167,6 +167,7 @@ class RunCreate(BaseModel):
     config: dict[str, Any] = Field(default_factory=dict)
     context: dict[str, Any] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
+    mode: RunMode = RunMode.backtest
     created_by_type: str = "human"
     created_by_id: str | None = None
 
@@ -178,6 +179,7 @@ class RunUpdate(BaseModel):
     config: dict[str, Any] | None = None
     context: dict[str, Any] | None = None
     tags: list[str] | None = None
+    mode: RunMode | None = None
 
 
 class RunCloneCreate(BaseModel):
@@ -203,6 +205,7 @@ class RunRead(ORMModel):
     context_json: dict[str, Any] = Field(default_factory=dict)
     summary_json: dict[str, Any] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
+    mode: str = "backtest"
     started_at: datetime | None = None
     ended_at: datetime | None = None
     created_by_type: str
@@ -482,3 +485,147 @@ class SearchViewRead(ORMModel):
     filters_json: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime
+
+
+# ---------------------------------------------------------------------------
+# Research maps (manually maintained research trees)
+# ---------------------------------------------------------------------------
+
+RESEARCH_MAP_KEY_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+RESEARCH_MAP_BINDING_KINDS = ("run", "branch", "compare_set", "research")
+RESEARCH_MAP_REF_KINDS = ("run", "branch", "research", "project", "compare_set", "artifact", "sweep", "file", "url")
+
+
+class ResearchMapBinding(BaseModel):
+    kind: str = Field(pattern="^(run|branch|compare_set|research)$")
+    id: str
+
+
+class ResearchMapChange(BaseModel):
+    what: str
+    to: str
+    from_: str | None = Field(default=None, alias="from")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ResearchMapRef(BaseModel):
+    kind: str = Field(pattern="^(run|branch|research|project|compare_set|artifact|sweep|file|url)$")
+    id: str | None = None
+    href: str | None = None
+    label: str | None = None
+
+
+class ResearchMapActor(BaseModel):
+    created_by_type: str | None = None
+    created_by_id: str | None = None
+
+
+class ResearchMapNodeFields(BaseModel):
+    """Narrative fields shared by node create, upsert, update, and import payloads."""
+
+    title: str | None = None
+    full_title: str | None = None
+    date_label: str | None = None
+    stage: ResearchMapStage | None = None
+    decision: ResearchMapDecision | None = None
+    hypothesis: str | None = None
+    change: list[Any] | None = Field(default=None, description="list of {what, from, to} objects or plain strings")
+    reading: list[str] | None = None
+    verdict: str | None = None
+    caveats: list[str] | None = None
+    next: str | None = None
+    binding: ResearchMapBinding | None = None
+    refs: list[ResearchMapRef] | None = None
+    meta: dict[str, Any] | None = None
+
+
+class ResearchMapNodeCreate(ResearchMapNodeFields, ResearchMapActor):
+    key: str = Field(pattern=RESEARCH_MAP_KEY_PATTERN)
+    title: str
+    parent_key: str | None = None
+    position: int | None = None
+    stage: ResearchMapStage = ResearchMapStage.idea
+
+
+class ResearchMapNodeUpsert(ResearchMapNodeFields, ResearchMapActor):
+    parent_key: str | None = None
+    position: int | None = None
+
+
+class ResearchMapNodeUpdate(ResearchMapNodeFields, ResearchMapActor):
+    parent_key: str | None = None
+    position: int | None = None
+    reason: str | None = Field(default=None, description="required when moving the stage backwards")
+
+
+class ResearchMapNodeDecide(ResearchMapActor):
+    decision: ResearchMapDecision
+    reading: list[str] | None = None
+    verdict: str | None = None
+    caveats: list[str] | None = None
+    next: str | None = None
+    note: bool = Field(default=False, description="also write a kind=decision note on the bound run")
+
+
+class ResearchMapNodeAdvance(ResearchMapActor):
+    stage: ResearchMapStage
+    reason: str | None = None
+    date_label: str | None = None
+
+
+class ResearchMapBaselineSet(ResearchMapActor):
+    node_key: str | None = Field(default=None, description="null clears the baseline")
+    reason: str | None = None
+
+
+class ResearchMapImportNode(ResearchMapNodeFields):
+    key: str = Field(pattern=RESEARCH_MAP_KEY_PATTERN)
+    parent_key: str | None = None
+    position: int | None = None
+    children: list["ResearchMapImportNode"] = Field(default_factory=list)
+
+
+class ResearchMapFields(BaseModel):
+    title: str | None = None
+    subtitle: str | None = None
+    description: str | None = None
+    status: ResearchMapStatus | None = None
+    primary_metric: str | None = None
+    settings: dict[str, Any] | None = None
+
+
+class ResearchMapCreate(ResearchMapFields, ResearchMapActor):
+    project_id: str | None = None
+    project_key: str | None = None
+    project: str | None = None
+    research_id: str | None = None
+    research_key: str | None = None
+    research: str | None = None
+    key: str = Field(pattern=RESEARCH_MAP_KEY_PATTERN)
+    title: str
+    status: ResearchMapStatus = ResearchMapStatus.active
+
+
+class ResearchMapUpdate(ResearchMapFields, ResearchMapActor):
+    research_id: str | None = None
+
+
+class ResearchMapNodesImport(ResearchMapActor):
+    nodes: list[ResearchMapImportNode] = Field(default_factory=list)
+    mode: str = Field(default="merge", pattern=r"^(merge|replace)$")
+
+
+class ResearchMapDocumentImport(ResearchMapFields, ResearchMapActor):
+    """One-shot document import: creates the map when missing, then upserts nodes."""
+
+    project_id: str | None = None
+    project_key: str | None = None
+    project: str | None = None
+    research_id: str | None = None
+    research_key: str | None = None
+    research: str | None = None
+    key: str = Field(pattern=RESEARCH_MAP_KEY_PATTERN)
+    baseline: str | None = None
+    nodes: list[ResearchMapImportNode] = Field(default_factory=list)
+    mode: str = Field(default="merge", pattern=r"^(merge|replace)$")

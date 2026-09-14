@@ -164,6 +164,49 @@ def research_lineage(research_id: str, endpoint: str | None = None, token: str |
     return default_client(endpoint=endpoint, token=token).research_lineage(research_id)
 
 
+def import_research_map(document: dict[str, Any], *, mode: str | None = None, created_by_type: str | None = None, created_by_id: str | None = None, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
+    """Create or update a manually maintained research map from a document."""
+    return default_client(endpoint=endpoint, token=token).import_research_map(document, mode=mode, created_by_type=created_by_type, created_by_id=created_by_id)
+
+
+def get_research_map(map_ref: str, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).get_research_map(map_ref)
+
+
+def export_research_map(map_ref: str, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).export_research_map(map_ref)
+
+
+def list_research_maps(*, project: str | None = None, research: str | None = None, status: str | None = None, endpoint: str | None = None, token: str | None = None) -> list[dict[str, Any]]:
+    return default_client(endpoint=endpoint, token=token).list_research_maps(project=project, research=research, status=status)
+
+
+def research_map_status(map_ref: str, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).research_map_status(map_ref)
+
+
+def set_research_map_node(map_ref: str, key: str, endpoint: str | None = None, token: str | None = None, **fields: Any) -> dict[str, Any]:
+    """Upsert one research map node by key (narrative fields, stage, decision, binding)."""
+    return default_client(endpoint=endpoint, token=token).set_research_map_node(map_ref, key, **fields)
+
+
+def decide_research_map_node(map_ref: str, key: str, decision: str, endpoint: str | None = None, token: str | None = None, **fields: Any) -> dict[str, Any]:
+    """Write the decision (and verdict / reading / caveats / next); ``note=True`` also writes a decision note on the bound run."""
+    return default_client(endpoint=endpoint, token=token).decide_research_map_node(map_ref, key, decision, **fields)
+
+
+def advance_research_map_node(map_ref: str, key: str, stage: str, endpoint: str | None = None, token: str | None = None, **fields: Any) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).advance_research_map_node(map_ref, key, stage, **fields)
+
+
+def set_research_map_baseline(map_ref: str, node_key: str | None, endpoint: str | None = None, token: str | None = None, **fields: Any) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).set_research_map_baseline(map_ref, node_key, **fields)
+
+
+def delete_research_map_node(map_ref: str, key: str, *, cascade: bool = False, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
+    return default_client(endpoint=endpoint, token=token).delete_research_map_node(map_ref, key, cascade=cascade)
+
+
 def branch_lineage(branch_id: str, endpoint: str | None = None, token: str | None = None) -> dict[str, Any]:
     return default_client(endpoint=endpoint, token=token).branch_lineage(branch_id)
 

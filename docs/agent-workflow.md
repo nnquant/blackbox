@@ -134,6 +134,50 @@ bbox note add `
 
 The WebUI will show the resulting run, artifacts, compare output, lineage, notes, and creator/source fields after refresh or websocket update.
 
+## Research Map Maintenance
+
+A research map is the agent's hand-maintained tree of research nodes. Each node has a lifecycle **stage** (`idea → hypothesis → experiment → validation → tracking → simulation → live → retired`), a review **decision** (`pending | kept | accepted | rejected | superseded`, empty while undecided), a short narrative (hypothesis, change, reading, verdict, caveats, next), and at most one **binding** to a run, branch, compare set, or research. Metrics, quality-gate status, artifacts, and decision notes are read from the bound entity; Blackbox never creates nodes, changes stages or decisions, or moves the baseline by itself.
+
+Register the node when you start the experiment, decide when the results are in, advance accepted nodes through the lifecycle:
+
+```powershell
+bbox map init --project alpha-lab --research csi500-reversal --key csi500-map --title "CSI500 reversal map" --created-by-id agent-alpha
+
+bbox map node set --map alpha-lab/csi500-map --key fee-v2 --parent baseline --title "Fee model v2" --stage experiment `
+  --hypothesis "A conservative post-cost fee model keeps the right tail?" `
+  --change "fee per side|5bp|10bp" --run run_new --created-by-id agent-alpha --agent-output
+
+bbox map node decide --map alpha-lab/csi500-map --key fee-v2 --decision kept `
+  --reading "sharpe 1.30 vs baseline 1.21" --reading "max_drawdown -8.1% vs -9.4%" `
+  --verdict "Keep: better Sharpe and drawdown; compare against baseline before promotion." `
+  --caveat "single fee assumption, not swept" --note --created-by-id agent-alpha
+
+bbox map node advance --map alpha-lab/csi500-map --key fee-v2 --stage validation --date 2026-09-14
+bbox map baseline --map alpha-lab/csi500-map --key fee-v2 --reason "promoted after robustness review" --created-by-id agent-alpha
+bbox map node update --map alpha-lab/csi500-map --key fee-v1 --decision superseded --verdict "Superseded by fee-v2."
+bbox map node delete --map alpha-lab/csi500-map --key abandoned --cascade
+```
+
+Review and document-style maintenance:
+
+```powershell
+bbox map status --map alpha-lab/csi500-map      # results without a decision, stale experiments, accepted but not advanced, broken bindings, runs without a node
+bbox map lint --map alpha-lab/csi500-map        # field limits (title ≤ 14, hypothesis ≤ 50, ≤ 3 changes / readings / caveats, verdict ≤ 60) and consistency
+bbox map export --map alpha-lab/csi500-map --output-file .\research-map.yaml
+bbox map import --file .\research-map.yaml --created-by-id agent-alpha --agent-output   # merge by key; add --replace to prune
+```
+
+Rules:
+
+- `decide --note` writes the verdict as a `kind=decision` note on the bound run, so the review board and the map never disagree. Use it instead of a separate `bbox note add` for map decisions.
+- Stages only advance; moving back needs `--reason` and is recorded in `bbox map revisions`.
+- Accepted nodes should bind a run that passes the quality gate; tracking / simulation / live nodes should be accepted. `map lint` reports both.
+- Use `run start --mode paper|sim|live` for forward-tracking, simulated, and live runs so they can be bound to the matching stages.
+- Keep node keys stable, pass `--created-by-id`, and put long text in run notes or report artifacts, not in the map.
+- Prefer `--fields-file` or the document for long Chinese text on Windows; shell arguments can be mangled by the console code page.
+
+Document format, SDK helpers (`bb.set_research_map_node`, `bb.decide_research_map_node`, `bb.advance_research_map_node`, `bb.set_research_map_baseline`), and the REST API are described in `docs/research-map.md`.
+
 ## Batch Operations
 
 Use batch commands when an agent needs one machine-readable report for many targets.
@@ -260,3 +304,4 @@ After an agent run, verify in WebUI:
 - Search page: filters can find the run by project/research/branch/status/tags/metric/config/context/author/artifact.
 - Compare page: selected runs show metric matrix, config diff, series preview, artifact comparison, and Pareto view.
 - Sweep page: attached sweep runs show heatmap, result table, Pareto frontier, and links back to run detail.
+- Research page: the embedded map opens on the baseline node; the branch and recent-run tables show the Map node column; the node detail shows the verdict, the comparison against the baseline, and the bound run's quality gate.

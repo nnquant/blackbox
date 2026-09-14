@@ -102,6 +102,7 @@ from .models import (
     utcnow,
 )
 from .realtime import event_hub, publish_change
+from .research_maps import register_research_map_routes
 from .settings import get_settings
 from .storage import get_artifact_content_target, get_storage
 from .workers import get_worker
@@ -642,6 +643,7 @@ def create_app() -> FastAPI:
             context_json=payload.context,
             summary_json=summary,
             tags=payload.tags,
+            mode=payload.mode.value if hasattr(payload.mode, "value") else str(payload.mode or "backtest"),
             created_by_type=payload.created_by_type,
             created_by_id=payload.created_by_id,
             started_at=utcnow(),
@@ -687,7 +689,7 @@ def create_app() -> FastAPI:
         run = require_run(db, run_id)
         if "config" in payload.model_fields_set and run.status in {RunStatus.completed.value, RunStatus.failed.value, RunStatus.cancelled.value}:
             raise ApiError(ErrorCode.state_error, f"run {run_id} config is immutable after terminal status")
-        update_fields(run, payload, {"name", "title", "source_run_id", "tags"})
+        update_fields(run, payload, {"name", "title", "source_run_id", "tags", "mode"})
         if "config" in payload.model_fields_set:
             run.config_json = payload.config or {}
             flag_modified(run, "config_json")
@@ -1518,6 +1520,8 @@ def create_app() -> FastAPI:
                 ],
             }
         )
+
+    register_research_map_routes(app)
 
     webui_dist = Path(__file__).resolve().parents[3] / "webui" / "dist"
     if webui_dist.exists():

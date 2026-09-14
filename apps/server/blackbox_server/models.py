@@ -101,6 +101,7 @@ class Run(TimestampMixin, Base):
     context_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
     summary_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
     tags: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
+    mode: Mapped[str] = mapped_column(String(32), default="backtest", nullable=False, index=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=utcnow)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by_type: Mapped[str] = mapped_column(String(32), default="human", nullable=False)
@@ -275,3 +276,79 @@ class SearchView(Base):
     filters_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchMap(TimestampMixin, Base):
+    """A manually maintained research map: a tree of claims, changes, readings, and verdicts.
+
+    Maps are never derived from runs. Research agents create and update nodes explicitly
+    through the API, the SDK, or ``bbox map``. Evidence (metrics, quality, artifacts, decision
+    notes) is read live from the entity each node binds to.
+    """
+
+    __tablename__ = "research_maps"
+    __table_args__ = (UniqueConstraint("project_id", "key", name="uq_research_map_project_key"),)
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("research_map"))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
+    research_id: Mapped[str | None] = mapped_column(ForeignKey("researches.id"), index=True)
+    key: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
+    subtitle: Mapped[str | None] = mapped_column(String(512))
+    description: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(32), default="active", nullable=False, index=True)
+    baseline_node_key: Mapped[str | None] = mapped_column(String(128))
+    primary_metric: Mapped[str] = mapped_column(String(128), default="strategy.summary.sharpe", nullable=False)
+    settings_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+    created_by_type: Mapped[str] = mapped_column(String(32), default="human", nullable=False)
+    created_by_id: Mapped[str | None] = mapped_column(String(128))
+
+    nodes: Mapped[list["ResearchMapNode"]] = relationship(back_populates="map", cascade="all, delete-orphan")
+
+
+class ResearchMapNode(TimestampMixin, Base):
+    __tablename__ = "research_map_nodes"
+    __table_args__ = (UniqueConstraint("map_id", "key", name="uq_research_map_node_key"),)
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("research_map_node"))
+    map_id: Mapped[str] = mapped_column(ForeignKey("research_maps.id"), nullable=False, index=True)
+    key: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    parent_id: Mapped[str | None] = mapped_column(ForeignKey("research_map_nodes.id"), index=True)
+    position: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
+    full_title: Mapped[str | None] = mapped_column(String(512))
+    date_label: Mapped[str | None] = mapped_column(String(128))
+    stage: Mapped[str] = mapped_column(String(32), default="idea", nullable=False, index=True)
+    decision: Mapped[str | None] = mapped_column(String(32), index=True)
+    hypothesis: Mapped[str | None] = mapped_column(Text)
+    change_json: Mapped[list[Any]] = mapped_column(JSON, default=list, nullable=False)
+    reading_json: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
+    verdict: Mapped[str | None] = mapped_column(Text)
+    caveats_json: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
+    next_step: Mapped[str | None] = mapped_column(Text)
+    binding_kind: Mapped[str | None] = mapped_column(String(32), index=True)
+    binding_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    refs_json: Mapped[list[Any]] = mapped_column(JSON, default=list, nullable=False)
+    meta_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+    created_by_type: Mapped[str] = mapped_column(String(32), default="human", nullable=False)
+    created_by_id: Mapped[str | None] = mapped_column(String(128))
+    updated_by_type: Mapped[str] = mapped_column(String(32), default="human", nullable=False)
+    updated_by_id: Mapped[str | None] = mapped_column(String(128))
+
+    map: Mapped[ResearchMap] = relationship(back_populates="nodes")
+
+
+class ResearchMapRevision(Base):
+    """Append-only change log for maps and nodes (who changed what, when, and the old values)."""
+
+    __tablename__ = "research_map_revisions"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("research_map_revision"))
+    map_id: Mapped[str] = mapped_column(ForeignKey("research_maps.id"), nullable=False, index=True)
+    node_key: Mapped[str | None] = mapped_column(String(128), index=True)
+    action: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    summary: Mapped[str] = mapped_column(String(512), nullable=False)
+    changes_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+    by_type: Mapped[str] = mapped_column(String(32), default="human", nullable=False)
+    by_id: Mapped[str | None] = mapped_column(String(128))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

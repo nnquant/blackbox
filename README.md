@@ -103,6 +103,16 @@ bbox --endpoint http://127.0.0.1:8010 run start --project alpha-lab --research c
 
 Use `BLACKBOX_ENDPOINT`, `BLACKBOX_TOKEN`, or `BLACKBOX_API_TOKEN` to avoid repeating endpoint and token flags.
 
+Research maps (研究地图) are manually maintained research trees: each node has a lifecycle `stage`, a review `decision`, a short narrative, and a binding to a run, branch, or compare set whose metrics are read live. They are never derived from runs:
+
+```powershell
+bbox map init --project quadrant-lab --research quadrant-options --key quadrant-options-tree --title "象限期权研究树" --created-by-id agent-alpha
+bbox map node set --map quadrant-lab/quadrant-options-tree --key h20 --parent hold --title "HOLD20" --stage experiment --run <run_id> --created-by-id agent-alpha
+bbox map node decide --map quadrant-lab/quadrant-options-tree --key h20 --decision rejected --verdict "否决：门槛未改善。" --note --created-by-id agent-alpha
+```
+
+The WebUI embeds the map on the research page and lists all maps under **Research Map**. See `docs/research-map.md`.
+
 Agents should publish standard backtest outputs through the high-level command so Blackbox normalizes the performance contract and validates the stored result in one pass:
 
 ```powershell
@@ -185,4 +195,5 @@ npm run build
 - Deployment: `docs/deploy.md`
 - Artifact storage: `docs/storage.md`
 - Agent workflow: `docs/agent-workflow.md`
+- Research maps: `docs/research-map.md`
 - Product and design notes: `docs/designs`

@@ -23,11 +23,14 @@ import {
   LineChart,
   ListTree,
   Maximize2,
+  Moon,
+  Network,
   Pencil,
   PlusCircle,
   RefreshCw,
   Search,
   Send,
+  Sun,
   TableProperties,
   Trophy,
   XCircle,
@@ -35,9 +38,25 @@ import {
 import './index.css';
 import { apiGet, apiPatch, apiPost, apiUpload, artifactContentUrl, formatMetric, metricValue, websocketUrl } from './api';
 import { t, tStatus, tx } from './i18n';
+import { MapNodeCell, ResearchMapEmbed, ResearchMapsPage, ScopedResearchMapsPanel } from './ResearchMap';
 
 const SHOW_SWEEPS = false;
-const CHART_SERIES_COLORS = ['#2563eb', '#f97316', '#10b981', '#a855f7', '#e11d48', '#06b6d4'];
+const CHART_SERIES_COLORS = ['#d9a441', '#8fb3d9', '#7fb069', '#b39ddb', '#e08a4e', '#d98aa8'];
+const THEME_STORAGE_KEY = 'blackbox.theme';
+function readTheme() {
+  try { return window.localStorage.getItem(THEME_STORAGE_KEY) === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
+}
+function applyTheme(theme) {
+  if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  try { window.localStorage.setItem(THEME_STORAGE_KEY, theme); } catch { /* ignore */ }
+}
+applyTheme(readTheme());
+// Theme colours for ECharts (which needs concrete values). Read at render time so a theme switch re-renders correctly.
+function tone(name) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--c-${name}`).trim();
+  return value ? `rgb(${value})` : '#888';
+}
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Boxes },
@@ -46,6 +65,7 @@ const navItems = [
   { id: 'branch', label: 'Branch', icon: GitBranch },
   { id: 'runs', label: 'Runs', icon: LineChart },
   { id: 'compare', label: 'Compare', icon: Layers3 },
+  { id: 'maps', label: 'Research Map', icon: Network },
   SHOW_SWEEPS ? { id: 'sweep', label: 'Sweep', icon: Trophy } : null,
   { id: 'search', label: 'Search', icon: Search },
   { id: 'management', label: 'Manage', icon: BarChart3 },
@@ -70,14 +90,14 @@ const artifactKinds = [
 ];
 
 function Badge({ children, tone = 'neutral' }) {
-  const colorClass = {
-    positive: 'text-positive',
-    negative: 'text-negative',
-    warning: 'text-warning',
-    info: 'text-info',
-    neutral: 'text-muted',
-  }[tone] || 'text-muted';
-  return <span className={`inline-flex whitespace-nowrap text-xs font-semibold ${colorClass}`}>{children}</span>;
+  const color = {
+    positive: 'var(--positive)',
+    negative: 'var(--negative)',
+    warning: 'var(--warning)',
+    info: 'var(--info)',
+    neutral: 'var(--subtle)',
+  }[tone] || 'var(--subtle)';
+  return <span className="bb-badge" style={{ '--badge-color': color }}><i className="dot" />{children}</span>;
 }
 
 function Panel({ className = '', children }) {
@@ -88,7 +108,7 @@ function PanelHeader({ title, action, titleMeta }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
       <div className="flex min-w-0 items-center gap-2">
-        <h2 className="truncate text-sm font-semibold text-ink">{tx(title)}</h2>
+        <h2 className="truncate text-[13px] font-medium text-muted">{tx(title)}</h2>
         {titleMeta}
       </div>
       {action}
@@ -107,9 +127,10 @@ const createActions = [
   { id: 'search-view', label: 'Search View', description: 'Save reusable search filters.' },
 ].filter(Boolean);
 
-function TopBar({ data, onCreated, onOpenSearch }) {
+function TopBar({ data, onCreated, onOpenSearch, theme, onToggleTheme, createRequest }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [createKind, setCreateKind] = useState(null);
+  useEffect(() => { if (createRequest?.kind) setCreateKind(createRequest.kind); }, [createRequest?.nonce]);
   const menuRef = useRef(null);
   const openCreate = (kind) => {
     setCreateKind(kind);
@@ -131,7 +152,7 @@ function TopBar({ data, onCreated, onOpenSearch }) {
     };
   }, [menuOpen]);
   return (
-    <header className="fixed left-0 right-0 top-0 z-40 flex h-12 items-center justify-between border-b border-line bg-panel/90 px-3 backdrop-blur md:px-4">
+    <header className="fixed left-0 right-0 top-0 z-40 flex h-12 items-center justify-between border-b border-line bg-panel px-3 md:px-4">
       <div className="flex items-center gap-3">
         <span className="text-base font-semibold text-ink">Blackbox</span>
       </div>
@@ -142,6 +163,9 @@ function TopBar({ data, onCreated, onOpenSearch }) {
         </button>
         <button className="icon-button sm:hidden" type="button" onClick={onOpenSearch} aria-label={t('Open search')} title="Ctrl+K">
           <Search className="h-4 w-4" />
+        </button>
+        <button className="icon-button theme-toggle" type="button" onClick={onToggleTheme} aria-label={theme === 'light' ? t('Switch to dark') : t('Switch to light')} title={theme === 'light' ? t('Switch to dark') : t('Switch to light')}>
+          {theme === 'light' ? <Moon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" /> : <Sun className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />}
         </button>
         <div className="relative" ref={menuRef}>
           <button className="primary-button" type="button" onClick={() => setMenuOpen((current) => !current)}>
@@ -165,35 +189,105 @@ function TopBar({ data, onCreated, onOpenSearch }) {
   );
 }
 
-function Sidebar({ active, onSelect }) {
+function Sidebar({ active, onSelect, navigator }) {
   return (
-    <aside className="fixed bottom-0 left-0 top-12 z-30 hidden w-56 border-r border-line bg-canvas p-3 md:flex md:flex-col">
-      <nav className="flex flex-1 flex-col gap-0.5">
+    <aside className="fixed bottom-0 left-0 top-12 z-30 hidden w-64 overflow-y-auto border-r border-line bg-panel p-3 md:flex md:flex-col">
+      <nav className="side-nav flex flex-col gap-0.5">
         {navItems.map(({ id, label, icon: Icon }) => (
-          <button
-            className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm font-semibold transition ${
-              isNavItemActive(active, id) ? 'bg-white text-ink' : 'text-muted hover:bg-white/45 hover:text-ink'
-            }`}
-            key={id}
-            onClick={() => onSelect(id)}
-          >
+          <button className={`navitem ${isNavItemActive(active, id) ? 'on' : ''}`} key={id} type="button" onClick={() => onSelect(id)}>
             <Icon className="h-4 w-4" />
             {t(label)}
           </button>
         ))}
       </nav>
+      {navigator ? <SidebarNavigator active={active} {...navigator} /> : null}
     </aside>
   );
 }
 
-function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, loading = false, children }) {
+function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId, selectedBranchId, selectedMapId, selectProject, selectResearch, selectBranch, selectMap, onCreate }) {
+  const projects = data?.projects || [];
+  const researches = data?.researches || [];
+  const branches = data?.branches || [];
+  const runs = data?.runs || [];
+  const [open, setOpen] = useState(() => new Set());
+  const [maps, setMaps] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    apiGet('/api/v1/research-maps').then((rows) => { if (!cancelled) setMaps(rows || []); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [data?.summary?.runs, data?.researches?.length]);
+  const currentProjectId = selectedProjectId || researches.find((r) => r.id === selectedResearchId)?.project_id || null;
+  const isOpen = (id) => open.has(id) || id === currentProjectId;
+  const toggle = (id) => setOpen((current) => { const next = new Set(current); if (next.has(id) || id === currentProjectId) { next.delete(id); if (id === currentProjectId) next.add(`closed:${id}`); } else next.add(id); return next; });
+  const closed = (id) => open.has(`closed:${id}`);
+  const runCount = (pred) => runs.filter(pred).length;
+  const familyColor = { active: 'rgb(var(--c-info))', accepted: 'rgb(var(--c-positive))', kept: 'rgb(var(--c-purple))', ended: 'rgb(var(--c-subtle))' };
+  const branchColor = (branch) => ({ accepted: 'rgb(var(--c-positive))', rejected: 'rgb(var(--c-subtle))', archived: 'rgb(var(--c-subtle))', paused: 'rgb(var(--c-warning))' }[branch.status] || 'rgb(var(--c-info))');
+  return (
+    <>
+      <div className="side-h"><span>{t('Projects')}</span><button type="button" title={t('New project')} aria-label={t('New project')} onClick={() => onCreate('project')}>+</button></div>
+      <ul className="side-tree">
+        {projects.map((project) => {
+          const expanded = isOpen(project.id) && !closed(project.id);
+          const projectResearches = researches.filter((r) => r.project_id === project.id);
+          return (
+            <li key={project.id}>
+              <button className={`row lv1 ${active === 'project' && selectedProjectId === project.id ? 'on' : ''}`} type="button" onClick={() => selectProject(project.id)}>
+                <span className="tw" role="presentation" onClick={(e) => { e.stopPropagation(); toggle(project.id); }}>{expanded ? '▾' : '▸'}</span>
+                <span className="lbl">{project.title || project.key}</span>
+                <span className="n">{runCount((run) => run.project_id === project.id)}</span>
+              </button>
+              {expanded ? (projectResearches.length ? projectResearches.map((research) => {
+                const on = selectedResearchId === research.id && (active === 'research' || active === 'branch' || active === 'run');
+                const researchBranches = branches.filter((b) => b.research_id === research.id);
+                return (
+                  <React.Fragment key={research.id}>
+                    <button className={`row lv2 ${active === 'research' && selectedResearchId === research.id ? 'on' : ''}`} type="button" onClick={() => selectResearch(research.id)}>
+                      <span className="dot" style={{ '--c': research.status === 'active' ? 'rgb(var(--c-accent))' : 'rgb(var(--c-subtle))' }} />
+                      <span className="lbl">{research.title || research.key}</span>
+                      <span className="n">{runCount((run) => run.research_id === research.id)}</span>
+                    </button>
+                    {on ? researchBranches.map((branch) => (
+                      <button className={`row lv3 ${active === 'branch' && selectedBranchId === branch.id ? 'on' : ''}`} key={branch.id} type="button" onClick={() => selectBranch(branch.id)}>
+                        <span className="dot" style={{ '--c': branchColor(branch) }} />
+                        <span className="lbl">{branch.key}</span>
+                        <span className="n">{runCount((run) => run.branch_id === branch.id)}</span>
+                      </button>
+                    )) : null}
+                  </React.Fragment>
+                );
+              }) : <div className="empty">{t('No researches yet')}</div>) : null}
+            </li>
+          );
+        })}
+        {!projects.length ? <li className="empty">{t('No projects yet')}</li> : null}
+      </ul>
+      <div className="side-h"><span>{t('Research Map')}</span></div>
+      <ul className="side-tree">
+        {maps.map((map) => (
+          <li key={map.id}>
+            <button className={`row lv2 ${active === 'maps' && selectedMapId === map.id ? 'on' : ''}`} style={{ paddingLeft: 10 }} type="button" onClick={() => selectMap(map.id)}>
+              <span className="dot" style={{ '--c': map.baseline ? 'rgb(var(--c-accent))' : familyColor.active }} />
+              <span className="lbl">{map.title}</span>
+              <span className="n">{map.node_count}</span>
+            </button>
+          </li>
+        ))}
+        {!maps.length ? <li className="empty">{t('No research maps yet')}</li> : null}
+      </ul>
+    </>
+  );
+}
+
+function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, loading = false, navigator, theme, onToggleTheme, children }) {
   return (
     <div className="min-h-screen">
       <LoadingRail active={loading} />
-      <TopBar data={data} onCreated={onCreated} onOpenSearch={onOpenSearch} />
-      <Sidebar active={active} onSelect={onSelect} />
-      <main className="pt-12 md:pl-56">
-        <div className="mx-auto max-w-[1880px] p-3 pb-20 md:p-4 lg:p-5">
+      <TopBar data={data} onCreated={onCreated} onOpenSearch={onOpenSearch} theme={theme} onToggleTheme={onToggleTheme} createRequest={navigator?.createRequest} />
+      <Sidebar active={active} onSelect={onSelect} navigator={navigator} />
+      <main className="pt-12 md:pl-64">
+        <div className={`mx-auto w-full min-w-0 p-3 pb-20 md:p-4 lg:p-5 ${active === 'maps' ? '' : 'max-w-[1880px]'}`}>
           {contextNav}
           {children}
         </div>
@@ -259,7 +353,7 @@ function QuickRunSearchModal({ open, data, onClose, onSelectRun }) {
     }
   };
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/18 px-4 py-8 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={t('Search')}>
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[var(--overlay)] px-4 py-8 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={t('Search')}>
       <button className="absolute inset-0 h-full w-full cursor-default" type="button" aria-label={t('Close search')} onClick={onClose} />
       <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-bento border border-lineStrong bg-panel shadow-2xl">
         <div className="border-b border-line bg-white/75 p-3">
@@ -341,8 +435,8 @@ function ContextNav({ items }) {
 
 function EmptyState({ title, detail }) {
   return (
-    <Panel className="p-6 text-center">
-      <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-md bg-white/70 text-muted"><Search className="h-5 w-5" /></div>
+    <Panel className="border-dashed bg-transparent p-6 text-center">
+      <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-md bg-surface2 text-subtle"><Search className="h-5 w-5" /></div>
       <h2 className="mt-3 text-base font-semibold text-ink">{tx(title)}</h2>
       <p className="mt-2 text-sm text-muted">{tx(detail)}</p>
     </Panel>
@@ -352,8 +446,8 @@ function EmptyState({ title, detail }) {
 function StatTile({ label, value, tone = 'neutral' }) {
   return (
     <Panel className="min-h-[88px] p-3">
-      <div className="text-xs font-semibold uppercase text-muted">{tx(label)}</div>
-      <div className={`metric-value mt-3 text-2xl ${tone === 'negative' ? 'text-negative' : tone === 'positive' ? 'text-positive' : 'text-ink'}`}>{value}</div>
+      <div className="text-xs text-subtle">{tx(label)}</div>
+      <div className={`metric-value mt-2 text-[22px] ${tone === 'negative' ? 'text-negative' : tone === 'positive' ? 'text-positive' : 'text-ink'}`}>{value}</div>
     </Panel>
   );
 }
@@ -974,7 +1068,7 @@ function CreateModal({ kind, data, onClose, onCreated }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[var(--overlay)] px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-lg overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div>
@@ -1192,7 +1286,7 @@ function WorkspaceEditModal({ workspace, onClose, onChanged }) {
     }
   };
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[var(--overlay)] px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-lg overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="truncate text-lg font-semibold text-ink">{workspace.key}</h2>
@@ -1867,7 +1961,7 @@ function ProjectTable({ rows, workspaces, researches, runs, onSelect }) {
   );
 }
 
-function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, selectRun, selectCompareSet, selectSearchView, onChanged }) {
+function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, selectRun, selectCompareSet, selectSearchView, selectMap, onChanged }) {
   const projectBase = (data?.projects || []).find((item) => item.id === selectedProjectId) || data?.projects?.[0];
   const [projectDetail, setProjectDetail] = useState(null);
   const [projectDetailError, setProjectDetailError] = useState(null);
@@ -1921,6 +2015,7 @@ function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, se
         onSelectRun={selectRun}
       />
       <ResearchTable rows={researches} branches={branches} runs={runs} onSelect={selectResearch} onSelectRun={selectRun} />
+      <ScopedResearchMapsPanel scope="project" scopeId={project.id} refreshToken={data} onSelectMap={selectMap} />
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <ProjectSavedItems title="Compare Sets" icon={Layers3} items={compareSets} renderDetail={(item) => `${item.run_ids_json?.length || 0} runs`} actionLabel="Open" onSelect={selectCompareSet} />
         <ProjectSavedItems title="Search Views" icon={Search} items={searchViews} renderDetail={(item) => item.description || formatFilterSummary(item.filters_json)} actionLabel="Run" onSelect={selectSearchView} />
@@ -2470,7 +2565,8 @@ function RunsBoardSummary({ runs, filteredRuns }) {
   );
 }
 
-function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch }) {
+function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch, mapIndex = null, onLocateMapNode }) {
+  const showMap = Boolean(mapIndex && mapIndex.mapId);
   const pageSize = 10;
   const [page, setPage] = useState(1);
   const sortedRuns = useMemo(() => [...(runs || [])].sort((a, b) => (
@@ -2509,6 +2605,7 @@ function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch }
               <th className="px-4 py-3">{t("STATUS")}</th>
               <th className="px-4 py-3">{t("CREATOR")}</th>
               <th className="px-4 py-3 text-right">{t("SHARPE")}</th>
+              {showMap ? <th className="px-4 py-3">{t("MAP NODE")}</th> : null}
               <th className="px-4 py-3 text-right">{t("RUNTIME")}</th>
               <th className="px-4 py-3 text-right">{t("UPDATED")}</th>
             </tr>
@@ -2525,11 +2622,12 @@ function ResearchRecentRunsPanel({ runs, scopeKey, onSelectRun, onSelectBranch }
                 <td className="table-cell"><StatusBadge status={run.status} /></td>
                 <td className="table-cell text-muted">{runCreator(run)}</td>
                 <td className="table-cell text-right font-semibold text-positive">{formatMetric(metricValue(run, 'strategy.summary', 'sharpe'))}</td>
+                {showMap ? <td className="table-cell"><MapNodeCell nodes={mapIndex.byRun[run.id]} onLocate={onLocateMapNode} /></td> : null}
                 <td className="table-cell text-right text-muted">{runRuntime(run)}</td>
                 <td className="table-cell text-right text-muted">{formatDate(run.updated_at || run.ended_at || run.started_at || run.created_at)}</td>
               </tr>
             )) : (
-              <tr><td className="table-cell text-muted" colSpan="7">{t("No runs found.")}</td></tr>
+              <tr><td className="table-cell text-muted" colSpan={showMap ? 8 : 7}>{t("No runs found.")}</td></tr>
             )}
           </tbody>
         </table>
@@ -2617,8 +2715,12 @@ function runCreator(run) {
   return run.created_by_id ? `${type} / ${run.created_by_id}` : type;
 }
 
-function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selectCompareSet, onChanged }) {
+function ResearchPage({ data, selectedResearchId, selectProject, selectResearch, selectBranch, selectRun, selectCompareSet, selectMap, onChanged }) {
   const research = (data?.researches || []).find((item) => item.id === selectedResearchId) || data?.researches?.[0];
+  const [mapIndex, setMapIndex] = useState({ byRun: {}, byBranch: {}, mapId: null });
+  const [mapLocate, setMapLocate] = useState(null);
+  const locateMapNode = (key) => { setMapLocate({ key, nonce: Date.now() }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const mapNav = { selectProject, selectResearch, selectBranch, selectRun, selectCompareSet };
   const branches = (data?.branches || []).filter((branch) => branch.research_id === research?.id);
   const runs = (data?.runs || []).filter((run) => branches.some((branch) => branch.id === run.branch_id));
   const [lineage, setLineage] = useState(null);
@@ -2704,6 +2806,7 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
     <div className="space-y-4">
       <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
       <ResearchWorkspaceSummary research={research} branches={lineageBranches} runs={lineageRuns} />
+      <ResearchMapEmbed researchId={research.id} refreshToken={data} nav={mapNav} onIndex={setMapIndex} locate={mapLocate} selectMap={selectMap} />
       <ResearchReviewPanel
         review={researchReview}
         error={reviewError}
@@ -2713,8 +2816,8 @@ function ResearchPage({ data, selectedResearchId, selectBranch, selectRun, selec
         onChanged={onChanged}
       />
       <div className="space-y-4">
-        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} />
-        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} mapIndex={mapIndex} onLocateMapNode={locateMapNode} />
+        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} mapIndex={mapIndex} onLocateMapNode={locateMapNode} />
         <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
       </div>
       {lineageExpanded ? <LineageChartModal option={lineageChartOption} onClose={() => setLineageExpanded(false)} /> : null}
@@ -3074,7 +3177,8 @@ function ResearchEditPanel({ research, onChanged }) {
   );
 }
 
-function BranchesTable({ branches, runs, onSelect, onChanged }) {
+function BranchesTable({ branches, runs, onSelect, onChanged, mapIndex = null, onLocateMapNode }) {
+  const showMap = Boolean(mapIndex && mapIndex.mapId);
   const sortedBranches = [...(branches || [])].sort((a, b) => (
     latestRunMillisForBranch(b, runs) - latestRunMillisForBranch(a, runs)
     || entityUpdatedMillis(b) - entityUpdatedMillis(a)
@@ -3148,7 +3252,7 @@ function BranchesTable({ branches, runs, onSelect, onChanged }) {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] border-collapse">
-          <thead className="table-head"><tr><th className="px-4 py-3">{t("Use")}</th><th className="px-4 py-3">{t("Branch")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3">{t("Reason")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th><th className="px-4 py-3 text-right">{t("Updated")}</th></tr></thead>
+          <thead className="table-head"><tr><th className="px-4 py-3">{t("Use")}</th><th className="px-4 py-3">{t("Branch")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3">{t("Reason")}</th><th className="px-4 py-3 text-right">{t("Runs")}</th>{showMap ? <th className="px-4 py-3">{t("Map node")}</th> : null}<th className="px-4 py-3 text-right">{t("Updated")}</th></tr></thead>
           <tbody>
             {sortedBranches.map((branch) => (
               <tr className="cursor-pointer transition hover:bg-white/45" key={branch.id} onClick={() => onSelect(branch.id)}>
@@ -3159,10 +3263,11 @@ function BranchesTable({ branches, runs, onSelect, onChanged }) {
                 <td className="table-cell"><Badge tone={branch.status === 'active' ? 'positive' : 'neutral'}>{tStatus(branch.status)}</Badge></td>
                 <td className="table-cell text-muted">{branch.reason_summary || '--'}</td>
                 <td className="table-cell text-right">{runs.filter((run) => run.branch_id === branch.id).length}</td>
+                {showMap ? <td className="table-cell" onClick={(event) => event.stopPropagation()}><MapNodeCell nodes={mapIndex.byBranch[branch.id]} onLocate={onLocateMapNode} /></td> : null}
                 <td className="table-cell text-right text-muted">{formatDate(branch.updated_at)}</td>
               </tr>
             ))}
-            {!branches.length ? <tr><td className="table-cell text-muted" colSpan="6">{t("No branches yet.")}</td></tr> : null}
+            {!branches.length ? <tr><td className="table-cell text-muted" colSpan={showMap ? 7 : 6}>{t("No branches yet.")}</td></tr> : null}
           </tbody>
         </table>
       </div>
@@ -3335,7 +3440,7 @@ function LineageChartModal({ option, onClose }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/25 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[var(--overlay)] p-4 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="flex h-[min(86vh,860px)] w-full max-w-6xl flex-col overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="text-lg font-semibold text-ink">{t("Branch Lineage")}</h2>
@@ -4990,10 +5095,10 @@ function resultSeriesChartOption(item) {
     animation: false,
     color: CHART_SERIES_COLORS,
     tooltip: { trigger: 'axis' },
-    legend: { top: 0, left: 0, right: 8, type: 'scroll', textStyle: { color: '#6b7280' } },
+    legend: { top: 0, left: 0, right: 8, type: 'scroll', textStyle: { color: tone('subtle') } },
     grid: { top: 42, left: 44, right: 12, bottom: 34 },
-    xAxis: { type: 'category', boundaryGap: false, axisLabel: { color: '#6b7280', hideOverlap: true } },
-    yAxis: { type: 'value', scale: true, axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#e5e7eb' } } },
+    xAxis: { type: 'category', boundaryGap: false, axisLabel: { color: tone('subtle'), hideOverlap: true } },
+    yAxis: { type: 'value', scale: true, axisLabel: { color: tone('subtle') }, splitLine: { lineStyle: { color: tone('line') } } },
     series: yKeys.map((key) => ({
       name: key,
       type: 'line',
@@ -5031,7 +5136,7 @@ function RunTabs({ activeTab, setActiveTab, resultItems, keyMetrics, equityChart
       <div className="flex flex-wrap gap-2 border-b border-line p-3">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
-            className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${activeTab === id ? 'bg-white text-ink shadow-insetLine' : 'text-muted hover:bg-white/55 hover:text-ink'}`}
+            className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${activeTab === id ? 'bg-panel2 text-ink' : 'text-muted hover:bg-surface2 hover:text-ink'}`}
             key={id}
             onClick={() => setActiveTab(id)}
           >
@@ -7737,7 +7842,7 @@ function paretoChartOption(points, frontierIds, xMetric, yMetric) {
     yAxis: { type: 'value', name: yMetric, scale: true },
     series: [
       { name: 'Runs', type: 'scatter', symbolSize: 10, data: toScatterData(other) },
-      { name: 'Frontier', type: 'scatter', symbolSize: 14, data: toScatterData(frontier), itemStyle: { color: '#111827' } },
+      { name: 'Frontier', type: 'scatter', symbolSize: 14, data: toScatterData(frontier), itemStyle: { color: tone('accent') } },
     ],
   };
 }
@@ -8158,7 +8263,7 @@ function MetricDataModal({ item, onClose }) {
   const availableViews = artifactDataViews(detail, item);
   const showTabs = availableViews.length > 1;
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[var(--overlay)] px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-5xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div className="min-w-0">
@@ -8462,10 +8567,10 @@ function MetricDataPlot({ item, rows, columns }) {
   const option = {
     color: CHART_SERIES_COLORS,
     tooltip: { trigger: 'axis' },
-    legend: { top: 0, textStyle: { color: '#6b7280' } },
+    legend: { top: 0, textStyle: { color: tone('subtle') } },
     grid: { left: 54, right: 22, top: 48, bottom: 54 },
-    xAxis: { type: 'category', data: rows.map((row, index) => String(row?.[xKey] ?? index + 1)), axisLabel: { color: '#6b7280' } },
-    yAxis: { type: 'value', axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#e5e7eb' } } },
+    xAxis: { type: 'category', data: rows.map((row, index) => String(row?.[xKey] ?? index + 1)), axisLabel: { color: tone('subtle') } },
+    yAxis: { type: 'value', axisLabel: { color: tone('subtle') }, splitLine: { lineStyle: { color: tone('line') } } },
     series: yKeys.map((key) => ({
       name: key,
       type: 'line',
@@ -8588,7 +8693,7 @@ function ArtifactDetailModal({ artifact, onClose }) {
     };
   }, [artifact.id, onClose]);
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-ink/25 px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[var(--overlay)] px-4 py-16 backdrop-blur-sm" role="dialog" aria-modal="true" onPointerDown={onClose}>
       <div className="max-h-[calc(100vh-8rem)] w-full max-w-3xl overflow-hidden rounded-md border border-line bg-panel shadow-xl" onPointerDown={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="truncate text-lg font-semibold text-ink">{detail.name}</h2>
@@ -9149,9 +9254,9 @@ function lineageOption(branches, runs = []) {
       orient: 'LR',
       roam: true,
       symbolSize: 12,
-      lineStyle: { color: '#9ca3af', width: 2 },
-      label: { color: '#111827', fontWeight: 700, lineHeight: 18 },
-      leaves: { label: { position: 'right', color: '#111827', fontWeight: 700, lineHeight: 18 } },
+      lineStyle: { color: tone('lineStrong'), width: 2 },
+      label: { color: tone('ink'), fontWeight: 700, lineHeight: 18 },
+      leaves: { label: { position: 'right', color: tone('ink'), fontWeight: 700, lineHeight: 18 } },
     }],
   };
 }
@@ -9336,9 +9441,9 @@ function dashboardTimelineGroups(data) {
 }
 
 function heatmapRed(value, max) {
-  if (!value) return '#f3f4f6';
+  if (!value) return 'rgb(var(--c-panel2))';
   const level = Math.min(4, Math.max(1, Math.ceil((Number(value) / Math.max(1, max)) * 4)));
-  return ['#f3f4f6', '#fee2e2', '#fca5a5', '#ef4444', '#991b1b'][level];
+  return ['rgb(var(--c-panel2))', 'rgb(var(--c-accent) / 0.3)', 'rgb(var(--c-accent) / 0.55)', 'rgb(var(--c-accent) / 0.8)', 'rgb(var(--c-accent))'][level];
 }
 
 function startOfLocalDay(date) {
@@ -10415,7 +10520,7 @@ function monthlyReturnHeatmapOption(heatmap) {
     if (Number.isFinite(row.sum)) {
       data.push(monthlyReturnHeatmapCell(
         [12, rowIndex, row.sum, row.firstDate, row.lastDate],
-        { borderColor: '#94a3b8', borderWidth: 2 },
+        { borderColor: tone('lineStrong'), borderWidth: 2 },
       ));
     }
   });
@@ -10439,18 +10544,18 @@ function monthlyReturnHeatmapOption(heatmap) {
       type: 'category',
       data: xLabels,
       position: 'top',
-      axisLine: { lineStyle: { color: '#d7dce2' } },
+      axisLine: { lineStyle: { color: tone('line') } },
       axisTick: { show: false },
-      axisLabel: { color: '#475569', fontSize: 13, fontWeight: 600 },
+      axisLabel: { color: tone('muted'), fontSize: 13, fontWeight: 600 },
       splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.18)'] } },
     },
     yAxis: {
       type: 'category',
       data: heatmap.rows.map((row) => String(row.year)),
       inverse: true,
-      axisLine: { lineStyle: { color: '#d7dce2' } },
+      axisLine: { lineStyle: { color: tone('line') } },
       axisTick: { show: false },
-      axisLabel: { color: '#334155', fontSize: 13, fontWeight: 700 },
+      axisLabel: { color: tone('ink'), fontSize: 13, fontWeight: 700 },
       splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)'] } },
     },
     visualMap: {
@@ -10473,20 +10578,20 @@ function monthlyReturnHeatmapOption(heatmap) {
       data,
       label: {
         show: true,
-        color: '#172033',
+        color: tone('ink'),
         fontSize: 13,
         fontWeight: 700,
         formatter: (params) => formatMonthlyReturnPercent(Number(params.value?.[2])),
       },
-      itemStyle: { borderColor: '#fbfbf8', borderWidth: 2 },
-      emphasis: { itemStyle: { borderColor: '#202326', borderWidth: 1 } },
+      itemStyle: { borderColor: tone('panel'), borderWidth: 2 },
+      emphasis: { itemStyle: { borderColor: tone('ink'), borderWidth: 1 } },
     }],
   };
 }
 
 function monthlyReturnHeatmapCell(value, itemStyle = {}) {
   const cellValue = Number(value[2]);
-  let labelColor = '#172033';
+  let labelColor = tone('ink');
   if (Math.abs(cellValue) >= 0.15) labelColor = '#ffffff';
   return {
     value,
@@ -10512,7 +10617,7 @@ function runEquityChartOption(chart) {
   };
   return {
     animation: false,
-    color: ['#111827', '#6b7280'],
+    color: [tone('accent'), tone('subtle')],
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'cross' },
@@ -10530,9 +10635,9 @@ function runEquityChartOption(chart) {
       type: chart.xAxisType || 'category',
       boundaryGap: false,
       ...(chart.xAxisType === 'time' ? {} : { data: chart.xValues || [] }),
-      axisLine: { lineStyle: { color: '#d1d5db' } },
+      axisLine: { lineStyle: { color: tone('line') } },
       axisTick: { show: false },
-      axisLabel: { color: '#4b5563', hideOverlap: true },
+      axisLabel: { color: tone('muted'), hideOverlap: true },
     },
     yAxis: [
       {
@@ -10540,8 +10645,8 @@ function runEquityChartOption(chart) {
         scale: true,
         axisLine: { show: false },
         axisTick: { show: false },
-        splitLine: { lineStyle: { color: '#e5e7eb' } },
-        axisLabel: { color: '#4b5563', formatter: chart.valueAsPercent ? percentLabel : undefined },
+        splitLine: { lineStyle: { color: tone('line') } },
+        axisLabel: { color: tone('muted'), formatter: chart.valueAsPercent ? percentLabel : undefined },
       },
       {
         type: 'value',
@@ -10550,7 +10655,7 @@ function runEquityChartOption(chart) {
         axisLine: { show: false },
         axisTick: { show: false },
         splitLine: { show: false },
-        axisLabel: { color: '#374151', formatter: chart.drawdownAsPercent ? percentLabel : undefined },
+        axisLabel: { color: tone('muted'), formatter: chart.drawdownAsPercent ? percentLabel : undefined },
       },
     ],
     series: [
@@ -10561,7 +10666,7 @@ function runEquityChartOption(chart) {
         data: chart.equityData,
         showSymbol: false,
         smooth: false,
-        lineStyle: { color: '#111827', width: 2 },
+        lineStyle: { color: tone('accent'), width: 2 },
         z: 3,
       },
       {
@@ -10589,7 +10694,7 @@ function runSummaryChartOption(rows) {
     series: [{
       type: 'bar',
       data: rows.map((row) => row.value),
-      itemStyle: { color: '#111827' },
+      itemStyle: { color: tone('accent') },
     }],
   };
 }
@@ -11097,6 +11202,8 @@ function buildPageContext(data, active, selections, runDetail) {
   } else if (active === 'search') {
     extra = { label: 'Search', value: entityName(selectedSearchView), id: selectedSearchView?.id };
     project = projects.find((item) => item.id === selectedSearchView?.project_id) || selectedProject;
+  } else if (active === 'maps') {
+    extra = { label: 'Research Map', value: selections.mapId ? t('Research Map') : t('Research Maps'), active: 'maps' };
   }
 
   return { project, research, branch, run, extra };
@@ -11121,6 +11228,7 @@ function parseAppRoute(pathname = '/') {
   if (section === 'sweeps') return { active: 'sweep', sweepId: id || null };
   if (section === 'compare') return { active: 'compare', compareSetId: id || null };
   if (section === 'search') return { active: 'search', searchViewId: id || null };
+  if (section === 'maps') return { active: 'maps', mapId: id || null };
   return { active: 'dashboard' };
 }
 
@@ -11138,6 +11246,7 @@ function pathForAppState(active, selections) {
   if (active === 'sweep') return pathWithOptionalId('/sweeps', selections.sweepId);
   if (active === 'compare') return pathWithOptionalId('/compare', selections.compareSetId);
   if (active === 'search') return pathWithOptionalId('/search', selections.searchViewId);
+  if (active === 'maps') return pathWithOptionalId('/maps', selections.mapId);
   return '/';
 }
 
@@ -11160,10 +11269,14 @@ function App() {
   const [selectedSweepId, setSelectedSweepId] = useState(initialRoute.sweepId || null);
   const [selectedCompareSetId, setSelectedCompareSetId] = useState(initialRoute.compareSetId || null);
   const [selectedSearchViewId, setSelectedSearchViewId] = useState(initialRoute.searchViewId || null);
+  const [selectedMapId, setSelectedMapId] = useState(initialRoute.mapId || null);
   const [runDetail, setRunDetail] = useState(null);
   const [liveStatus, setLiveStatus] = useState('connecting');
   const [quickSearch, setQuickSearch] = useState(null);
   const [quickRunSearchOpen, setQuickRunSearchOpen] = useState(false);
+  const [theme, setTheme] = useState(readTheme);
+  const [createRequest, setCreateRequest] = useState(null);
+  const toggleTheme = () => setTheme((current) => { const next = current === 'light' ? 'dark' : 'light'; applyTheme(next); return next; });
 
   const refresh = async () => {
     setLoading(true);
@@ -11210,6 +11323,7 @@ function App() {
       setSelectedSweepId(route.sweepId || null);
       setSelectedCompareSetId(route.compareSetId || null);
       setSelectedSearchViewId(route.searchViewId || null);
+      setSelectedMapId(route.mapId || null);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -11224,6 +11338,7 @@ function App() {
       sweepId: selectedSweepId,
       compareSetId: selectedCompareSetId,
       searchViewId: selectedSearchViewId,
+      mapId: selectedMapId,
     });
     if (skipNextHistoryWriteRef.current) {
       skipNextHistoryWriteRef.current = false;
@@ -11232,7 +11347,7 @@ function App() {
     if (window.location.pathname !== nextPath) {
       window.history.pushState({}, '', nextPath);
     }
-  }, [active, selectedBranchId, selectedCompareSetId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
+  }, [active, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
 
   useEffect(() => {
     const nextPath = pathForAppState(active, {
@@ -11243,11 +11358,12 @@ function App() {
       sweepId: selectedSweepId,
       compareSetId: selectedCompareSetId,
       searchViewId: selectedSearchViewId,
+      mapId: selectedMapId,
     });
     if (lastScrollPathRef.current === nextPath) return;
     lastScrollPathRef.current = nextPath;
     scrollPageToTop();
-  }, [active, selectedBranchId, selectedCompareSetId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
+  }, [active, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -11327,8 +11443,10 @@ function App() {
   const selectSweep = (id) => { setSelectedSweepId(id); setActive('sweep'); };
   const selectCompareSet = (id) => { setSelectedCompareSetId(id || null); setActive('compare'); };
   const selectSearchView = (id) => { setSelectedSearchViewId(id); setActive('search'); };
+  const selectMap = (id) => { setSelectedMapId(id || null); setActive('maps'); };
   const selectSection = (id) => {
     if (id === 'compare') setSelectedCompareSetId(null);
+    if (id === 'maps') setSelectedMapId(null);
     setActive(id);
   };
   const runGlobalSearch = (query) => {
@@ -11363,7 +11481,8 @@ function App() {
     sweepId: selectedSweepId,
     compareSetId: selectedCompareSetId,
     searchViewId: selectedSearchViewId,
-  }, runDetail), [active, data, runDetail, selectedBranchId, selectedCompareSetId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
+    mapId: selectedMapId,
+  }, runDetail), [active, data, runDetail, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
 
   const contextItems = useMemo(() => {
     if (active === 'dashboard') return [];
@@ -11382,8 +11501,9 @@ function App() {
     if (!data && loading) return <AppLoadingAnimation />;
     if (!data) return <EmptyState title="No API data" detail="Start the FastAPI server or set VITE_BLACKBOX_API_BASE." />;
     if (active === 'management') return <ManagementPage data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} />;
-    if (active === 'project') return <ProjectPage data={data} selectedProjectId={selectedProjectId} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectSearchView={selectSearchView} onChanged={onChanged} />;
-    if (active === 'research') return <ResearchPage data={data} selectedResearchId={selectedResearchId} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} onChanged={onChanged} />;
+    if (active === 'project') return <ProjectPage data={data} selectedProjectId={selectedProjectId} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectSearchView={selectSearchView} selectMap={selectMap} onChanged={onChanged} />;
+    if (active === 'research') return <ResearchPage data={data} selectedResearchId={selectedResearchId} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectMap={selectMap} onChanged={onChanged} />;
+    if (active === 'maps') return <ResearchMapsPage data={data} selectedMapId={selectedMapId} selectMap={selectMap} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} />;
     if (active === 'branch') return <BranchPage data={data} selectedBranchId={selectedBranchId} selectBranch={selectBranch} selectRun={selectRun} onChanged={onChanged} />;
     if (active === 'runs') return <RunsBoardPage data={data} selectRun={selectRun} selectBranch={selectBranch} selectCompareSet={selectCompareSet} onChanged={onChanged} />;
     if (active === 'run') return <RunPage runDetail={runDetail} data={data} onRunChanged={onRunChanged} />;
@@ -11392,8 +11512,9 @@ function App() {
     if (active === 'search') return <SearchPage data={data} selectRun={selectRun} selectResearch={selectResearch} selectBranch={selectBranch} selectedSearchViewId={selectedSearchViewId} quickSearch={quickSearch} onChanged={onChanged} />;
     if (active === 'compare') return <ComparePage data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} selectBranch={selectBranch} selectCompareSet={selectCompareSet} selectedCompareSetId={selectedCompareSetId} onChanged={onChanged} />;
     return <Dashboard data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectSweep={selectSweep} onChanged={onChanged} />;
-  }, [active, data, error, loading, quickSearch, runDetail, selectedBranchId, selectedCompareSetId, selectedProjectId, selectedResearchId, selectedSearchViewId, selectedSweepId]);
+  }, [active, data, error, loading, quickSearch, runDetail, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedSearchViewId, selectedSweepId, theme]);
 
+  const navigator = { data, selectedProjectId, selectedResearchId, selectedBranchId, selectedMapId, selectProject, selectResearch, selectBranch, selectMap, onCreate: (kind) => setCreateRequest({ kind, nonce: Date.now() }), createRequest };
   return (
     <>
       <Shell
@@ -11404,6 +11525,9 @@ function App() {
         onOpenSearch={() => setQuickRunSearchOpen(true)}
         contextNav={<ContextNav items={contextItems} />}
         loading={loading}
+        navigator={navigator}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       >
         <div className="page-enter" key={`${active}:${data ? 'ready' : 'pending'}`}>
           {page}

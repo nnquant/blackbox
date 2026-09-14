@@ -1,0 +1,368 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线" [active]:
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "WH-F2 强势股策略"
+    - generic: /
+    - button "F2个股股性与池子跨日延续性初筛"
+  - generic: Project / wh-f2
+  - heading "F2个股股性与池子跨日延续性初筛" [level=1]
+  - paragraph: 固定60日验证股性稳定性及池子延续广度
+  - generic: 状态
+  - generic "active":
+    - generic: active
+  - generic: 研究分支
+  - generic "1":
+    - generic: "1"
+  - generic: 已完成 Run
+  - generic "1":
+    - generic: "1"
+  - generic: 运行中
+  - generic "0":
+    - generic: "0"
+  - generic: 失败
+  - generic "0":
+    - generic: "0"
+  - generic: 最新 Run
+  - generic "wh-f2-stock-continuation-60d-20260909-results":
+    - generic: wh-f2-stock-continuation-60d-20260909-results
+    - button "展开"
+  - generic: 研究地图
+  - generic: · 这条研究线还没有研究地图。研究 agent 使用 bbox map 维护地图。
+  - heading "Research Review" [level=2]
+  - button "Save candidate set":
+    - text: Save candidate set
+  - generic: State
+  - generic "活跃":
+    - generic: 活跃
+  - generic: Candidates
+  - generic "1":
+    - generic: "1"
+  - generic: 对比集
+  - generic "0":
+    - generic: "0"
+  - generic: Decision Notes
+  - generic "0":
+    - generic: "0"
+  - generic: Archive Queue
+  - generic "0":
+    - generic: "0"
+  - generic: 下一页
+  - generic "save_candidate_compare_set":
+    - generic: save_candidate_compare_set
+    - button "展开"
+  - generic: Candidate Set
+  - table:
+    - rowgroup:
+      - row "Run Branch Metric Compared Updated":
+        - columnheader "Run"
+        - columnheader "Branch"
+        - columnheader "Metric"
+        - columnheader "Compared"
+        - columnheader "Updated"
+    - rowgroup:
+      - row "wh-f2-stock-continuation-60d-20260909-results frozen60-triage -- no 2026/9/9 11:07:43":
+        - cell "wh-f2-stock-continuation-60d-20260909-results":
+          - button "wh-f2-stock-continuation-60d-20260909-results"
+        - cell "frozen60-triage":
+          - button "frozen60-triage"
+        - cell "--"
+        - cell "no"
+        - cell "2026/9/9 11:07:43"
+  - generic: Archive Queue
+  - table:
+    - rowgroup:
+      - row "Branch Status Runs Reason Latest":
+        - columnheader "Branch"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Reason"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "No archive candidates.":
+        - cell "No archive candidates."
+  - generic: Compare Sets
+  - generic: No saved compare sets.
+  - generic: Decision Notes
+  - generic: No decision notes yet.
+  - heading "研究分支" [level=2]
+  - button "Batch Status":
+    - text: Batch Status
+  - generic: 0 selected · target archived
+  - generic: 批量状态
+  - generic "0 selected · target archived":
+    - generic: 0 selected · target archived
+  - table:
+    - rowgroup:
+      - row "使用 研究分支 状态 原因 Run 更新时间":
+        - columnheader "使用"
+        - columnheader "研究分支"
+        - columnheader "状态"
+        - columnheader "原因"
+        - columnheader "Run"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "60日固定窗口探索检验 活跃 用户提出跨日股性及池子广度验证；独立诊断 2 2026/9/9 10:52:44":
+        - cell:
+          - checkbox
+        - cell "60日固定窗口探索检验"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "用户提出跨日股性及池子广度验证；独立诊断"
+        - cell "2"
+        - cell "2026/9/9 10:52:44"
+  - heading "最近 Run" [level=2]
+  - generic: 2 runs
+  - table:
+    - rowgroup:
+      - row "研究分支 Run 状态 创建者 Sharpe 耗时 更新时间":
+        - columnheader "研究分支"
+        - columnheader "Run"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "耗时"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "frozen60-triage wh-f2-stock-continuation-60d-20260909-results 已完成 agent / codex -- 47s 2026/9/9 11:07:43":
+        - cell "frozen60-triage":
+          - button "frozen60-triage"
+        - cell "wh-f2-stock-continuation-60d-20260909-results":
+          - button "wh-f2-stock-continuation-60d-20260909-results"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "47s"
+        - cell "2026/9/9 11:07:43"
+      - row "frozen60-triage wh-f2-stock-continuation-60d-20260909 已取消 agent / codex -- 12m 2026/9/9 11:07:39":
+        - cell "frozen60-triage":
+          - button "frozen60-triage"
+        - cell "wh-f2-stock-continuation-60d-20260909":
+          - button "wh-f2-stock-continuation-60d-20260909"
+        - cell "已取消":
+          - generic: 已取消
+        - cell "agent / codex"
+        - cell "--"
+        - cell "12m"
+        - cell "2026/9/9 11:07:39"
+  - heading "对比集" [level=2]
+  - generic: 0 sets
+  - table:
+    - rowgroup:
+      - row "名称 Run Layout 创建时间 Action":
+        - columnheader "名称"
+        - columnheader "Run"
+        - columnheader "Layout"
+        - columnheader "创建时间"
+        - columnheader "Action"
+    - rowgroup:
+      - row "No compare sets yet.":
+        - cell "No compare sets yet."
+  - heading "对比" [level=2]
+  - generic: 暂无序列数据
+  - table:
+    - rowgroup:
+      - row "Toggle all compare series 目标 ↕ Run ↕ annual return ↕ annual volatility ↕ max drawdown ↕ sharpe ↕ sortino ↕ calmar ↕ turnover ↕":
+        - columnheader "Toggle all compare series":
+          - checkbox "Toggle all compare series" [checked]
+        - columnheader "目标 ↕":
+          - button "目标 ↕":
+            - generic: 目标
+            - generic: ↕
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "annual return ↕":
+          - button "annual return ↕":
+            - generic: annual return
+            - generic: ↕
+        - columnheader "annual volatility ↕":
+          - button "annual volatility ↕":
+            - generic: annual volatility
+            - generic: ↕
+        - columnheader "max drawdown ↕":
+          - button "max drawdown ↕":
+            - generic: max drawdown
+            - generic: ↕
+        - columnheader "sharpe ↕":
+          - button "sharpe ↕":
+            - generic: sharpe
+            - generic: ↕
+        - columnheader "sortino ↕":
+          - button "sortino ↕":
+            - generic: sortino
+            - generic: ↕
+        - columnheader "calmar ↕":
+          - button "calmar ↕":
+            - generic: calmar
+            - generic: ↕
+        - columnheader "turnover ↕":
+          - button "turnover ↕":
+            - generic: turnover
+            - generic: ↕
+    - rowgroup:
+      - row "Toggle 60日固定窗口探索检验 60日固定窗口探索检验 branch wh-f2-stock-continuation-60d-20260909-results -- -- -- -- -- -- --":
+        - cell "Toggle 60日固定窗口探索检验":
+          - checkbox "Toggle 60日固定窗口探索检验" [checked]
+        - cell "60日固定窗口探索检验 branch":
+          - generic: 60日固定窗口探索检验
+          - generic: branch
+        - cell "wh-f2-stock-continuation-60d-20260909-results":
+          - button "wh-f2-stock-continuation-60d-20260909-results"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+        - cell "--"
+  - generic "Lineage and Activity":
+    - generic: Lineage and Activity

@@ -1,0 +1,487 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "Bond ETF T0"
+    - generic: /
+    - button "TL88 mid diff factor drives 511090"
+    - generic: /
+    - button "TL88 511090 50W strategy comparison 20250827-20260624"
+  - generic: 对比
+  - heading "策略结果对比" [level=1]
+  - paragraph: TL88 511090 50W strategy comparison 20250827-20260624
+  - button "返回对比列表":
+    - text: 返回对比列表
+  - generic: 决策摘要
+  - generic: 先回答哪个方案更值得推进，再给出曲线、回撤、指标和诊断证据。
+  - generic: 可决策
+  - generic: 模板
+  - generic "绩效对比":
+    - generic: 绩效对比
+  - generic: Run
+  - generic "5":
+    - generic: "5"
+  - generic: 基准
+  - generic "baseline-market-ioc-binary-50w":
+    - generic: baseline-market-ioc-binary-50w
+    - button "展开"
+  - generic: 领先候选
+  - generic "step2-sliced-ioc-linear-50w / 30987.28":
+    - generic: step2-sliced-ioc-linear-50w / 30987.28
+    - button "展开"
+  - generic: 主指标
+  - generic "capacity.summary.total_pnl_cny":
+    - generic: capacity.summary.total_pnl_cny
+    - button "展开"
+  - generic: 回撤最优
+  - generic "step3-sliced-ioc-linear-liq-50w / -1.00":
+    - generic: step3-sliced-ioc-linear-liq-50w / -1.00
+    - button "展开"
+  - generic: 序列
+  - generic "1 组 / 5 runs":
+    - generic: 1 组 / 5 runs
+  - generic: 指标覆盖
+  - generic "30/30":
+    - generic: 30/30
+  - generic: 建议
+  - generic: step2-sliced-ioc-linear-50w 是当前主指标领先候选，相对基准提升 +10565.19，该候选 max_drawdown=-1.00；风险最优为 step3-sliced-ioc-linear-liq-50w。建议围绕成本、OOS 和异常诊断再做 promote / iterate 决策。
+  - button "对比诊断 1 WARNING":
+    - generic: 对比诊断
+    - generic: 1 WARNING
+  - heading "曲线对比" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 序列 模式 行数 值":
+        - columnheader "Run"
+        - columnheader "序列"
+        - columnheader "模式"
+        - columnheader "行数"
+        - columnheader "值"
+    - rowgroup:
+      - row "baseline-market-ioc-binary-50w pnl_series absolute_change 195 series_values":
+        - cell "baseline-market-ioc-binary-50w":
+          - button "baseline-market-ioc-binary-50w"
+        - cell "pnl_series"
+        - cell "absolute_change"
+        - cell "195"
+        - cell "series_values"
+      - row "step1-sliced-ioc-binary-50w pnl_series absolute_change 195 series_values":
+        - cell "step1-sliced-ioc-binary-50w":
+          - button "step1-sliced-ioc-binary-50w"
+        - cell "pnl_series"
+        - cell "absolute_change"
+        - cell "195"
+        - cell "series_values"
+      - row "step2-sliced-ioc-linear-50w pnl_series absolute_change 195 series_values":
+        - cell "step2-sliced-ioc-linear-50w":
+          - button "step2-sliced-ioc-linear-50w"
+        - cell "pnl_series"
+        - cell "absolute_change"
+        - cell "195"
+        - cell "series_values"
+      - row "step2-sliced-ioc-linear-exec-any-50w pnl_series absolute_change 195 series_values":
+        - cell "step2-sliced-ioc-linear-exec-any-50w":
+          - button "step2-sliced-ioc-linear-exec-any-50w"
+        - cell "pnl_series"
+        - cell "absolute_change"
+        - cell "195"
+        - cell "series_values"
+      - row "step3-sliced-ioc-linear-liq-50w pnl_series absolute_change 195 series_values":
+        - cell "step3-sliced-ioc-linear-liq-50w":
+          - button "step3-sliced-ioc-linear-liq-50w"
+        - cell "pnl_series"
+        - cell "absolute_change"
+        - cell "195"
+        - cell "series_values"
+  - heading "回撤对比" [level=2]
+  - generic: 暂无回撤序列数据
+  - heading "关键指标表" [level=2]
+  - table:
+    - rowgroup:
+      - row "指标 step3-sliced-ioc-linear-liq-50w step2-sliced-ioc-linear-50w step2-sliced-ioc-linear-exec-any-50w step1-sliced-ioc-binary-50w baseline-market-ioc-binary-50w (基准)":
+        - columnheader "指标"
+        - columnheader "step3-sliced-ioc-linear-liq-50w"
+        - columnheader "step2-sliced-ioc-linear-50w"
+        - columnheader "step2-sliced-ioc-linear-exec-any-50w"
+        - columnheader "step1-sliced-ioc-binary-50w"
+        - columnheader "baseline-market-ioc-binary-50w (基准)"
+    - rowgroup:
+      - row "capacity.summary.total_pnl_cny 30807.53 +10385.44 / +50.85% 30987.28 +10565.19 / +51.73% 30160.78 +9738.69 / +47.69% 30065.20 +9643.11 / +47.22% 20422.09":
+        - cell "capacity.summary.total_pnl_cny"
+        - cell "30807.53 +10385.44 / +50.85%":
+          - generic: "30807.53"
+          - generic: +10385.44 / +50.85%
+        - cell "30987.28 +10565.19 / +51.73%":
+          - generic: "30987.28"
+          - generic: +10565.19 / +51.73%
+        - cell "30160.78 +9738.69 / +47.69%":
+          - generic: "30160.78"
+          - generic: +9738.69 / +47.69%
+        - cell "30065.20 +9643.11 / +47.22%":
+          - generic: "30065.20"
+          - generic: +9643.11 / +47.22%
+        - cell "20422.09":
+          - generic: "20422.09"
+      - row "capacity.summary.pnl_per_10k_cny 616.15 +207.71 / +50.85% 619.75 +211.30 / +51.73% 603.22 +194.77 / +47.69% 601.30 +192.86 / +47.22% 408.44":
+        - cell "capacity.summary.pnl_per_10k_cny"
+        - cell "616.15 +207.71 / +50.85%":
+          - generic: "616.15"
+          - generic: +207.71 / +50.85%
+        - cell "619.75 +211.30 / +51.73%":
+          - generic: "619.75"
+          - generic: +211.30 / +51.73%
+        - cell "603.22 +194.77 / +47.69%":
+          - generic: "603.22"
+          - generic: +194.77 / +47.69%
+        - cell "601.30 +192.86 / +47.22%":
+          - generic: "601.30"
+          - generic: +192.86 / +47.22%
+        - cell "408.44":
+          - generic: "408.44"
+      - row "sharpe 3.58 +1.56 / +76.68% 3.53 +1.50 / +73.83% 3.45 +1.42 / +69.89% 2.98 +0.95 / +46.79% 2.03":
+        - cell "sharpe"
+        - cell "3.58 +1.56 / +76.68%":
+          - generic: "3.58"
+          - generic: +1.56 / +76.68%
+        - cell "3.53 +1.50 / +73.83%":
+          - generic: "3.53"
+          - generic: +1.50 / +73.83%
+        - cell "3.45 +1.42 / +69.89%":
+          - generic: "3.45"
+          - generic: +1.42 / +69.89%
+        - cell "2.98 +0.95 / +46.79%":
+          - generic: "2.98"
+          - generic: +0.95 / +46.79%
+        - cell "2.03":
+          - generic: "2.03"
+      - row "max_drawdown -1.00 +0.26 / +20.72% -1.00 +0.26 / +20.72% -1.00 +0.26 / +20.72% -1.14 +0.12 / +9.76% -1.26":
+        - cell "max_drawdown"
+        - cell "-1.00 +0.26 / +20.72%":
+          - generic: "-1.00"
+          - generic: +0.26 / +20.72%
+        - cell "-1.00 +0.26 / +20.72%":
+          - generic: "-1.00"
+          - generic: +0.26 / +20.72%
+        - cell "-1.00 +0.26 / +20.72%":
+          - generic: "-1.00"
+          - generic: +0.26 / +20.72%
+        - cell "-1.14 +0.12 / +9.76%":
+          - generic: "-1.14"
+          - generic: +0.12 / +9.76%
+        - cell "-1.26":
+          - generic: "-1.26"
+      - row "capacity.summary.total_turnover 3392186007.27 +1006030338.84 / +22.87% 3582317336.12 +815899009.99 / +18.55% 3634439544.01 +763776802.10 / +17.37% 4301257408.17 +96958937.94 / +2.20% 4398216346.11":
+        - cell "capacity.summary.total_turnover"
+        - cell "3392186007.27 +1006030338.84 / +22.87%":
+          - generic: "3392186007.27"
+          - generic: +1006030338.84 / +22.87%
+        - cell "3582317336.12 +815899009.99 / +18.55%":
+          - generic: "3582317336.12"
+          - generic: +815899009.99 / +18.55%
+        - cell "3634439544.01 +763776802.10 / +17.37%":
+          - generic: "3634439544.01"
+          - generic: +763776802.10 / +17.37%
+        - cell "4301257408.17 +96958937.94 / +2.20%":
+          - generic: "4301257408.17"
+          - generic: +96958937.94 / +2.20%
+        - cell "4398216346.11":
+          - generic: "4398216346.11"
+      - row "capacity.summary.total_orders 25947.00 +16245.00 / +167.44% 31220.00 +21518.00 / +221.79% 32581.00 +22879.00 / +235.82% 16313.00 +6611.00 / +68.14% 9702.00":
+        - cell "capacity.summary.total_orders"
+        - cell "25947.00 +16245.00 / +167.44%":
+          - generic: "25947.00"
+          - generic: +16245.00 / +167.44%
+        - cell "31220.00 +21518.00 / +221.79%":
+          - generic: "31220.00"
+          - generic: +21518.00 / +221.79%
+        - cell "32581.00 +22879.00 / +235.82%":
+          - generic: "32581.00"
+          - generic: +22879.00 / +235.82%
+        - cell "16313.00 +6611.00 / +68.14%":
+          - generic: "16313.00"
+          - generic: +6611.00 / +68.14%
+        - cell "9702.00":
+          - generic: "9702.00"
+  - heading "收益风险散点" [level=2]
+  - button "step3-sliced-ioc-linear-liq-50w 30807.53 / 616.15":
+    - generic: step3-sliced-ioc-linear-liq-50w
+    - generic: 30807.53 / 616.15
+  - button "step2-sliced-ioc-linear-50w 30987.28 / 619.75":
+    - generic: step2-sliced-ioc-linear-50w
+    - generic: 30987.28 / 619.75
+  - button "step2-sliced-ioc-linear-exec-any-50w 30160.78 / 603.22":
+    - generic: step2-sliced-ioc-linear-exec-any-50w
+    - generic: 30160.78 / 603.22
+  - button "step1-sliced-ioc-binary-50w 30065.20 / 601.30":
+    - generic: step1-sliced-ioc-binary-50w
+    - generic: 30065.20 / 601.30
+  - button "baseline-market-ioc-binary-50w 20422.09 / 408.44":
+    - generic: baseline-market-ioc-binary-50w
+    - generic: 20422.09 / 408.44
+  - heading "参与对比的 Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run 研究线 / 研究分支 状态 创建者 Sharpe 最大回撤 IC 均值 耗时 配置 产物 更新时间":
+        - columnheader "Run"
+        - columnheader "研究线 / 研究分支"
+        - columnheader "状态"
+        - columnheader "创建者"
+        - columnheader "Sharpe"
+        - columnheader "最大回撤"
+        - columnheader "IC 均值"
+        - columnheader "耗时"
+        - columnheader "配置"
+        - columnheader "产物"
+        - columnheader "更新时间"
+    - rowgroup:
+      - row "step3-sliced-ioc-linear-liq-50w tl88-mid-diff-511090 step3-sliced-ioc-linear-liq 已完成 agent / codex 3.58 -1.00 -- 4s etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs result_json, table_csv · 4 2026/6/30 14:38:30":
+        - cell "step3-sliced-ioc-linear-liq-50w":
+          - button "step3-sliced-ioc-linear-liq-50w"
+        - cell "tl88-mid-diff-511090 step3-sliced-ioc-linear-liq":
+          - generic: tl88-mid-diff-511090
+          - button "step3-sliced-ioc-linear-liq"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.58"
+        - cell "-1.00"
+        - cell "--"
+        - cell "4s"
+        - cell "etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs":
+          - generic: etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs
+        - cell "result_json, table_csv · 4":
+          - generic: result_json, table_csv · 4
+        - cell "2026/6/30 14:38:30"
+      - row "step2-sliced-ioc-linear-exec-any-50w tl88-mid-diff-511090 step2-sliced-ioc-linear-exec-any 已完成 agent / codex 3.45 -1.00 -- 5s etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs result_json, table_csv · 4 2026/6/30 14:38:07":
+        - cell "step2-sliced-ioc-linear-exec-any-50w":
+          - button "step2-sliced-ioc-linear-exec-any-50w"
+        - cell "tl88-mid-diff-511090 step2-sliced-ioc-linear-exec-any":
+          - generic: tl88-mid-diff-511090
+          - button "step2-sliced-ioc-linear-exec-any"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.45"
+        - cell "-1.00"
+        - cell "--"
+        - cell "5s"
+        - cell "etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs":
+          - generic: etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs
+        - cell "result_json, table_csv · 4":
+          - generic: result_json, table_csv · 4
+        - cell "2026/6/30 14:38:07"
+      - row "step2-sliced-ioc-linear-50w tl88-mid-diff-511090 step2-sliced-ioc-linear 已完成 agent / codex 3.53 -1.00 -- 7s etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs result_json, table_csv · 4 2026/6/30 14:37:40":
+        - cell "step2-sliced-ioc-linear-50w":
+          - button "step2-sliced-ioc-linear-50w"
+        - cell "tl88-mid-diff-511090 step2-sliced-ioc-linear":
+          - generic: tl88-mid-diff-511090
+          - button "step2-sliced-ioc-linear"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.53"
+        - cell "-1.00"
+        - cell "--"
+        - cell "7s"
+        - cell "etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs":
+          - generic: etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs
+        - cell "result_json, table_csv · 4":
+          - generic: result_json, table_csv · 4
+        - cell "2026/6/30 14:37:40"
+      - row "step1-sliced-ioc-binary-50w tl88-mid-diff-511090 step1-sliced-ioc-binary 已完成 agent / codex 2.98 -1.14 -- 6s etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs result_json, table_csv · 4 2026/6/30 14:37:12":
+        - cell "step1-sliced-ioc-binary-50w":
+          - button "step1-sliced-ioc-binary-50w"
+        - cell "tl88-mid-diff-511090 step1-sliced-ioc-binary":
+          - generic: tl88-mid-diff-511090
+          - button "step1-sliced-ioc-binary"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.98"
+        - cell "-1.14"
+        - cell "--"
+        - cell "6s"
+        - cell "etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs":
+          - generic: etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs
+        - cell "result_json, table_csv · 4":
+          - generic: result_json, table_csv · 4
+        - cell "2026/6/30 14:37:12"
+      - row "baseline-market-ioc-binary-50w tl88-mid-diff-511090 baseline-market-ioc-binary 已完成 agent / codex 2.03 -1.26 -- 7s etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs result_json, table_csv · 4 2026/6/30 14:36:47":
+        - cell "baseline-market-ioc-binary-50w":
+          - button "baseline-market-ioc-binary-50w"
+        - cell "tl88-mid-diff-511090 baseline-market-ioc-binary":
+          - generic: tl88-mid-diff-511090
+          - button "baseline-market-ioc-binary"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.03"
+        - cell "-1.26"
+        - cell "--"
+        - cell "7s"
+        - cell "etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs":
+          - generic: etf_root=/data3/bond-etf-t0/outputs/sh_ordertrade_orderbook_l50_10ms_btx_ts, tl_root=/data3/bond-etf-t0/outputs/rqdatac_tl88_btx_l5, output_root=/data3/bond-etf-t0/outputs/511090_tl88_mid_diff_factor_runs
+        - cell "result_json, table_csv · 4":
+          - generic: result_json, table_csv · 4
+        - cell "2026/6/30 14:36:47"
+  - generic "对比设置与保存":
+    - generic: 对比设置与保存
+  - option "全部项目" [selected]
+  - option "strategy-daily-backtests"
+  - option "wh-a1"
+  - option "wh-f2"
+  - option "wh-multi-factor-v2"
+  - option "wh-pool"
+  - option "全部状态" [selected]
+  - option "已取消"
+  - option "已完成"
+  - option "失败"
+  - option "运行中"
+  - generic "高级诊断与原始明细":
+    - generic: 高级诊断与原始明细

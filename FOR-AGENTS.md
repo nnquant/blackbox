@@ -117,6 +117,16 @@ bbox run publish-performance --run-id <run_id> --curve-file .\equity.csv --mode 
 bbox note add --run-id <run_id> --kind decision --summary "Keep for review" --author-type agent --client-event-id codex-demo:note:decision --json
 ```
 
+Maintain the research map by hand (never generated from runs; see `docs/research-map.md`):
+
+```powershell
+bbox map init --project alpha-lab --research csi500-reversal --key csi500-map --title "CSI500 reversal map" --created-by-id codex
+bbox map node set --map alpha-lab/csi500-map --key fee-v2 --parent baseline --title "Fee model v2" --stage experiment --hypothesis "A conservative fee model keeps the right tail?" --change "fee|5bp|10bp per side" --run <run_id> --created-by-id codex
+bbox map node decide --map alpha-lab/csi500-map --key fee-v2 --decision kept --reading "sharpe 1.30 vs 1.21" --verdict "Keep: better Sharpe, review before promotion." --note --created-by-id codex
+bbox map baseline --map alpha-lab/csi500-map --key fee-v2 --reason "promoted after review" --created-by-id codex
+bbox map status --map alpha-lab/csi500-map
+```
+
 Search and compare:
 
 ```powershell
@@ -168,3 +178,4 @@ bbox sync --spool-dir "$HOME\.blackbox" --endpoint http://127.0.0.1:8010 --json
 - Retry transient network/storage failures with the same idempotency key.
 - Do not retry validation or state errors unchanged.
 - Verify important writes in WebUI: dashboard, search, run detail, lineage, compare, and sweep pages.
+- Research maps are the agent's own curated tree: register a node when you start an experiment (`map node set --run`), write the conclusion with `map node decide --note`, advance stages with `map node advance`, and never expect Blackbox to build the map from runs.

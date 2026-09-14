@@ -1,0 +1,2417 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run" [active]:
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "All Runs"
+  - generic: Run
+  - heading "查看 Run" [level=1]
+  - generic: 已过滤
+  - generic "200 / 200":
+    - generic: 200 / 200
+  - generic: 已完成
+  - generic "197":
+    - generic: "197"
+  - generic: 运行中
+  - generic "1":
+    - generic: "1"
+  - generic: 失败
+  - generic "1":
+    - generic: "1"
+  - generic: 有产物
+  - generic "199":
+    - generic: "199"
+  - generic: 最新
+  - generic "2026/9/14 14:05:19":
+    - generic: 2026/9/14 14:05:19
+  - heading "全部 Run" [level=2]
+  - generic: Loading runs...
+  - text: 搜索 Run
+  - textbox "搜索 Run":
+    - /placeholder: run, project, branch, config, tag
+  - text: 项目
+  - combobox "项目":
+    - option "任意项目" [selected]
+    - option "wh-pool"
+    - option "wh-a2"
+    - option "wh-a1"
+    - option "wh-n3"
+    - option "wh-strategy-timing-overlays"
+    - option "wh-n2"
+    - option "wh-n1"
+    - option "wh-f2"
+    - option "stock-pyramid-stock-network-mechanism"
+    - option "stock-pyramid-industry-network"
+    - option "wh-intraday-timing-research"
+    - option "strategy-daily-backtests"
+    - option "strategy-paused-backtests"
+    - option "strategy-combination-backtests"
+    - option "wh-multi-factor-v2"
+    - option "wh-minions"
+    - option "bond-etf-t0"
+    - option "wh-strategy-3d"
+    - option "wh-events-v1"
+    - option "cbt0-factor-research"
+    - option "wh-strategy-v1"
+    - option "wh-strategy-v2"
+  - text: 研究线
+  - combobox "研究线":
+    - option "任意研究线" [selected]
+    - option "wh-f2-stock-continuation-20260909"
+    - option "wh-f2-overnight-prediction-20260911"
+    - option "wh-f2-overnight-fusion-20260911"
+    - option "wh-f2-low-open-oracle-20260912"
+    - option "wh-f2-historical-audit-and-remediation"
+    - option "wh-f2-gap-thresholds-20260914"
+    - option "v5-fidelity-20260914"
+    - option "wh-f2-limit-down-open-20260914"
+    - option "f2-information-transfer-20260910"
+    - option "concept-dp-20260910"
+    - option "acceleration-events-20260908"
+    - option "consolidation-restart-20260908"
+    - option "event-structure-20260908"
+    - option "s1-strength-topn-20260908"
+    - option "v3-dual-sleeve-baseline-20260908"
+    - option "strong-pool-redesign-20260908"
+    - option "wh-a1-exit-improvement-20260906"
+    - option "locked-risk-allocation-20260906"
+    - option "f2-core-adaptive-exit-20260905"
+    - option "wh-a1-exit-model-diagnostic-20260905"
+    - option "wh-a1-pro-e2-label-bridge-20260905"
+    - option "wh-a1-pro-e1-crossed-exit-20260905"
+    - option "conditional-log-utility-v3"
+    - option "monthly-relative-strength-v2"
+    - option "adaptive-continuation"
+    - option "m2-wh-f2-strong-pool-top10pct-friction-veto-t1"
+    - option "m2-wh-f2-limit-friction-tophalf-veto-t1"
+    - option "c12-m2-daily-overlay-wh-v1-wh-f2-t1"
+    - option "m2-diffusion-exhaustion-industry-top"
+    - option "m1-sir-parameter-application-value"
+    - option "wh-f2-abnormal-market-state-factors"
+    - option "recent-multiboard-883410-ma5-entry-gate-t1"
+    - option "wh-f2-abnormal-seat-flow-factors"
+    - option "full-market-abnormal-stock-forward-performance"
+    - option "capital-attention-sir-identifiability-m0"
+    - option "wh-f2-abnormal-stock-recent-entry-exclusion"
+    - option "m1-narrative-ecology"
+    - option "m0-narrative-contagion"
+    - option "wh-f2-low-high-dispersion-attribution"
+    - option "wh-f2-t2-sell-timing-s1"
+    - option "wh-f2-index-gap-top10-gross-return"
+    - option "wh-f2-t2-sell-timing-s0"
+    - option "wh-f2-timing-top3-cost-sensitivity"
+    - option "wh-f2-timing-top3-cost-recheck"
+    - option "wh-f2-arm1-holding-risk-early-exit"
+    - option "wh-f5b-morning-feature-marginal"
+    - option "wh-f5-midday-entry-relabel"
+    - option "wh-r1-m0-panic-reversal"
+    - option "wh-f2-morning-mispricing-capture"
+    - option "wh-f4-demand-prediction-concentrated"
+    - option "wh-f2-pro-ranking-capacity"
+    - option "wh-state-conditioned-candidate-veto"
+    - option "wh-f3-reopen-condition-validation"
+    - option "wh-f3-concentrated-abstention"
+    - option "wh-f2-1-factor-program"
+    - option "WH-F2 Oaks Crosect 13:01 涨停递延"
+    - option "wh-f2"
+    - option "wh-f2-oaks-crosect-1301-limitup-defer"
+    - option "wh-v1-v2-expanding-wfo"
+    - option "strong-stock-index-pool-stress-timing"
+    - option "wh-v2-2025-age20-111-1301-transfer"
+    - option "金字塔股池T+1早盘15分钟残差收益分布"
+    - option "stock-pyramid-age-rank-lifecycle-state"
+    - option "wh-v1-v2-1000-entry-filter8-quick-validation"
+    - option "stock-pyramid-pool-age-lifecycle-predictiveness"
+    - option "stock-pyramid-level2-dual-state-supply-demand-xsec"
+    - option "pyramid-maxcap10-universe-2022"
+    - option "stock-pyramid-level2-supply-demand-xsec"
+    - option "pyramid-microcap10-universe-2022"
+    - option "real-neighbor-incremental-mechanism"
+    - option "688347-level2-supply-demand-pressure-response"
+    - option "v1-alpha32-level2-eventkey-free-daily-augmentation"
+    - option "dual-horizon-citic-l2-rotation"
+    - option "wh-v1-alpha32-raw4-crosect-execution-ablation"
+    - option "wh-v1-alpha32-fixed-split-model-compare"
+    - option "wh-v1-alpha32-ranker-reproduction"
+    - option "stock-local-pricing-mode-prototypes"
+    - option "wh-v2-2025-t1-new-tranche-risk-state-machine"
+    - option "wh-v2-2025-residual-alpha-industry-allocation"
+    - option "wh-v1-overnight-rank-early-exit-family-20260719"
+    - option "wh-v2-2025-overnight-rank-early-exit-20260718"
+    - option "wh-v2-2025-shsz-auction-native-snapshot-composite-top10"
+    - option "stock-pyramid-overnight-next-intraday-dependence"
+    - option "stock-pyramid-two-intraday-segment-dependence"
+    - option "wh-v2-2025-szse-auction-five-factor-composite-top10"
+    - option "wh-v2-2025-szse-auction-factor-pool"
+    - option "wh-v2-2025-auction-top5-concentration"
+    - option "wh-v2-2025-szse-auction-secondary-screen"
+    - option "stock-participant-role-prototypes"
+    - option "wh-v2-2025-limit-up-entry-filter-no-refill"
+    - option "szse-auction-active-fund-inflow-top10-reproduction"
+    - option "wh-v1-industry-board-preference"
+    - option "strong-stock-participant-ecology-moe"
+    - option "wh-v2-2025-deepmeta-sector-rotation"
+    - option "wh-v1-v2-risk-return-attribution"
+    - option "wh-v2-2025-market-mechanism-audit"
+    - option "wh-v1-regulatory-event-preopen-entry-gate"
+    - option "wh-v1-market-mechanism-audit"
+    - option "level2-post-migration-rebuild"
+    - option "wh-v1-v2-intersection-count-exposure-timing"
+    - option "wh-v1-v2-top10-intersection-crosect"
+    - option "stock-pyramid-intraday-equal-weight-index-prediction"
+    - option "WH-V2 非线性因子筛选"
+    - option "wh-alpha3-v1-v2-native-strategy-comparison"
+    - option "alpha5d-fixed-t5-1455-factor-model"
+    - option "alpha3d-fixed-t3-1455-model-comparison"
+    - option "wh-v2-full-candidate-payoff-distribution-portfolio"
+    - option "wh-v1-like-alpha32-wfo-2024"
+    - option "sentiment-cycle-prediction-model"
+    - option "wh-v3"
+    - option "vix-independent-timing-gate"
+    - option "wh-v2-2025-market-regime-total-exposure-gate"
+    - option "wh-v2-2025-position-sizing"
+    - option "stock-t1-sell-timing-vs-1455"
+    - option "stock-intraday-t0"
+    - option "market-regime-indicator20"
+    - option "wh-v1-v2-v3-equal-capital"
+    - option "microcap300-composite-factor-crosect-t5-rebalance5-2022"
+    - option "microcap300-composite-oaks-xsec-t5-rebalance5-2022"
+    - option "microcap300-factor-pool-correlation-t5-rebalance5-2022"
+    - option "microcap300-1d1m-factor-screen-t5-rebalance5-2022"
+    - option "microcap300-composite-oaks-xsec-full-sample-2022"
+    - option "wh-v2-stable-event-joint-20260703"
+    - option "microcap300-xgb-ranker-lowvar-wfo-2026"
+    - option "microcap300-oos-sleeve-benchmark-2026"
+    - option "microcap300-composite-factor-eval-2022"
+    - option "microcap300-factor-pool-correlation-2022"
+    - option "microcap300-1d1m-factor-screen-2022"
+    - option "three-part-pnl-attribution-20260702"
+    - option "microcap300-ret20drop30-2022"
+    - option "risk-style-exposure-attribution-20260702"
+    - option "pyramid-maxcap30-universe-2022"
+    - option "pyramid-microcap30-universe-2022"
+    - option "microcap300-universe-2022"
+    - option "stock-pyramid-event-ranker-oos-20260701"
+    - option "stock-pyramid-leader-first-bearish-20260701"
+    - option "stock-pyramid-breakout-events-20260630"
+    - option "tl88-mid-diff-511090"
+    - option "t1-open-t3-close-label"
+    - option "wh-v2-dynamic-residual-cluster-diversification-20260629"
+    - option "stock-intraday-upthrust-prediction"
+    - option "wh-v2-fixed77-factor-incremental"
+    - option "daily-market-extreme-day-factors"
+    - option "stock-pyramid-tradable-event-factor-mining-20260626"
+    - option "stock-pyramid-tradable-event-factor-mining-20260626"
+    - option "stock-pyramid-event-factor-mining-low-corr-20260626"
+    - option "stock-pyramid-event-strategy-framework-20260626"
+    - option "wh-v2-lowvar-breakout-buy-signal-20260626"
+    - option "wh-v2-pool-open5m-prediction-20260626"
+    - option "wh-v2-selected-limit-up-continuation-20260625"
+    - option "wh-v2-fixed77-dip-buy-execution-v1"
+    - option "wh-v2-77-execution-layer-20260625"
+    - option "wh-v2-77-model-layer-20260623"
+    - option "wh-v2-77-market-state-xgbranker"
+    - option "strategy-wh-v2-2025-v1-live-audit"
+    - option "hft-level2-daily-factor-mining"
+    - option "wh-v2-2025"
+    - option "wh-v1"
+    - option "no-flow-ema-horizons-2025"
+    - option "batch-factor-suite-2025"
+    - option "morning-5m-return-prediction"
+    - option "wh-v2-champion-intraday-crosect-timing"
+    - option "alpha-1d-plus-alpha-1m-top10-xgb-wfo-12m-2022-2026"
+    - option "alpha-1d-plus-alpha-1m-q10-linear-vs-xgb-oos-2026"
+    - option "alpha-1d-plus-alpha-1m-top10-linear-vs-xgb-oos-2026"
+    - option "alpha-1m-named-factor-pools"
+    - option "alpha-1m-versions-v110-v124-linear-equal-oos-2026"
+    - option "alpha-1d-plus-alpha-1m-v1-v124-linear-equal-oos-2026"
+    - option "alpha-1d-plus-alpha-1m-v1-v124-xgb-oos-2026"
+    - option "alpha-1m-v1-v124-xgb-ranker-oos-2026"
+    - option "alpha-1m-v1-v124-oos-2026"
+    - option "hft-market-microstructure-breadth"
+    - option "hft-cross-day-repair-v2"
+    - option "hft-state-conditioned-residual"
+    - option "hft-annual-stability-screen"
+    - option "hft-manual-state-templates"
+    - option "alpha-1d-x-1m-condition-filter"
+    - option "hft-market-state-conditioning"
+    - option "hft-cross-day-state-continuation"
+    - option "hft-strong-factor-interactions"
+    - option "hft-residual-orthogonalization"
+    - option "hft-amount-pulse-decay"
+    - option "hft-pv-divergence-regression"
+    - option "hft-tail-liquidity-recovery"
+    - option "hft-path-noise-efficiency"
+    - option "hft-market-share-migration"
+    - option "hft-market-impact-relative"
+    - option "hft-impact-resilience"
+    - option "hft-ohlc-vol-structure"
+    - option "wh-v1-intraday-crosect-timing"
+    - option "wh-v1-intraday-crosect-timing"
+    - option "hft-return-curve-shape"
+    - option "hft-open-shock-absorption"
+    - option "hft-xsec-relative-strength"
+    - option "hft-market-amount-regime-activity"
+    - option "hft-high-vol-state-profile"
+    - option "hft-chip-migration"
+    - option "hft-market-lead-lag-profile"
+    - option "hft-volatility-squeeze-release"
+    - option "hft-market-tail-amount-repair"
+    - option "hft-market-tail-beta-v2"
+    - option "hft-multi-scale-return-migration"
+    - option "hft-amplitude-turnover-coupling"
+    - option "hft-markov-state-flow"
+    - option "hft-volume-predictability"
+    - option "hft-chip-profile-variant"
+    - option "hft-intraday-chip-profile"
+    - option "hft-liquidity-dryup-drift"
+    - option "hft-turning-point-profile"
+    - option "hft-salience-attention"
+    - option "hft-support-resistance-flow"
+    - option "hft-price-bucket-contest"
+    - option "hft-segmented-price-volume"
+    - option "hft-candlestick-shape"
+    - option "hft-volume-persistence"
+    - option "hft-market-relative-intraday"
+    - option "hft-net-siphon"
+    - option "hft-shortline-crowding"
+    - option "alpha-1d-1m-linear-icir-wfo-2022-2026-top10"
+    - option "hft-state-transition"
+    - option "hft-active-pressure"
+    - option "hft-shock-repair"
+    - option "hft-same-minute-profile"
+    - option "alpha-1m-factor-pool-diagnostics"
+    - option "hft-liquidity-timing"
+    - option "hft-return-volume-state"
+    - option "hft-intraday-path-ext"
+    - option "hft-market-flow-ext"
+    - option "hft-state-split"
+    - option "hft-market-structure"
+    - option "alpha-1d-1m-xgb-ranker-walk-forward-2022-2026-top10"
+    - option "alpha-1d-1m-xgb-ranker-oos-2026-top10"
+    - option "alpha-1d-1m-combo-oos-2026"
+    - option "alpha-1d-1m-combo"
+    - option "hft-manual-path-flow"
+    - option "hft-price-volume-corr"
+    - option "hft-vol-ratio-jump"
+    - option "hft-adjust-swing"
+    - option "hft-intraday-reversal"
+    - option "hft-volume-distribution"
+    - option "hft-return-distribution"
+    - option "daily-manual-ohlcv-factors"
+    - option "daily-factor-slicing"
+    - option "alpha-exp-v1"
+  - text: 研究分支
+  - combobox "研究分支":
+    - option "任意研究分支" [selected]
+    - option "oaks-crosect-full-history"
+    - option "event-memory-backfill-20260908"
+    - option "event-data-training-repair-20260908"
+    - option "production-incident-audit-20260908"
+    - option "f2-ordered-remediation-20260908"
+    - option "f2-full-repair-nav-20260908"
+    - option "f2-repair-attribution-20260908"
+    - option "f2-pure-event-memory-20260908"
+    - option "four-cumulative-thresholds"
+    - option "frozen-v5"
+    - option "fixed-limit-down-open"
+    - option "fixed-gap-lt-zero"
+    - option "residual-and-soft-rank-v1"
+    - option "quarterly-shared-v1"
+    - option "fixed-four-arm-v1"
+    - option "adjustment-v2"
+    - option "approved-v1"
+    - option "frozen60-triage"
+    - option "e2-frozen"
+    - option "e2-frozen"
+    - option "frozen-e0-e1"
+    - option "frozen-gross-s1"
+    - option "frozen-gross"
+    - option "schema-diagnosis"
+    - option "r13-quarterly-refresh"
+    - option "r12-winsorized-target"
+    - option "r11-turnover-market-state"
+    - option "r10-market-distribution"
+    - option "r09-positive-part-mean"
+    - option "r08-recency-weight"
+    - option "r07-market-residual"
+    - option "r06-downside-utility"
+    - option "r05-industry-peers"
+    - option "r04-normalized-liquidity"
+    - option "r03-context-components-delay"
+    - option "r02-opening-context"
+    - option "design-v1"
+    - option "r01-features"
+    - option "design-v0"
+    - option "diagnostic"
+    - option "e2"
+    - option "e1"
+    - option "v3"
+    - option "v2"
+    - option "v1"
+    - option "strong-pool-top10pct-veto-v1"
+    - option "frozen-tophalf-veto-v1"
+    - option "wh-f2-m2-empty50-full75-levered"
+    - option "wh-f2-full-history"
+    - option "wh-v1-alpha32"
+    - option "frozen-ttp5-w10-u60"
+    - option "frozen-primary-w10-u60"
+    - option "market-state-factor-funnel-v1"
+    - option "frozen-ma5-t1"
+    - option "e01b-noisy-identifiability-point-gate-v1"
+    - option "main"
+    - option "frozen-matched-event-study-v1"
+    - option "e02-stable-hash-exact-replay-v1"
+    - option "e00a-synthetic-observation-contract-v1"
+    - option "data-audit-v2-deterministic"
+    - option "e01-identifiability-v1"
+    - option "data-audit-v1"
+    - option "fixed-six-window-exclusion"
+    - option "v1-expanding-vs-frozen-static-20260830"
+    - option "frozen-zero-train"
+    - option "v1-market-state-effectiveness-audit-20260830"
+    - option "frozen-m0"
+    - option "formal-read-only-attribution"
+    - option "s1-frozen-full-market-wfo"
+    - option "formal-descriptive-diagnostic"
+    - option "s0-descriptive-audit"
+    - option "top3-t4-20bp-single-point"
+    - option "top3-t4-66bp-preregistered-recheck"
+    - option "historical-risk-gate-v1"
+    - option "m1-e-c-窄化连续账户"
+    - option "m1-execution-feasibility"
+    - option "m0-four-arm-morning-wfo"
+    - option "m0-label-map-and-retrain"
+    - option "m0-e-d-高位崩塌"
+    - option "m0-e-c-泥沙俱下"
+    - option "m0-e-b-跌停结构"
+    - option "m0-e-a-个股闪崩"
+    - option "phase1-fixed-grid"
+    - option "p0-demand-existence"
+    - option "e06-read-only-scientific-review-v1"
+    - option "e05-independent-exact-replay-v1"
+    - option "e02-common-execution-carrier"
+    - option "e01-objective-candidates"
+    - option "g0-frozen-target-recipes"
+    - option "frozen-state-veto-v1"
+    - option "frozen-conditional-returns-v1"
+    - option "m1-tail-full-pool"
+    - option "m1b-constrained-calibration"
+    - option "m1-meta-existence"
+    - option "batch-2026q4a-g0-20260810"
+    - option "m0-stage1-revalidation-20260810"
+    - option "m0-p0-cutoff-20260810"
+    - option "b-track-b1-e3-v2-blend"
+    - option "e-track-t1-auction-sell-pressure-veto"
+    - option "m0-2-top123-concentration"
+    - option "batch-2-cross-source-preregistered"
+    - option "m0-data-contract"
+    - option "batch-1-g0-preregistered"
+    - option "m0-isolated-research-infra"
+    - option "top8-top5-concentration-upper-bound"
+    - option "t1-first-limit-touch-entry-top30-upper-bounds"
+    - option "t1-first-limit-touch-entry-upper-bounds"
+    - option "t1-first-limit-touch-entry-upper-bounds"
+    - option "oaks-crosect-2026"
+    - option "formal-oaks-crosect-comparison"
+    - option "wh-v2-fixed77"
+    - option "wh-v1-alpha32"
+    - option "pool-stress-gate"
+    - option "v2-full-transfer-20260726"
+    - option "v1-age20-top10-1301-vs-1125-execution"
+    - option "v1-age20-top10-1125-execution"
+    - option "v1-alpha32-raw-pool-age-20260725"
+    - option "v1-alpha32-20260722-execution-111-20260721"
+    - option "v1-age20-top10-111-execution"
+    - option "v1-open-limit-queue-fill-ablation"
+    - option "全历史描述性基线"
+    - option "v1-fullpool-execution-factorial-attribution"
+    - option "v1-age2-10-top10-no8-limitup-defer"
+    - option "age-constitution-posthoc-v1"
+    - option "age-bucket-basket-mean-index-v1"
+    - option "full-pool-age-executable-edge-924-v1"
+    - option "age1-basket-mean-index-v1"
+    - option "age1-open-t1-close-t2-strategy-v1"
+    - option "age-state-next-close-index-v1"
+    - option "age-rank-lifecycle-state-v1"
+    - option "daily-age-composition-information-v1"
+    - option "age-rank-e00-data-audit-v1"
+    - option "v1-age20-postfilter-cash"
+    - option "v1-age20-prefilter-top10"
+    - option "pool-age-winrate-payoff-2026-v1"
+    - option "open-vs-1000-entry-filter8-v1"
+    - option "pool-age-pnl-attribution-2026-v1"
+    - option "pool-age-2026-user-authorized-posthoc-v1"
+    - option "pool-age-discovery-2022-2024-v1"
+    - option "dual-state-v1"
+    - option "pyramid-maxcap10-two-basket-open-t2-1455-v1"
+    - option "e00-oaks-boundary-parity-v1"
+    - option "phase1-mechanical-smoke-v1"
+    - option "data-audit-v1"
+    - option "pyramid-microcap10-two-basket-open-t2-1455-v1"
+    - option "approved-spec-20260723"
+    - option "active-imbalance-divergence-v2"
+    - option "tday-next-day-ablation-v1"
+    - option "pressure-response-v1"
+    - option "data-audit-v1"
+    - option "data-audit-v1"
+    - option "audit-and-mechanism-baseline"
+    - option "v1-alpha32-20260722-baseline"
+    - option "alpha32-raw4-filter8-tp8"
+    - option "old-v1-filter8-tp8"
+    - option "alpha32-raw4-no-filter-no-tp"
+    - option "old-v1-no-filter-no-tp"
+    - option "xgbranker-market-tsq60-fixed-split"
+    - option "xgb-regressor-lowvar-fixed-split"
+    - option "fixed-split-20250920"
+    - option "e03a3b-pooled-identifiability"
+    - option "e03a2c-frozen-synthetic-covariance-recovery"
+    - option "e03a2b-paired-delete-one-covariance"
+    - option "e03b-smallest-algorithm-recovery"
+    - option "e02-formation-fingerprint-build"
+    - option "v2-2025-daily-industry-demean-top10-v1"
+    - option "proxy-prospective-shadow-v1"
+    - option "development-lambda-selection-v1"
+    - option "e01-streaming-fingerprint-smoke"
+    - option "champion-baseline-parity-v1"
+    - option "residualization-allocation-contract-smoke-v1"
+    - option "data-audit-v1"
+    - option "residual-alpha-data-audit-v1"
+    - option "amendment-a-e03-2025-factor-diagnostics-v1"
+    - option "amendment-a-e02-2025-full-precompute-v1"
+    - option "amendment-a-e01-three-date-smoke-v1"
+    - option "amendment-a-e00-kernel-contract-v1"
+    - option "amendment-a-experiment-plan-v1"
+    - option "filter-one-price-limit-up-official-split-20250920"
+    - option "overnight-rank-family-locked-eval-20260719"
+    - option "official-20250920-split-lowvar-latest-exec"
+    - option "fixed2025-lowvar-no-open8-no-tp-no-limit-filter-sell-lu-defer"
+    - option "stage-b1-e06-other-prototype-identity-reconnaissance-v1"
+    - option "fixed2025-lowvar-no-open8-no-tp-no-limit-filter"
+    - option "amendment-a-observable-unmatched-data-audit-v1"
+    - option "stage-b1-e05-provisional-semantic-enrichment-v1"
+    - option "overnight-rank-early-exit-locked-eval"
+    - option "scoped-market-data-audit-v1"
+    - option "stage-b1-e04d-blind-annotation-v1"
+    - option "confirmatory-baseline"
+    - option "stage-b1-e04c-blind-packet-v1"
+    - option "e05-primary-increment-robustness"
+    - option "implementation-validation-v1"
+    - option "e04-fixed-2026-full-accounts"
+    - option "stage-b1-e04b-full-external-margin-ledger-v1"
+    - option "data-audit-v1"
+    - option "e03-crosect-smoke"
+    - option "e02-2025-diagnostics"
+    - option "stage-b1-e04a2-margin-financing-evidence-v1"
+    - option "e01-score-kernel-alignment"
+    - option "five-factor-correlation-audit-2025"
+    - option "stage-b1-p03-external-evidence-v1"
+    - option "amendment1-last-state-full-audit"
+    - option "frozen-v1-data-audit"
+    - option "fixed-2026-top5-concentration"
+    - option "stage-a-k5-resolution-challenger-v1"
+    - option "fixed-2026-szse-secondary-screens"
+    - option "stage-a-neutral-prototypes-v1"
+    - option "rank-refill"
+    - option "one-price-limit-up-hindsight-2025-v1"
+    - option "one-price-limit-up-hindsight-2026-v1"
+    - option "fixed-top10-no-refill"
+    - option "open-limit-up-unfilled-2026-v1"
+    - option "open-limit-up-unfilled-2025-v1"
+    - option "implementation-smoke-v1"
+    - option "data-audit-post-migration-v1"
+    - option "standard-reader-integration-v4"
+    - option "conditional-mfa-algorithm-contract-v0-1"
+    - option "event-semantics-audit-v3"
+    - option "raw-data-contract-reaudit-v2"
+    - option "transparent-baseline-v0-1"
+    - option "baseline-diagnostic"
+    - option "feature-contract-v0-1"
+    - option "data-contract-transparent-baseline-v1"
+    - option "deepmeta-native-review-v1"
+    - option "morning-q20-four-anchor-small-sample-posthoc-20260715"
+    - option "doris-risk-attribution-v1"
+    - option "random-and-worst-signal-days-v1"
+    - option "severe-title-full-v1"
+    - option "mechanical-smoke-v1"
+    - option "data-audit-v1"
+    - option "worst-days-intraday-forensics-v1"
+    - option "random-worst-signal-days-v1"
+    - option "morning-q10-q20-fixed-1125-20260714"
+    - option "raw-data-contract-audit-v1"
+    - option "wh-v1-v2-30m-exit-overlay-v1"
+    - option "intraday-index-timing-gross-v1"
+    - option "fixed-intersection-count-linear-mapping-v1"
+    - option "strict-intersection-fixed-crosect-v1"
+    - option "full-2024-2025-transparent-wfo-v1"
+    - option "2024q1-three-fold-transparent-prediction-v1"
+    - option "january-2024-transparent-prediction-smoke-v1"
+    - option "first-fold-panel-v1"
+    - option "index-contract-smoke-v1"
+    - option "data-audit-v1"
+    - option "nonlinear-ablation"
+    - option "研究规格与数据审计"
+    - option "alpha3-ew-crosect-latest-v1"
+    - option "data-audit-v1"
+    - option "stage8-full-2025-development-v1"
+    - option "stage7-account-smoke-2025q1-v1"
+    - option "stage6-predictive-smoke-202501-v1"
+    - option "stage5-lineage-oaks-formal-pool-v2-clean"
+    - option "stage5-lineage-oaks-formal-pool-v1"
+    - option "stage4-full-retrieval-streaming-v1"
+    - option "stage3-100-factor-full-screen-smoke-v1"
+    - option "data-audit-v1-1-derived-output-filter"
+    - option "stage2-contract-smoke-v1"
+    - option "data-audit-v1"
+    - option "fixed-t3-1455-core-model-development-wfo-v1"
+    - option "fixed-t3-1455-core-model-smoke-v1"
+    - option "data-audit-v2"
+    - option "data-audit-v1"
+    - option "core-mean-wfo-v1"
+    - option "fixed2025-lowvar-no-open8-no-tp"
+    - option "fixed2025-lowvar-oos2026"
+    - option "wh-v1-stable-crosect-2025-20260706"
+    - option "alpha32-12m1m-lowvar-compare"
+    - option "timing-senti-auction-q0025-entry-strategy"
+    - option "daily-close-spec-draft"
+    - option "tminus1-index-raw-b5-oos"
+    - option "limit-down-deferred-next-day-v1"
+    - option "predictive-sell-gate-1030-v1"
+    - option "predictive-sell-gate-v1"
+    - option "bucket-total-exposure-oos-2026"
+    - option "rank-weight-zero-tail-oos-20260706"
+    - option "rank-weight-sensitivity-oos-20260705"
+    - option "wh-v2-2025-rank-weight-zero-tail-oos-20260706"
+    - option "wh-v2-2025-rank-weight-sensitivity-oos-20260705"
+    - option "transparent-policy-ladder-v1"
+    - option "lowcorr-gate-crosect-whv2stable-oos-20260705"
+    - option "lowcorr-gate-crosect-whv1-oos-20260705"
+    - option "t0-2-minimal-overlay-pnl-2025q4"
+    - option "lowcorr-gate-crosect-sensitivity-oos-20260705"
+    - option "lowcorr-gate-crosect-overlay-oos-20260705"
+    - option "t0-1f-gate-calibration-2025q4"
+    - option "lowcorr-gate-top10-proxy-oos-20260705"
+    - option "lowcorr-combo-gate-oos-2026-locked-20260705"
+    - option "lowcorr-combo-gate-is-20260705"
+    - option "oaks-crosect-2026"
+    - option "microcap300-rank101-400-two-basket-open-t2-1455-v1"
+    - option "oaks-crosect-2026"
+    - option "microcap300-sleeve-top10-crosect-t5-rebalance5"
+    - option "microcap300-composite-oaks-xsec-t5-rebalance5-20251231"
+    - option "microcap300-final-factor-pool-t5-rebalance5-corr1m050-1d070"
+    - option "microcap300-factor-screen-t5-rebalance5-is-20251231"
+    - option "top-body-fresh-limit-touch-first-touch-crosect-tp8-from2024-v1"
+    - option "microcap300-composite-oaks-xsec-full-sample-20251231"
+    - option "joint-fixed77-event-wfo-v1"
+    - option "microcap300-composite-oaks-xsec-report-2026"
+    - option "top-body-fresh-limit-touch-first-touch-crosect-tp8-v1"
+    - option "microcap300-1m-components-xgb-ranker-lowvar-wfo-2026"
+    - option "microcap300-1d-components-xgb-ranker-lowvar-wfo-2026"
+    - option "microcap300-full-components-xgb-ranker-lowvar-wfo-2026"
+    - option "top-body-fresh-limit-touch-first-touch-crosect-v1"
+    - option "event-ranker-oos-monthly-crosect-v1"
+    - option "microcap300-sleeve-equal-oos-2026"
+    - option "microcap300-composite-factor-eval-is-20251231"
+    - option "microcap300-final-factor-pool-corr1m050-1d070-is-20251231"
+    - option "microcap300-final-factor-pool-corr050-is-20251231"
+    - option "microcap300-final-factor-pool-corr070-is-20251231"
+    - option "microcap300-universe-factor-screen-is-20251231"
+    - option "20260702-three-part-attribution"
+    - option "microcap300-ret20drop30-two-basket-open-t2-1455-v1"
+    - option "20260702-risk-style-report"
+    - option "pyramid-maxcap30-two-basket-open-t2-1455-v1"
+    - option "event-ranker-oos-monthly-v1"
+    - option "pyramid-microcap30-two-basket-open-t2-1455-v1"
+    - option "microcap300-two-basket-open-t2-1455-v1"
+    - option "event-ranker-oos-v1"
+    - option "tier-quota-433-20260701"
+    - option "leader-first-bearish-event-study-v1"
+    - option "breakout-basket50-n20-crosect-v1"
+    - option "breakout-prior-high-gap-v1"
+    - option "breakout-basket50-crosect-v1"
+    - option "price-cap-1000-replacement-top50-20260630"
+    - option "price-cap-1000-crosect-20260630"
+    - option "alpha3d-latest-oaks-crosect-execution-v1"
+    - option "breakout-event-study-v1"
+    - option "alpha3d-latest-input-extension-v1"
+    - option "baseline-market-ioc-binary"
+    - option "step2-sliced-ioc-linear-exec-any"
+    - option "step2-sliced-ioc-linear"
+    - option "step3-sliced-ioc-linear-liq"
+    - option "step1-sliced-ioc-binary"
+    - option "alpha3d-oaks-crosect-execution-v1"
+    - option "alpha3-icseq-corr-pools-v1"
+    - option "alpha3-all-history-factor-retest-v1"
+    - option "factor-roadmap-1d-1m-retest-v1"
+    - option "alpha-1m-prune-stability-v1"
+    - option "event-family-strength-top5-first75-sweep-v1"
+    - option "event-family-strength-top5-half-sweep-v1"
+    - option "event-big-family-trigger-sweep-v6-top10-any"
+    - option "event-big-family-trigger-sweep-v5-top5-any"
+    - option "label-smoke-v1"
+    - option "event-big-family-trigger-sweep-v4-top5-min3"
+    - option "event-big-family-trigger-sweep-v3-top5-ge3"
+    - option "hard-cap2-oos-2026"
+    - option "event-big-family-trigger-sweep-v2-big-only"
+    - option "event-big-family-trigger-sweep-v1"
+    - option "event-source-family-gt70-score60-full-alloc-v6-index-industry-underlying100"
+    - option "event-source-family-gt70-score60-full-alloc-v4-index-context-exploration100"
+    - option "event-source-family-gt70-score60-full-alloc-v2-exploration88"
+    - option "event-source-family-gt70-score60-full-alloc-v1"
+    - option "announcement-abnormal-filter-20260629"
+    - option "event-family-agg-gt70-score60-full-alloc-v1"
+    - option "event-family-aggregate-combo-v1"
+    - option "pred-upthrust-take-profit-execution-20260629"
+    - option "prefix300-688-take-profit-12pct-20260629"
+    - option "stock-upthrust-market-train-2022-2025"
+    - option "prefix300-take-profit-12pct-20260629"
+    - option "event-score-ratio-gt60-actual-count-alloc-v1"
+    - option "event-score-ratio-combo-strict26-v1"
+    - option "event-factor-expand-50-v1"
+    - option "stock-upthrust-wfo-2022-2025"
+    - option "event-vote-combo-fixed-slot-v1"
+    - option "event-vote-combo-fixed-slot-v1"
+    - option "fixed77-plus-market-extreme-rel-is-oos-20260527"
+    - option "relative-return-tail10-is-20251231"
+    - option "index-tail10-is-20251231"
+    - option "tradable-v1"
+    - option "tradable-exec-label-2022-v2"
+    - option "tradable-exec-label-2022-v2"
+    - option "tradable-2022-v1"
+    - option "all-market-proxy-tail10-is-20251231"
+    - option "tradable-v1"
+    - option "low-corr-v1"
+    - option "event-factor-mining-v1"
+    - option "limit-touch-vectorized-crosect-adapter-v1"
+    - option "wh-v2-open5m-second-tick-depth-vwap-execution"
+    - option "topn-high-breakout-hold-next-close"
+    - option "stock-pyramid-universe-limit-touch-v1"
+    - option "d1-level2-auction-v1"
+    - option "d0-d2-minimal-v1"
+    - option "strategy-candidate-v1"
+    - option "event-state-diagnostic-v1"
+    - option "dip-buy-ladder-v1"
+    - option "xgb-regressor-lowvar-afternoon-trailing-tp-20260625"
+    - option "fixed77-xgb-regressor-intraday-entry-path-20260625"
+    - option "xgb-regressor-lowvar-fixed77-buy0931-segmented-tp-20260623"
+    - option "xgb-regressor-lowvar-fixed77-segmented-tp-20260623"
+    - option "xgb-regressor-lowvar-market-raw4-20260623"
+    - option "xgb-regressor-lowvar-l1-sector-raw4-20260623"
+    - option "xgb-regressor-lowvar-full-freeze-20260623"
+    - option "segmented-take-profit-10-9-8-7"
+    - option "wh-v2-77-l2-linear-two-stage-rerank"
+    - option "wh-v2-77-l2-two-stage-rerank"
+    - option "wh-v2-77-citics-sector-state-lgbm-ranker"
+    - option "wh-v2-77-lgbm-ranker-raw4-market-state"
+    - option "wh-v2-2025-l2-xgb-regressor-single-heads-top5-2026-common"
+    - option "wh-v2-2025-l2-xgb-regressor-top5-each-top10-2026-common"
+    - option "wh-v2-2025-l2-xgb-regressor-top10-each-top20-2026-common"
+    - option "wh-v2-2025-l2-xgb-regressor-dual-head-2026-common"
+    - option "alpha-l2-v2-model-layer-wfo-2026-common"
+    - option "l2-only-wfo-ranker-2026-common"
+    - option "l2-addon-wfo-ranker-2026-common"
+    - option "triple-overlap-top1-no-open8-no-tp"
+    - option "triple-overlap-top1"
+    - option "extend-results-20260623"
+    - option "interactions-xgb-regressor-lowvar-full"
+    - option "interactions-top10-full"
+    - option "interactions-full-label"
+    - option "interactions-smoke"
+    - option "state-columns-smoke"
+    - option "label-layer-smoke"
+    - option "registry-factor-model-review-20260622"
+    - option "level2-methodology-and-loader-infra"
+    - option "oaks-crosect-2026"
+    - option "oaks-crosect-2026"
+    - option "addon-portfolios"
+    - option "curated-short-medium-long"
+    - option "wh-v2-exclude-3-limit-up"
+    - option "wh-v2-high-vol-risk-rank-5d-weighting"
+    - option "wh-v2-risk-rank-5d-weighting"
+    - option "factor-split-by-factor-v1"
+    - option "factor-batch-trend-v1"
+    - option "wh-v2-champion-extended-open-lt8-sell-gt8-liquidity-fix-20260612"
+    - option "wh-v2-champion-open-lt8-sell-gt8-liquidity-fix-20260612"
+    - option "wh-v1-2026-open-lt8-sell-gt8-20260612"
+    - option "wh-v2-champion-open-lt8-sell-gt8-latest-attempt-20260612"
+    - option "continuous-half-rolling-open-sell1455-2026-ytd"
+    - option "continuous-half-rolling-open-sell1455-2026-ytd"
+    - option "classifier-oos-2026"
+    - option "factor-transfer-oos-2026"
+    - option "alpha-1d-1m-q10-open-buy-lt8pct-sell-intraday-gt8pct-exclude-st"
+    - option "top20-open-buy-lt8pct-sell-intraday-gt8pct-exclude-st"
+    - option "open-buy-lt8pct-sell-intraday-gt8pct-exclude-st"
+    - option "open-buy-lt8pct-sell-limitup-else-1455"
+    - option "open-buy-lt8pct-sell-only-limitup"
+    - option "open-buy-lt8pct-sell-intraday-gt8pct"
+    - option "open-buy-lt8pct-sell-1455"
+    - option "baseline-open-buy-sell-1455"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-top10-12m-train-top10"
+    - option "xgb-ranker-alpha-1d-plus-1m-q10-1y-train-oos-2026-top10"
+    - option "linear-equal-alpha-1d-plus-1m-q10-oos-2026-top10"
+    - option "xgb-ranker-alpha-1d-plus-1m-top10-1y-train-oos-2026-top10"
+    - option "linear-equal-alpha-1d-plus-1m-top10-oos-2026-top10"
+    - option "alpha-1m-q10"
+    - option "alpha-1m-top10"
+    - option "continuous-open-buy-lt0pct-sell-gt8"
+    - option "alpha-1m-v124-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v123-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v122-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v121-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v120-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v119-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v118-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v117-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v116-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v115-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v114-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v113-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v112-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v111-linear-equal-oos-2026-top10"
+    - option "alpha-1m-v110-linear-equal-oos-2026-top10"
+    - option "continuous-half-rolling-staged-buy-open-half-dip-099-095-chase-1000-sell-gt8"
+    - option "linear-equal-alpha-1d-plus-1m-v124-oos-2026-top10"
+    - option "linear-equal-alpha-1d-plus-1m-v1-oos-2026-top10"
+    - option "linear-equal-alpha-1d-oos-2026-top10"
+    - option "strategy-equal-three-xgb-alpha-1d-plus-1m-v1-plus-1m-v124-oos-2026-top10"
+    - option "xgb-ranker-alpha-1d-v12-plus-1m-v124-oos-2026-top10"
+    - option "xgb-ranker-alpha-1d-v12-plus-1m-v1-oos-2026-top10"
+    - option "xgb-ranker-alpha-1d-v12-oos-2026-top10"
+    - option "continuous-half-rolling-staged-buy-open-half-dip-099-095-sell-gt8"
+    - option "xgb-ranker-alpha-1m-v124-oos-2026-top10"
+    - option "xgb-ranker-alpha-1m-v1-oos-2026-top10"
+    - option "alpha-1m-v124-oos-2026"
+    - option "alpha-1m-v1-oos-2026"
+    - option "continuous-half-rolling-open-buy-lt8pct-sell-intraday-gt8-half-then-1455-limitup-defer"
+    - option "continuous-half-rolling-open-buy-lt8pct-sell-intraday-tp-sweep"
+    - option "alpha-1m-v124-hft-factor-pool-20260610"
+    - option "alpha-1m-v123-breadth-tail-switch-tail-upper-replace-combo-is-20251231"
+    - option "alpha-1m-v123-breadth-noise-crowding-dry-return-replace-combo-is-20251231"
+    - option "alpha-1m-v123-market-microstructure-breadth-residual-incremental-combo-is-20251231"
+    - option "hft-market-microstructure-breadth-residual-is-20251231"
+    - option "continuous-half-rolling-open-buy-lt8pct-sell-limitup-defer"
+    - option "alpha-1m-v123-cross-day-repair-v2-nearmiss-incremental-combo-is-20251231"
+    - option "hft-cross-day-repair-v2-is-20251231"
+    - option "continuous-half-rolling-open-buy-lt8pct-sell-limitup-tp"
+    - option "alpha-1m-v123-hft-factor-pool-20260610"
+    - option "alpha-1m-v122-state-resid-mkt-up-tail-chip-pressure-balance-replace-combo-is-20251231"
+    - option "alpha-1m-v122-state-resid-mkt-up-xsec-ret-rank-tail-mean-replace-combo-is-20251231"
+    - option "alpha-1m-v122-state-resid-mkt-up-dry-return-mean-replace-combo-is-20251231"
+    - option "alpha-1m-v122-state-conditioned-residual-incremental-combo-is-20251231"
+    - option "hft-state-conditioned-residual-is-20251231"
+    - option "continuous-half-rolling-open-buy-threshold-sweep-5-8pct-sell1455"
+    - option "continuous-half-rolling-open-buy-lt7pct-sell1455"
+    - option "alpha-1m-v122-hft-factor-pool-20260610"
+    - option "alpha-1m-v121-residual-v2-tail-upper-pressure-share-replace-combo-is-20251231"
+    - option "alpha-1m-v121-residual-v2-tail-chip-pressure-balance-replace-combo-is-20251231"
+    - option "alpha-1m-v121-residual-orthogonalization-v2-top8-incremental-combo-is-20251231"
+    - option "hft-residual-orthogonalization-v2-top8-is-20251231"
+    - option "continuous-half-rolling-buy-time-limit-filter-0931-0945-sell1455"
+    - option "continuous-half-rolling-open-buy-one-price-limit-sell1455-1445"
+    - option "alpha-1m-v121-hft-factor-pool-20260610"
+    - option "continuous-half-rolling-open-buy-one-price-limit-sell1455-1445"
+    - option "alpha-1d-x-1m-condition-filter-combo-is-20251231"
+    - option "hft-annual-stability-screen-is-20251231"
+    - option "alpha-1m-v120-shortline-crowding-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-turning-point-profile-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-segmented-price-volume-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-salience-attention-incremental-combo-is-20251231"
+    - option "alpha-1d-x-1m-condition-filter-is-20251231"
+    - option "continuous-half-rolling-open-buy-limit-filter-sell1455-1445"
+    - option "alpha-1m-v120-market-tail-beta-v2-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-market-relative-intraday-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-state-split-incremental-combo-is-20251231"
+    - option "hft-cross-day-state-continuation-is-20251231"
+    - option "alpha-1m-v120-same-minute-profile-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-strong-factor-interaction-incremental-combo-is-20251231"
+    - option "hft-strong-factor-interactions-is-20251231"
+    - option "alpha-1m-v120-residual-tail-repair-replace-combo-is-20251231"
+    - option "alpha-1m-v120-residual-orthogonalization-incremental-combo-is-20251231"
+    - option "continuous-half-rolling-limit-filter-0931-sell1455-1445"
+    - option "hft-residual-orthogonalization-is-20251231"
+    - option "alpha-1m-v120-price-bucket-contest-dominant-price-late-share-replace-combo-is-20251231"
+    - option "alpha-1m-v120-price-bucket-contest-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-market-flow-ext-buy-fade-ts-replace-combo-is-20251231"
+    - option "alpha-1m-v120-market-flow-ext-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-liquidity-dryup-drift-dry-negative-share-replace-combo-is-20251231"
+    - option "alpha-1m-v120-liquidity-dryup-drift-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-amplitude-turnover-coupling-confirmed-return-ts-mean-10-replace-combo-is-20251231"
+    - option "alpha-1m-v120-amplitude-turnover-coupling-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-xsec-relative-strength-tail-open-gap-replace-combo-is-20251231"
+    - option "alpha-1m-v120-xsec-relative-strength-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-chip-profile-variant-high-amount-lower-support-share-replace-combo-is-20251231"
+    - option "alpha-1m-v120-chip-profile-variant-incremental-combo-is-20251231"
+    - option "alpha-1m-v120-amount-pulse-decay-pulse-no-price-share-replace-combo-is-20251231"
+    - option "alpha-1m-v120-amount-pulse-decay-incremental-combo-is-20251231"
+    - option "hft-amount-pulse-decay-ts-is-20251231"
+    - option "hft-amount-pulse-decay-is-20251231"
+    - option "alpha-1m-v120-pv-divergence-regression-price-move-no-amount-share-replace-combo-is-20251231"
+    - option "alpha-1m-v120-pv-divergence-regression-incremental-combo-is-20251231"
+    - option "hft-pv-divergence-regression-ts-is-20251231"
+    - option "hft-pv-divergence-regression-is-20251231"
+    - option "alpha-1m-v120-tail-liquidity-recovery-pre-tail-runup-fade-replace-combo-is-20251231"
+    - option "alpha-1m-v120-tail-liquidity-recovery-incremental-combo-is-20251231"
+    - option "hft-tail-liquidity-recovery-ts-is-20251231"
+    - option "hft-tail-liquidity-recovery-is-20251231"
+    - option "alpha-1m-v120-hft-factor-pool-20260609"
+    - option "alpha-1m-v119-path-noise-efficiency-noise-spike-longest-run-replace-combo-is-20251231"
+    - option "alpha-1m-v119-path-noise-efficiency-incremental-combo-is-20251231"
+    - option "hft-path-noise-efficiency-ts-is-20251231"
+    - option "hft-path-noise-efficiency-is-20251231"
+    - option "alpha-1m-v119-hft-factor-pool-20260609"
+    - option "alpha-1m-v118-market-share-migration-share-resid-abs-mean-replace-combo-is-20251231"
+    - option "alpha-1m-v118-market-share-migration-incremental-combo-is-20251231"
+    - option "hft-market-share-migration-ts-is-20251231"
+    - option "hft-market-share-migration-is-20251231"
+    - option "alpha-1m-v118-hft-factor-pool-20260609"
+    - option "alpha-1m-v117-market-impact-relative-idio-autocorr-replace-combo-is-20251231"
+    - option "alpha-1m-v117-market-impact-relative-incremental-combo-is-20251231"
+    - option "hft-market-impact-relative-ts-is-20251231"
+    - option "hft-market-impact-relative-is-20251231"
+    - option "continuous-half-rolling-sell1445-loader-compare"
+    - option "alpha-1m-v117-hft-factor-pool-20260609"
+    - option "hft-impact-resilience-ts-is-20251231"
+    - option "hft-impact-resilience-is-20251231"
+    - option "continuous-half-rolling-baseline-0931-1455-20250922-20260608"
+    - option "hft-ohlc-vol-structure-ts-is-20251231"
+    - option "hft-ohlc-vol-structure-is-20251231"
+    - option "continuous-baseline-0931-1455-20250922-20260608"
+    - option "full-baseline-0931-1455-20250922-20260608"
+    - option "full-baseline-0931-1455-20250922-20260608"
+    - option "alpha-1m-v116-hft-factor-pool-20260609"
+    - option "hft-return-curve-shape-ts-is-20251231"
+    - option "baseline-0931-1455-smoke-20260527"
+    - option "hft-return-curve-shape-is-20251231"
+    - option "hft-open-shock-absorption-is-20251231"
+    - option "hft-xsec-relative-strength-ts-is-20251231"
+    - option "hft-xsec-relative-strength-is-20251231"
+    - option "hft-market-amount-regime-activity-is-20251231"
+    - option "hft-high-vol-state-profile-ts-is-20251231"
+    - option "hft-high-vol-state-profile-is-20251231"
+    - option "alpha-1m-v115-hft-factor-pool-20260608"
+    - option "alpha-1m-v114-chip-migration-replace-combo-is-20251231"
+    - option "alpha-1m-v114-chip-migration-incremental-combo-is-20251231"
+    - option "hft-chip-migration-ts-is-20251231"
+    - option "hft-chip-migration-is-20251231"
+    - option "alpha-1m-v114-market-lead-lag-profile-incremental-combo-is-20251231"
+    - option "hft-market-lead-lag-profile-ts-is-20251231"
+    - option "hft-market-lead-lag-profile-is-20251231"
+    - option "alpha-1m-v114-volatility-squeeze-release-incremental-combo-is-20251231"
+    - option "hft-volatility-squeeze-release-ts-is-20251231"
+    - option "hft-volatility-squeeze-release-is-20251231"
+    - option "hft-market-tail-amount-repair-is-20251231"
+    - option "alpha-1m-v114-market-tail-beta-v2-incremental-combo-is-20251231"
+    - option "hft-market-tail-beta-v2-ts-is-20251231"
+    - option "hft-market-tail-beta-v2-is-20251231"
+    - option "alpha-1m-v114-hft-factor-pool-20260608"
+    - option "alpha-1m-v113-multi-scale-return-migration-replace-combo-is-20251231"
+    - option "alpha-1m-v113-multi-scale-return-migration-incremental-combo-is-20251231"
+    - option "hft-multi-scale-return-migration-ts-is-20251231"
+    - option "hft-multi-scale-return-migration-is-20251231"
+    - option "alpha-1m-v113-amplitude-turnover-coupling-incremental-combo-is-20251231"
+    - option "hft-amplitude-turnover-coupling-ts-is-20251231"
+    - option "hft-amplitude-turnover-coupling-is-20251231"
+    - option "hft-markov-state-flow-ts-aggregate-is-20251231"
+    - option "hft-markov-state-flow-ts-is-20251231"
+    - option "hft-markov-state-flow-is-20251231"
+    - option "hft-volume-predictability-ts-is-20251231"
+    - option "hft-volume-predictability-is-20251231"
+    - option "alpha-1m-v113-chip-profile-variant-replace-combo-is-20251231"
+    - option "alpha-1m-v113-chip-profile-variant-incremental-combo-is-20251231"
+    - option "hft-chip-profile-variant-ts-is-20251231"
+    - option "hft-chip-profile-variant-is-20251231"
+    - option "alpha-1m-v113-hft-factor-pool-20260607"
+    - option "alpha-1m-v112-intraday-chip-profile-incremental-combo-is-20251231"
+    - option "hft-intraday-chip-profile-ts-is-20251231"
+    - option "hft-intraday-chip-profile-is-20251231"
+    - option "alpha-1m-v112-liquidity-dryup-drift-incremental-combo-is-20251231"
+    - option "hft-liquidity-dryup-drift-ts-is-20251231"
+    - option "hft-liquidity-dryup-drift-is-20251231"
+    - option "alpha-1m-v112-turning-point-profile-incremental-combo-is-20251231"
+    - option "hft-turning-point-profile-ts-is-20251231"
+    - option "hft-turning-point-profile-is-20251231"
+    - option "alpha-1m-v112-salience-attention-incremental-combo-is-20251231"
+    - option "hft-salience-attention-ts-is-20251231"
+    - option "hft-salience-attention-is-20251231"
+    - option "alpha-1m-v112-support-resistance-flow-incremental-combo-is-20251231"
+    - option "hft-support-resistance-flow-ts-is-20251231"
+    - option "hft-support-resistance-flow-is-20251231"
+    - option "alpha-1m-v112-price-bucket-contest-incremental-combo-is-20251231"
+    - option "hft-price-bucket-contest-ts-is-20251231"
+    - option "hft-price-bucket-contest-is-20251231"
+    - option "alpha-1m-v112-segmented-price-volume-incremental-combo-is-20251231"
+    - option "hft-segmented-price-volume-ts-is-20251231"
+    - option "hft-segmented-price-volume-is-20251231"
+    - option "alpha-1m-v112-hft-factor-pool-20260607"
+    - option "alpha-1m-v111-candlestick-shape-incremental-combo-is-20251231"
+    - option "hft-candlestick-shape-ts-is-20251231"
+    - option "hft-candlestick-shape-is-20251231"
+    - option "hft-volume-persistence-is-20251231"
+    - option "alpha-1m-v111-market-relative-intraday-incremental-combo-is-20251231"
+    - option "hft-market-relative-intraday-ts-is-20251231"
+    - option "hft-market-relative-intraday-is-20251231"
+    - option "alpha-1m-v111-hft-factor-pool-20260606"
+    - option "alpha-1m-v110-net-siphon-incremental-combo-is-20251231"
+    - option "hft-net-siphon-ts-is-20251231"
+    - option "hft-net-siphon-is-20251231"
+    - option "alpha-1m-v110-hft-factor-pool-20260606"
+    - option "alpha-1m-v19-shortline-crowding-incremental-combo-is-20251231"
+    - option "hft-shortline-crowding-ts-is-20251231"
+    - option "hft-shortline-crowding-is-20251231"
+    - option "xgb-strategy-equal-1d-1m-12m"
+    - option "xgb-alpha-1m-12m"
+    - option "xgb-alpha-1d-12m"
+    - option "linear-alpha-1m-max-abs-icir-selector-train-12m-top10"
+    - option "linear-alpha-1m-icir-weight-train-12m-top10"
+    - option "linear-alpha-1d-1m-max-abs-icir-selector-train-12m-top10"
+    - option "linear-alpha-1d-1m-icir-weight-train-12m-top10"
+    - option "linear-alpha-1d-max-abs-icir-selector-train-12m-top10"
+    - option "linear-alpha-1d-icir-weight-train-12m-top10"
+    - option "alpha-1m-v19-state-transition-incremental-combo-is-20251231"
+    - option "hft-state-transition-ts-is-20251231"
+    - option "hft-state-transition-is-20251231"
+    - option "alpha-1m-v19-hft-factor-pool-20260606"
+    - option "alpha-1m-v18-active-pressure-incremental-combo-is-20251231"
+    - option "hft-active-pressure-ts-is-20251231"
+    - option "hft-active-pressure-is-20251231"
+    - option "hft-shock-repair-ts-is-20251231"
+    - option "hft-shock-repair-is-20251231"
+    - option "alpha-1m-v18-same-minute-profile-incremental-combo-is-20251231"
+    - option "hft-same-minute-profile-ts-is-20251231"
+    - option "hft-same-minute-profile-is-20251231"
+    - option "alpha-1m-v18-corr-gt0p8-prune-is-20251231"
+    - option "alpha-1m-v18-high-corr-prune-is-20251231"
+    - option "alpha-1m-v18-factor-correlation-is-20251231"
+    - option "alpha-1m-v18-hft-factor-pool-20260605"
+    - option "alpha-1m-v17-liquidity-timing-incremental-combo-is-20251231"
+    - option "hft-liquidity-timing-ts-transform-is-20251231"
+    - option "hft-liquidity-timing-is-20251231"
+    - option "alpha-1m-v17-hft-factor-pool-20260605"
+    - option "alpha-1m-v16-return-volume-state-incremental-combo-is-20251231"
+    - option "hft-return-volume-state-ts-transform-is-20251231"
+    - option "hft-return-volume-state-is-20251231"
+    - option "alpha-1m-v16-hft-factor-pool-20260605"
+    - option "alpha-1m-v15-intraday-path-ext-incremental-combo-is-20251231"
+    - option "hft-intraday-path-ext-ts-transform-is-20251231"
+    - option "hft-intraday-path-ext-is-20251231"
+    - option "alpha-1m-v15-market-flow-ext-incremental-combo-is-20251231"
+    - option "hft-market-flow-ext-ts-transform-is-20251231"
+    - option "hft-market-flow-ext-is-20251231"
+    - option "alpha-1m-v16-retired-downgrade-v15-20260605"
+    - option "alpha-1m-v15-v16-combo-compare-is-20251231"
+    - option "alpha-1m-v16-hft-factor-pool-20260605"
+    - option "hft-state-split-ts-transform-is-20251231"
+    - option "hft-state-split-is-20251231"
+    - option "hft-market-structure-ts-transform-is-20251231"
+    - option "alpha-1m-v15-hft-factor-pool-20260604"
+    - option "hft-market-structure-is-20251231"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-12m-aligned-20230103-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-6m-aligned-20230103-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-3m-aligned-20230103-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-12m-trade-next-month-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-3m-aligned-20220701-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-6m-trade-next-month-top10"
+    - option "xgb-ranker-wfo-alpha-1d-plus-alpha-1m-strategy-equal-train-3m-trade-next-month-top10"
+    - option "strategy-equal-alpha-1d-xgb-plus-alpha-1m-xgb-oos-2026-top10"
+    - option "strategy-equal-alpha-1d-linear-plus-alpha-1m-xgb-oos-2026-top10"
+    - option "xgb-ranker-alpha-1d-1m-dual-head-score-sum-oos-2026-top10-stocks"
+    - option "xgb-ranker-alpha-1d-1m-v12-v14-oos-2026-top10-stocks"
+    - option "xgb-ranker-alpha-1m-v14-oos-2026-top10-stocks"
+    - option "xgb-ranker-alpha-1d-v12-oos-2026-top10-stocks"
+    - option "alpha-1d-1m-all68-equal-top10-stocks-long-oos-2026"
+    - option "alpha-1m-v14-top10-stocks-long-oos-2026"
+    - option "alpha-1d-v12-top10-stocks-long-oos-2026"
+    - option "alpha-1d-1m-all68-equal-top10-long-oos-2026"
+    - option "alpha-1m-v14-top10-long-oos-2026"
+    - option "alpha-1d-v12-top10-long-oos-2026"
+    - option "alpha-1d-1m-all68-equal-oos-2026"
+    - option "alpha-1m-v14-oos-2026"
+    - option "alpha-1d-v12-oos-2026"
+    - option "alpha-1d-1m-two-stage-equal-nav-is-20251231"
+    - option "alpha-1d-1m-all68-equal-nav-is-20251231"
+    - option "alpha-1m-v14-equal-nav-is-20251231"
+    - option "alpha-1d-v12-equal-nav-is-20251231"
+    - option "alpha-1d-1m-combo-is-20251231"
+    - option "alpha-1m-v14-hft-factor-pool-20260604"
+    - option "alpha-1m-v13-manual-path-flow-selected-combo-is-20251231"
+    - option "alpha-1m-v13-manual-path-flow-incremental-combo-is-20251231"
+    - option "hft-manual-path-flow-ts-is-20251231"
+    - option "hft-manual-path-flow-is-20251231"
+    - option "alpha-1m-v13-price-volume-incremental-combo-is-20251231"
+    - option "hft-price-volume-corr-ts-is-20251231"
+    - option "hft-price-volume-corr-is-20251231"
+    - option "alpha-1m-v13-hft-factor-pool-20260604"
+    - option "hft-vol-ratio-jump-ts-is-20251231"
+    - option "hft-vol-ratio-jump-is-20251231"
+    - option "hft-adjust-swing-ts-is-20251231"
+    - option "hft-adjust-swing-is-20251231"
+    - option "manual-daily-adjust-swing-is-20251231"
+    - option "alpha-1m-v12-hft-factor-pool-20260604"
+    - option "hft-intraday-reversal-ts-transform-is-20251231"
+    - option "hft-intraday-reversal-is-20251231"
+    - option "alpha-1m-v11-combo-is-20251231"
+    - option "alpha-1m-v11-hft-factor-pool-20260604"
+    - option "hft-volume-ts-transform-is-20251231"
+    - option "hft-volume-distribution-is-20251231"
+    - option "alpha-1m-v1-combo-is-20251231"
+    - option "alpha-1m-v1-hft-factor-pool-20260604"
+    - option "hft-ts-transform-fullmarket-is-20251231"
+    - option "hft-ts-transform-is-20251231"
+    - option "hft-tcv-daily-pool-incremental-is-20251231"
+    - option "alpha-1d-v1-1-uncovered-daily-incremental-is-20251231"
+    - option "uncovered-daily-proxy-is-20251231"
+    - option "ideal-amplitude-is-20251231"
+    - option "ideal-reversal-short-w10-q20-is-20251231"
+    - option "ideal-reversal-is-20251231"
+    - option "alpha-1d-v1-ricequant-replacement-is-20251231"
+    - option "alpha-1d-v1-ricequant-technical-incremental-is-20251231"
+    - option "alpha-exp-v1-ricequant-technical-factors-is-20251231"
+    - option "alpha-1d-v1-dongwu-shadow-incremental-is-20251231"
+    - option "alpha-exp-v1-salience-theory-factors-is-20251231"
+    - option "alpha-exp-v1-founder-team-coin-factors-is-20251231"
+    - option "alpha-exp-v1-dongwu-shadow-line-factors-is-20251231"
+    - option "alpha-exp-v1-ma-convergence-factors-is-20251231"
+    - option "alpha-exp-v1-weekday-mom-factors-is-20251231"
+    - option "alpha-1d-v1-technical-incremental-is-20251231"
+    - option "alpha-exp-v1-technical-extra-non-aroon-factors-is-20251231"
+    - option "alpha-exp-v1-technical-window-factors-is-20251231"
+    - option "alpha-exp-v1-technical-indicator-factors-is-20251231"
+    - option "alpha-exp-v1-21-plus-12-factor-pool-20260602"
+    - option "alpha-exp-v1-28-plus-recovered-nearmiss-is-20251231"
+    - option "alpha-exp-v1-with-short-nearmiss-combos-is-20251231"
+    - option "manual-daily-completion-short-ic-series-correlation-review-20251231"
+    - option "manual-daily-completion-short-correlation-review-20251231"
+    - option "manual-daily-completion-short-is-20251231"
+    - option "manual-daily-completion-is-20251231"
+    - option "alpha-exp-v1-low-corr-candidate-combos-is-20251231"
+    - option "manual-daily-alpha-migration-correlation-review-20260602"
+    - option "manual-daily-alpha-migration-is-20251231"
+    - option "alpha-exp-v1-is-results-20251231"
+    - option "manual-daily-variants-is-20251231"
+    - option "manual-daily-extended-is-20251231"
+    - option "manual-daily-is-20251231"
+    - option "amount-range-gaprepair-is-20251231"
+    - option "selected-oos-2026"
+    - option "stable-review-202506"
+    - option "decay-review-202506"
+    - option "object-tool-is-20251231"
+    - option "ac-is-20251231"
+    - option "full-is-20251231"
+    - option "small-batch-is-20251231"
+    - option "environment-takeover-20260601"
+  - text: 状态
+  - combobox "状态":
+    - option "任意状态" [selected]
+    - option "已取消"
+    - option "已完成"
+    - option "失败"
+    - option "运行中"
+  - text: 创建者
+  - combobox "创建者":
+    - option "任意创建者" [selected]
+    - option "agent"
+  - text: 产物
+  - combobox "产物":
+    - option "任意" [selected]
+    - option "有产物"
+    - option "有报告"
+    - option "无产物"
+  - button "清空"
+  - table:
+    - rowgroup:
+      - row "选择当前页 runs Run ↕ 项目 ↕ 研究线 / 研究分支 ↕ 状态 ↕ 创建者 ↕ Sharpe ↕ 最大回撤 ↕ 耗时 ↕ 产物 ↕ 配置 创建时间 ↕ 更新时间 ↓":
+        - columnheader "选择当前页 runs":
+          - checkbox "选择当前页 runs"
+        - columnheader "Run ↕":
+          - button "Run ↕":
+            - generic: Run
+            - generic: ↕
+        - columnheader "项目 ↕":
+          - button "项目 ↕":
+            - generic: 项目
+            - generic: ↕
+        - columnheader "研究线 / 研究分支 ↕":
+          - button "研究线 / 研究分支 ↕":
+            - generic: 研究线 / 研究分支
+            - generic: ↕
+        - columnheader "状态 ↕":
+          - button "状态 ↕":
+            - generic: 状态
+            - generic: ↕
+        - columnheader "创建者 ↕":
+          - button "创建者 ↕":
+            - generic: 创建者
+            - generic: ↕
+        - columnheader "Sharpe ↕":
+          - button "Sharpe ↕":
+            - generic: Sharpe
+            - generic: ↕
+        - columnheader "最大回撤 ↕":
+          - button "最大回撤 ↕":
+            - generic: 最大回撤
+            - generic: ↕
+        - columnheader "耗时 ↕":
+          - button "耗时 ↕":
+            - generic: 耗时
+            - generic: ↕
+        - columnheader "产物 ↕":
+          - button "产物 ↕":
+            - generic: 产物
+            - generic: ↕
+        - columnheader "配置"
+        - columnheader "创建时间 ↕":
+          - button "创建时间 ↕":
+            - generic: 创建时间
+            - generic: ↕
+        - columnheader "更新时间 ↓":
+          - button "更新时间 ↓":
+            - generic: 更新时间
+            - generic: ↓
+    - rowgroup:
+      - row "选择 run f2-gap-thresholds-G7-20260914 f2-gap-thresholds-G7-20260914 run_mu0u45ex_549e6cae20 wh-f2 wh-f2-gap-thresholds-20260914 four-cumulative-thresholds 已完成 agent / codex 1.40 -3.31 4m report, figure, json +3 · 11 -- 2026/9/14 14:01:02 2026/9/14 14:05:19":
+        - cell "选择 run f2-gap-thresholds-G7-20260914":
+          - checkbox "选择 run f2-gap-thresholds-G7-20260914"
+        - cell "f2-gap-thresholds-G7-20260914 run_mu0u45ex_549e6cae20":
+          - button "f2-gap-thresholds-G7-20260914"
+          - generic: run_mu0u45ex_549e6cae20
+        - cell "wh-f2"
+        - cell "wh-f2-gap-thresholds-20260914 four-cumulative-thresholds":
+          - generic: wh-f2-gap-thresholds-20260914
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.40"
+        - cell "-3.31"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 14:01:02"
+        - cell "2026/9/14 14:05:19"
+      - row "选择 run f2-gap-thresholds-G5-20260914 f2-gap-thresholds-G5-20260914 run_mu0u4575_e82a8d357b wh-f2 wh-f2-gap-thresholds-20260914 four-cumulative-thresholds 已完成 agent / codex 2.31 -3.59 4m report, figure, json +3 · 11 -- 2026/9/14 14:01:02 2026/9/14 14:05:18":
+        - cell "选择 run f2-gap-thresholds-G5-20260914":
+          - checkbox "选择 run f2-gap-thresholds-G5-20260914"
+        - cell "f2-gap-thresholds-G5-20260914 run_mu0u4575_e82a8d357b":
+          - button "f2-gap-thresholds-G5-20260914"
+          - generic: run_mu0u4575_e82a8d357b
+        - cell "wh-f2"
+        - cell "wh-f2-gap-thresholds-20260914 four-cumulative-thresholds":
+          - generic: wh-f2-gap-thresholds-20260914
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.31"
+        - cell "-3.59"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 14:01:02"
+        - cell "2026/9/14 14:05:18"
+      - row "选择 run f2-gap-thresholds-G3-20260914 f2-gap-thresholds-G3-20260914 run_mu0u450y_2649ae3e68 wh-f2 wh-f2-gap-thresholds-20260914 four-cumulative-thresholds 已完成 agent / codex 2.19 -4.43 4m report, figure, json +3 · 11 -- 2026/9/14 14:01:01 2026/9/14 14:05:17":
+        - cell "选择 run f2-gap-thresholds-G3-20260914":
+          - checkbox "选择 run f2-gap-thresholds-G3-20260914"
+        - cell "f2-gap-thresholds-G3-20260914 run_mu0u450y_2649ae3e68":
+          - button "f2-gap-thresholds-G3-20260914"
+          - generic: run_mu0u450y_2649ae3e68
+        - cell "wh-f2"
+        - cell "wh-f2-gap-thresholds-20260914 four-cumulative-thresholds":
+          - generic: wh-f2-gap-thresholds-20260914
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.19"
+        - cell "-4.43"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 14:01:01"
+        - cell "2026/9/14 14:05:17"
+      - row "选择 run f2-gap-thresholds-G1-20260914 f2-gap-thresholds-G1-20260914 run_mu0u44v0_7950906e09 wh-f2 wh-f2-gap-thresholds-20260914 four-cumulative-thresholds 已完成 agent / codex 3.24 -7.58 4m report, figure, json +3 · 11 -- 2026/9/14 14:01:01 2026/9/14 14:05:17":
+        - cell "选择 run f2-gap-thresholds-G1-20260914":
+          - checkbox "选择 run f2-gap-thresholds-G1-20260914"
+        - cell "f2-gap-thresholds-G1-20260914 run_mu0u44v0_7950906e09":
+          - button "f2-gap-thresholds-G1-20260914"
+          - generic: run_mu0u44v0_7950906e09
+        - cell "wh-f2"
+        - cell "wh-f2-gap-thresholds-20260914 four-cumulative-thresholds":
+          - generic: wh-f2-gap-thresholds-20260914
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.24"
+        - cell "-7.58"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 14:01:01"
+        - cell "2026/9/14 14:05:17"
+      - row "选择 run f2-gap-thresholds-B0-20260914 f2-gap-thresholds-B0-20260914 run_mu0u44mo_1c0d844c23 wh-f2 wh-f2-gap-thresholds-20260914 four-cumulative-thresholds 已完成 agent / codex 2.00 -17.20 4m report, figure, json +3 · 11 -- 2026/9/14 14:01:01 2026/9/14 14:05:16":
+        - cell "选择 run f2-gap-thresholds-B0-20260914":
+          - checkbox "选择 run f2-gap-thresholds-B0-20260914"
+        - cell "f2-gap-thresholds-B0-20260914 run_mu0u44mo_1c0d844c23":
+          - button "f2-gap-thresholds-B0-20260914"
+          - generic: run_mu0u44mo_1c0d844c23
+        - cell "wh-f2"
+        - cell "wh-f2-gap-thresholds-20260914 four-cumulative-thresholds":
+          - generic: wh-f2-gap-thresholds-20260914
+          - button "four-cumulative-thresholds"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "-17.20"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 14:01:01"
+        - cell "2026/9/14 14:05:16"
+      - row "选择 run wh-pool-v5-20260914 wh-pool-v5-20260914 run_mu0txk2c_f8d1107b24 wh-pool v5-fidelity-20260914 frozen-v5 运行中 agent / codex -- -- 0s -- -- 2026/9/14 13:55:54 2026/9/14 13:55:54":
+        - cell "选择 run wh-pool-v5-20260914":
+          - checkbox "选择 run wh-pool-v5-20260914"
+        - cell "wh-pool-v5-20260914 run_mu0txk2c_f8d1107b24":
+          - button "wh-pool-v5-20260914"
+          - generic: run_mu0txk2c_f8d1107b24
+        - cell "wh-pool"
+        - cell "v5-fidelity-20260914 frozen-v5":
+          - generic: v5-fidelity-20260914
+          - button "frozen-v5"
+        - cell "运行中":
+          - generic: 运行中
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "0s"
+        - cell "--"
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 13:55:54"
+        - cell "2026/9/14 13:55:54"
+      - row "选择 run f2-limit-down-open-LD-20260914 f2-limit-down-open-LD-20260914 run_mu0tpvp9_a455ee590c wh-f2 wh-f2-limit-down-open-20260914 fixed-limit-down-open 已完成 agent / codex -0.59 -3.09 4m report, figure, json +3 · 11 -- 2026/9/14 13:49:56 2026/9/14 13:54:13":
+        - cell "选择 run f2-limit-down-open-LD-20260914":
+          - checkbox "选择 run f2-limit-down-open-LD-20260914"
+        - cell "f2-limit-down-open-LD-20260914 run_mu0tpvp9_a455ee590c":
+          - button "f2-limit-down-open-LD-20260914"
+          - generic: run_mu0tpvp9_a455ee590c
+        - cell "wh-f2"
+        - cell "wh-f2-limit-down-open-20260914 fixed-limit-down-open":
+          - generic: wh-f2-limit-down-open-20260914
+          - button "fixed-limit-down-open"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-0.59"
+        - cell "-3.09"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 13:49:56"
+        - cell "2026/9/14 13:54:13"
+      - row "选择 run f2-limit-down-open-B0-20260914 f2-limit-down-open-B0-20260914 run_mu0tpvh2_2212b03af9 wh-f2 wh-f2-limit-down-open-20260914 fixed-limit-down-open 已完成 agent / codex 2.00 -17.20 4m report, figure, json +3 · 11 -- 2026/9/14 13:49:56 2026/9/14 13:54:12":
+        - cell "选择 run f2-limit-down-open-B0-20260914":
+          - checkbox "选择 run f2-limit-down-open-B0-20260914"
+        - cell "f2-limit-down-open-B0-20260914 run_mu0tpvh2_2212b03af9":
+          - button "f2-limit-down-open-B0-20260914"
+          - generic: run_mu0tpvh2_2212b03af9
+        - cell "wh-f2"
+        - cell "wh-f2-limit-down-open-20260914 fixed-limit-down-open":
+          - generic: wh-f2-limit-down-open-20260914
+          - button "fixed-limit-down-open"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "-17.20"
+        - cell "4m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/14 13:49:56"
+        - cell "2026/9/14 13:54:12"
+      - row "选择 run f2-low-open-oracle-LOW-20260912 f2-low-open-oracle-LOW-20260912 run_mty9em5b_4c39ed2d9b wh-f2 wh-f2-low-open-oracle-20260912 fixed-gap-lt-zero 已完成 agent / codex 3.02 -10.53 6m report, figure, json +3 · 11 -- 2026/9/12 18:45:46 2026/9/12 18:52:08":
+        - cell "选择 run f2-low-open-oracle-LOW-20260912":
+          - checkbox "选择 run f2-low-open-oracle-LOW-20260912"
+        - cell "f2-low-open-oracle-LOW-20260912 run_mty9em5b_4c39ed2d9b":
+          - button "f2-low-open-oracle-LOW-20260912"
+          - generic: run_mty9em5b_4c39ed2d9b
+        - cell "wh-f2"
+        - cell "wh-f2-low-open-oracle-20260912 fixed-gap-lt-zero":
+          - generic: wh-f2-low-open-oracle-20260912
+          - button "fixed-gap-lt-zero"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "3.02"
+        - cell "-10.53"
+        - cell "6m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/12 18:45:46"
+        - cell "2026/9/12 18:52:08"
+      - row "选择 run f2-low-open-oracle-B0-20260912 f2-low-open-oracle-B0-20260912 run_mty9elje_7f06dee5b8 wh-f2 wh-f2-low-open-oracle-20260912 fixed-gap-lt-zero 已完成 agent / codex 2.00 -17.20 6m report, figure, json +3 · 11 -- 2026/9/12 18:45:45 2026/9/12 18:52:06":
+        - cell "选择 run f2-low-open-oracle-B0-20260912":
+          - checkbox "选择 run f2-low-open-oracle-B0-20260912"
+        - cell "f2-low-open-oracle-B0-20260912 run_mty9elje_7f06dee5b8":
+          - button "f2-low-open-oracle-B0-20260912"
+          - generic: run_mty9elje_7f06dee5b8
+        - cell "wh-f2"
+        - cell "wh-f2-low-open-oracle-20260912 fixed-gap-lt-zero":
+          - generic: wh-f2-low-open-oracle-20260912
+          - button "fixed-gap-lt-zero"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.00"
+        - cell "-17.20"
+        - cell "6m"
+        - cell "report, figure, json +3 · 11":
+          - generic: report, figure, json +3 · 11
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/12 18:45:45"
+        - cell "2026/9/12 18:52:06"
+      - row "选择 run wh-f2-oaks-crosect-2026-20260911-performance-v1 wh-f2-oaks-crosect-2026-20260911-performance-v1 run_mtwz2ngy_957afeca91 strategy-daily-backtests wh-f2 oaks-crosect-2026 已完成 agent / codex 1.63 -17.20 0s json, table_csv · 15 strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect 2026/9/11 21:08:45 2026/9/11 21:08:45":
+        - cell "选择 run wh-f2-oaks-crosect-2026-20260911-performance-v1":
+          - checkbox "选择 run wh-f2-oaks-crosect-2026-20260911-performance-v1"
+        - cell "wh-f2-oaks-crosect-2026-20260911-performance-v1 run_mtwz2ngy_957afeca91":
+          - button "wh-f2-oaks-crosect-2026-20260911-performance-v1"
+          - generic: run_mtwz2ngy_957afeca91
+        - cell "strategy-daily-backtests"
+        - cell "wh-f2 oaks-crosect-2026":
+          - generic: wh-f2
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.63"
+        - cell "-17.20"
+        - cell "0s"
+        - cell "json, table_csv · 15":
+          - generic: json, table_csv · 15
+        - cell "strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect":
+          - generic: strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect
+        - cell "2026/9/11 21:08:45"
+        - cell "2026/9/11 21:08:45"
+      - row "选择 run wh-v2-2025-oaks-crosect-2026-20260911-performance-v1 wh-v2-2025-oaks-crosect-2026-20260911-performance-v1 run_mtwz2ncb_54c944ad82 strategy-daily-backtests wh-v2-2025 oaks-crosect-2026 已完成 agent / codex 0.76 -29.07 0s json, table_csv · 13 strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect 2026/9/11 21:08:45 2026/9/11 21:08:45":
+        - cell "选择 run wh-v2-2025-oaks-crosect-2026-20260911-performance-v1":
+          - checkbox "选择 run wh-v2-2025-oaks-crosect-2026-20260911-performance-v1"
+        - cell "wh-v2-2025-oaks-crosect-2026-20260911-performance-v1 run_mtwz2ncb_54c944ad82":
+          - button "wh-v2-2025-oaks-crosect-2026-20260911-performance-v1"
+          - generic: run_mtwz2ncb_54c944ad82
+        - cell "strategy-daily-backtests"
+        - cell "wh-v2-2025 oaks-crosect-2026":
+          - generic: wh-v2-2025
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "0.76"
+        - cell "-29.07"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect":
+          - generic: strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect
+        - cell "2026/9/11 21:08:45"
+        - cell "2026/9/11 21:08:45"
+      - row "选择 run wh-v1-oaks-crosect-2026-20260911-performance-v1 wh-v1-oaks-crosect-2026-20260911-performance-v1 run_mtwz2n6j_0de8e0ef14 strategy-daily-backtests wh-v1 oaks-crosect-2026 已完成 agent / codex 1.45 -30.03 0s json, table_csv · 13 strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect 2026/9/11 21:08:45 2026/9/11 21:08:45":
+        - cell "选择 run wh-v1-oaks-crosect-2026-20260911-performance-v1":
+          - checkbox "选择 run wh-v1-oaks-crosect-2026-20260911-performance-v1"
+        - cell "wh-v1-oaks-crosect-2026-20260911-performance-v1 run_mtwz2n6j_0de8e0ef14":
+          - button "wh-v1-oaks-crosect-2026-20260911-performance-v1"
+          - generic: run_mtwz2n6j_0de8e0ef14
+        - cell "strategy-daily-backtests"
+        - cell "wh-v1 oaks-crosect-2026":
+          - generic: wh-v1
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.45"
+        - cell "-30.03"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect":
+          - generic: strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect
+        - cell "2026/9/11 21:08:45"
+        - cell "2026/9/11 21:08:45"
+      - row "选择 run audit audit run_mtwuhs2g_3bf440f39b wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex -- -- 22m report, figure, json +2 · 12 -- 2026/9/11 19:00:33 2026/9/11 19:22:32":
+        - cell "选择 run audit":
+          - checkbox "选择 run audit"
+        - cell "audit run_mtwuhs2g_3bf440f39b":
+          - button "audit"
+          - generic: run_mtwuhs2g_3bf440f39b
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "22m"
+        - cell "report, figure, json +2 · 12":
+          - generic: report, figure, json +2 · 12
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:00:33"
+        - cell "2026/9/11 19:22:32"
+      - row "选择 run R_stress R_stress run_mtwv8vip_146bd0df28 wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 2.14 -30.13 54s report, json, md +2 · 10 -- 2026/9/11 19:21:37 2026/9/11 19:22:31":
+        - cell "选择 run R_stress":
+          - checkbox "选择 run R_stress"
+        - cell "R_stress run_mtwv8vip_146bd0df28":
+          - button "R_stress"
+          - generic: run_mtwv8vip_146bd0df28
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.14"
+        - cell "-30.13"
+        - cell "54s"
+        - cell "report, json, md +2 · 10":
+          - generic: report, json, md +2 · 10
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:21:37"
+        - cell "2026/9/11 19:22:31"
+      - row "选择 run S10_stress S10_stress run_mtwv8vby_7d74e0abd7 wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 1.52 -21.63 53s report, json, md +2 · 9 -- 2026/9/11 19:21:37 2026/9/11 19:22:30":
+        - cell "选择 run S10_stress":
+          - checkbox "选择 run S10_stress"
+        - cell "S10_stress run_mtwv8vby_7d74e0abd7":
+          - button "S10_stress"
+          - generic: run_mtwv8vby_7d74e0abd7
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.52"
+        - cell "-21.63"
+        - cell "53s"
+        - cell "report, json, md +2 · 9":
+          - generic: report, json, md +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:21:37"
+        - cell "2026/9/11 19:22:30"
+      - row "选择 run S05_stress S05_stress run_mtwv8v50_6e2d541b53 wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 1.78 -22.93 53s report, json, md +2 · 9 -- 2026/9/11 19:21:37 2026/9/11 19:22:29":
+        - cell "选择 run S05_stress":
+          - checkbox "选择 run S05_stress"
+        - cell "S05_stress run_mtwv8v50_6e2d541b53":
+          - button "S05_stress"
+          - generic: run_mtwv8v50_6e2d541b53
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.78"
+        - cell "-22.93"
+        - cell "53s"
+        - cell "report, json, md +2 · 9":
+          - generic: report, json, md +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:21:37"
+        - cell "2026/9/11 19:22:29"
+      - row "选择 run B0_stress B0_stress run_mtwv8uy5_8a93da62c6 wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 2.01 -25.23 52s report, json, md +2 · 8 -- 2026/9/11 19:21:36 2026/9/11 19:22:29":
+        - cell "选择 run B0_stress":
+          - checkbox "选择 run B0_stress"
+        - cell "B0_stress run_mtwv8uy5_8a93da62c6":
+          - button "B0_stress"
+          - generic: run_mtwv8uy5_8a93da62c6
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.01"
+        - cell "-25.23"
+        - cell "52s"
+        - cell "report, json, md +2 · 8":
+          - generic: report, json, md +2 · 8
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:21:36"
+        - cell "2026/9/11 19:22:29"
+      - row "选择 run R R run_mtwuy4qv_a03870741c wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 2.41 -29.42 9m report, json, md +2 · 10 -- 2026/9/11 19:13:16 2026/9/11 19:22:28":
+        - cell "选择 run R":
+          - checkbox "选择 run R"
+        - cell "R run_mtwuy4qv_a03870741c":
+          - button "R"
+          - generic: run_mtwuy4qv_a03870741c
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.41"
+        - cell "-29.42"
+        - cell "9m"
+        - cell "report, json, md +2 · 10":
+          - generic: report, json, md +2 · 10
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:13:16"
+        - cell "2026/9/11 19:22:28"
+      - row "选择 run S10 S10 run_mtwuy4g0_37ba984453 wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 1.85 -20.93 9m report, json, md +2 · 9 -- 2026/9/11 19:13:16 2026/9/11 19:22:27":
+        - cell "选择 run S10":
+          - checkbox "选择 run S10"
+        - cell "S10 run_mtwuy4g0_37ba984453":
+          - button "S10"
+          - generic: run_mtwuy4g0_37ba984453
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.85"
+        - cell "-20.93"
+        - cell "9m"
+        - cell "report, json, md +2 · 9":
+          - generic: report, json, md +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:13:16"
+        - cell "2026/9/11 19:22:27"
+      - row "选择 run S05 S05 run_mtwuy47o_0ad71317ea wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 2.08 -22.17 9m report, json, md +2 · 9 -- 2026/9/11 19:13:15 2026/9/11 19:22:26":
+        - cell "选择 run S05":
+          - checkbox "选择 run S05"
+        - cell "S05 run_mtwuy47o_0ad71317ea":
+          - button "S05"
+          - generic: run_mtwuy47o_0ad71317ea
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.08"
+        - cell "-22.17"
+        - cell "9m"
+        - cell "report, json, md +2 · 9":
+          - generic: report, json, md +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:13:15"
+        - cell "2026/9/11 19:22:26"
+      - row "选择 run B0 B0 run_mtwuy3v5_c16ccb147b wh-f2 wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1 已完成 agent / codex 2.30 -24.03 9m report, json, md +2 · 8 -- 2026/9/11 19:13:15 2026/9/11 19:22:25":
+        - cell "选择 run B0":
+          - checkbox "选择 run B0"
+        - cell "B0 run_mtwuy3v5_c16ccb147b":
+          - button "B0"
+          - generic: run_mtwuy3v5_c16ccb147b
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-fusion-20260911 residual-and-soft-rank-v1":
+          - generic: wh-f2-overnight-fusion-20260911
+          - button "residual-and-soft-rank-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "2.30"
+        - cell "-24.03"
+        - cell "9m"
+        - cell "report, json, md +2 · 8":
+          - generic: report, json, md +2 · 8
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 19:13:15"
+        - cell "2026/9/11 19:22:25"
+      - row "选择 run wh-f2-overnight-predictive-audit-20260911 wh-f2-overnight-predictive-audit-20260911 run_mtwt5b8y_d016578668 wh-f2 wh-f2-overnight-prediction-20260911 quarterly-shared-v1 已完成 agent / codex -- -- 28m report, figure, json +3 · 14 -- 2026/9/11 18:22:52 2026/9/11 18:50:52":
+        - cell "选择 run wh-f2-overnight-predictive-audit-20260911":
+          - checkbox "选择 run wh-f2-overnight-predictive-audit-20260911"
+        - cell "wh-f2-overnight-predictive-audit-20260911 run_mtwt5b8y_d016578668":
+          - button "wh-f2-overnight-predictive-audit-20260911"
+          - generic: run_mtwt5b8y_d016578668
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-prediction-20260911 quarterly-shared-v1":
+          - generic: wh-f2-overnight-prediction-20260911
+          - button "quarterly-shared-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "28m"
+        - cell "report, figure, json +3 · 14":
+          - generic: report, figure, json +3 · 14
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 18:22:52"
+        - cell "2026/9/11 18:50:52"
+      - row "选择 run wh-f2-overnight-downside-20260911 wh-f2-overnight-downside-20260911 run_mtwtemer_72205b11aa wh-f2 wh-f2-overnight-prediction-20260911 quarterly-shared-v1 已完成 agent / codex -- -- 21m report, json, markdown +2 · 9 -- 2026/9/11 18:30:06 2026/9/11 18:50:52":
+        - cell "选择 run wh-f2-overnight-downside-20260911":
+          - checkbox "选择 run wh-f2-overnight-downside-20260911"
+        - cell "wh-f2-overnight-downside-20260911 run_mtwtemer_72205b11aa":
+          - button "wh-f2-overnight-downside-20260911"
+          - generic: run_mtwtemer_72205b11aa
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-prediction-20260911 quarterly-shared-v1":
+          - generic: wh-f2-overnight-prediction-20260911
+          - button "quarterly-shared-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "21m"
+        - cell "report, json, markdown +2 · 9":
+          - generic: report, json, markdown +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 18:30:06"
+        - cell "2026/9/11 18:50:52"
+      - row "选择 run wh-f2-overnight-mean-20260911 wh-f2-overnight-mean-20260911 run_mtwtem85_c03ae0a989 wh-f2 wh-f2-overnight-prediction-20260911 quarterly-shared-v1 已完成 agent / codex -- -- 21m report, json, markdown +2 · 9 -- 2026/9/11 18:30:06 2026/9/11 18:50:51":
+        - cell "选择 run wh-f2-overnight-mean-20260911":
+          - checkbox "选择 run wh-f2-overnight-mean-20260911"
+        - cell "wh-f2-overnight-mean-20260911 run_mtwtem85_c03ae0a989":
+          - button "wh-f2-overnight-mean-20260911"
+          - generic: run_mtwtem85_c03ae0a989
+        - cell "wh-f2"
+        - cell "wh-f2-overnight-prediction-20260911 quarterly-shared-v1":
+          - generic: wh-f2-overnight-prediction-20260911
+          - button "quarterly-shared-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "21m"
+        - cell "report, json, markdown +2 · 9":
+          - generic: report, json, markdown +2 · 9
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/11 18:30:06"
+        - cell "2026/9/11 18:50:51"
+      - row "选择 run wh-f2-oaks-crosect-2026-20260910-performance-v1 wh-f2-oaks-crosect-2026-20260910-performance-v1 run_mtvo6oge_a9cab4ddc6 strategy-daily-backtests wh-f2 oaks-crosect-2026 已完成 agent / codex 1.82 -17.20 0s json, table_csv · 15 strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect 2026/9/10 23:16:11 2026/9/10 23:16:11":
+        - cell "选择 run wh-f2-oaks-crosect-2026-20260910-performance-v1":
+          - checkbox "选择 run wh-f2-oaks-crosect-2026-20260910-performance-v1"
+        - cell "wh-f2-oaks-crosect-2026-20260910-performance-v1 run_mtvo6oge_a9cab4ddc6":
+          - button "wh-f2-oaks-crosect-2026-20260910-performance-v1"
+          - generic: run_mtvo6oge_a9cab4ddc6
+        - cell "strategy-daily-backtests"
+        - cell "wh-f2 oaks-crosect-2026":
+          - generic: wh-f2
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.82"
+        - cell "-17.20"
+        - cell "0s"
+        - cell "json, table_csv · 15":
+          - generic: json, table_csv · 15
+        - cell "strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect":
+          - generic: strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect
+        - cell "2026/9/10 23:16:11"
+        - cell "2026/9/10 23:16:11"
+      - row "选择 run wh-v2-2025-oaks-crosect-2026-20260910-performance-v1 wh-v2-2025-oaks-crosect-2026-20260910-performance-v1 run_mtvo6o9e_975ed1104e strategy-daily-backtests wh-v2-2025 oaks-crosect-2026 已完成 agent / codex 0.84 -27.97 0s json, table_csv · 13 strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect 2026/9/10 23:16:11 2026/9/10 23:16:11":
+        - cell "选择 run wh-v2-2025-oaks-crosect-2026-20260910-performance-v1":
+          - checkbox "选择 run wh-v2-2025-oaks-crosect-2026-20260910-performance-v1"
+        - cell "wh-v2-2025-oaks-crosect-2026-20260910-performance-v1 run_mtvo6o9e_975ed1104e":
+          - button "wh-v2-2025-oaks-crosect-2026-20260910-performance-v1"
+          - generic: run_mtvo6o9e_975ed1104e
+        - cell "strategy-daily-backtests"
+        - cell "wh-v2-2025 oaks-crosect-2026":
+          - generic: wh-v2-2025
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "0.84"
+        - cell "-27.97"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect":
+          - generic: strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect
+        - cell "2026/9/10 23:16:11"
+        - cell "2026/9/10 23:16:11"
+      - row "选择 run wh-v1-oaks-crosect-2026-20260910-performance-v1 wh-v1-oaks-crosect-2026-20260910-performance-v1 run_mtvo6o2q_09adc531e2 strategy-daily-backtests wh-v1 oaks-crosect-2026 已完成 agent / codex 1.58 -30.03 0s json, table_csv · 13 strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect 2026/9/10 23:16:11 2026/9/10 23:16:11":
+        - cell "选择 run wh-v1-oaks-crosect-2026-20260910-performance-v1":
+          - checkbox "选择 run wh-v1-oaks-crosect-2026-20260910-performance-v1"
+        - cell "wh-v1-oaks-crosect-2026-20260910-performance-v1 run_mtvo6o2q_09adc531e2":
+          - button "wh-v1-oaks-crosect-2026-20260910-performance-v1"
+          - generic: run_mtvo6o2q_09adc531e2
+        - cell "strategy-daily-backtests"
+        - cell "wh-v1 oaks-crosect-2026":
+          - generic: wh-v1
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.58"
+        - cell "-30.03"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect":
+          - generic: strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect
+        - cell "2026/9/10 23:16:11"
+        - cell "2026/9/10 23:16:11"
+      - row "选择 run source-audit source-audit run_mtve1q0r_7a21c71ec9 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 已完成 agent / codex -- -- 29m report, csv, figure +3 · 19 -- 2026/9/10 18:32:24 2026/9/10 19:01:19":
+        - cell "选择 run source-audit":
+          - checkbox "选择 run source-audit"
+        - cell "source-audit run_mtve1q0r_7a21c71ec9":
+          - button "source-audit"
+          - generic: run_mtve1q0r_7a21c71ec9
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "29m"
+        - cell "report, csv, figure +3 · 19":
+          - generic: report, csv, figure +3 · 19
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/10 18:32:24"
+        - cell "2026/9/10 19:01:19"
+      - row "选择 run smoke-wh_e-daily-v2 smoke-wh_e-daily-v2 run_mtvf2ka0_5c50ce2ff7 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 已完成 agent / codex -- -- 3s csv, json +1 · 4 stage=engineering_smoke_only, month=2025-01, arm=WH_E 2026/9/10 19:01:03 2026/9/10 19:01:06":
+        - cell "选择 run smoke-wh_e-daily-v2":
+          - checkbox "选择 run smoke-wh_e-daily-v2"
+        - cell "smoke-wh_e-daily-v2 run_mtvf2ka0_5c50ce2ff7":
+          - button "smoke-wh_e-daily-v2"
+          - generic: run_mtvf2ka0_5c50ce2ff7
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "3s"
+        - cell "csv, json +1 · 4":
+          - generic: csv, json +1 · 4
+        - cell "stage=engineering_smoke_only, month=2025-01, arm=WH_E":
+          - generic: stage=engineering_smoke_only, month=2025-01, arm=WH_E
+        - cell "2026/9/10 19:01:03"
+        - cell "2026/9/10 19:01:06"
+      - row "选择 run smoke-py_e-daily-v2 smoke-py_e-daily-v2 run_mtvf2h8h_56dd5d2f27 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 已完成 agent / codex -- -- 3s csv, json +1 · 4 stage=engineering_smoke_only, month=2025-01, arm=PY_E 2026/9/10 19:00:59 2026/9/10 19:01:02":
+        - cell "选择 run smoke-py_e-daily-v2":
+          - checkbox "选择 run smoke-py_e-daily-v2"
+        - cell "smoke-py_e-daily-v2 run_mtvf2h8h_56dd5d2f27":
+          - button "smoke-py_e-daily-v2"
+          - generic: run_mtvf2h8h_56dd5d2f27
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "3s"
+        - cell "csv, json +1 · 4":
+          - generic: csv, json +1 · 4
+        - cell "stage=engineering_smoke_only, month=2025-01, arm=PY_E":
+          - generic: stage=engineering_smoke_only, month=2025-01, arm=PY_E
+        - cell "2026/9/10 19:00:59"
+        - cell "2026/9/10 19:01:02"
+      - row "选择 run smoke-wh_b-daily-v2 smoke-wh_b-daily-v2 run_mtvf2frr_0ba899c298 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 已完成 agent / codex -- -- 1s csv, json +1 · 4 stage=engineering_smoke_only, month=2025-01, arm=WH_B 2026/9/10 19:00:57 2026/9/10 19:00:58":
+        - cell "选择 run smoke-wh_b-daily-v2":
+          - checkbox "选择 run smoke-wh_b-daily-v2"
+        - cell "smoke-wh_b-daily-v2 run_mtvf2frr_0ba899c298":
+          - button "smoke-wh_b-daily-v2"
+          - generic: run_mtvf2frr_0ba899c298
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "1s"
+        - cell "csv, json +1 · 4":
+          - generic: csv, json +1 · 4
+        - cell "stage=engineering_smoke_only, month=2025-01, arm=WH_B":
+          - generic: stage=engineering_smoke_only, month=2025-01, arm=WH_B
+        - cell "2026/9/10 19:00:57"
+        - cell "2026/9/10 19:00:58"
+      - row "选择 run smoke-py_b-daily-v2 smoke-py_b-daily-v2 run_mtvf2cw1_0c95bdf991 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 已完成 agent / codex -- -- 2s csv, json +1 · 4 stage=engineering_smoke_only, month=2025-01, arm=PY_B 2026/9/10 19:00:53 2026/9/10 19:00:55":
+        - cell "选择 run smoke-py_b-daily-v2":
+          - checkbox "选择 run smoke-py_b-daily-v2"
+        - cell "smoke-py_b-daily-v2 run_mtvf2cw1_0c95bdf991":
+          - button "smoke-py_b-daily-v2"
+          - generic: run_mtvf2cw1_0c95bdf991
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "2s"
+        - cell "csv, json +1 · 4":
+          - generic: csv, json +1 · 4
+        - cell "stage=engineering_smoke_only, month=2025-01, arm=PY_B":
+          - generic: stage=engineering_smoke_only, month=2025-01, arm=PY_B
+        - cell "2026/9/10 19:00:53"
+        - cell "2026/9/10 19:00:55"
+      - row "选择 run smoke-py_b smoke-py_b run_mtveu4d7_9897384771 wh-pool f2-information-transfer-20260910 fixed-four-arm-v1 失败 agent / codex -- -- 6m csv, json +1 · 4 stage=engineering_smoke_only, month=2025-01, arm=PY_B 2026/9/10 18:54:29 2026/9/10 19:00:52":
+        - cell "选择 run smoke-py_b":
+          - checkbox "选择 run smoke-py_b"
+        - cell "smoke-py_b run_mtveu4d7_9897384771":
+          - button "smoke-py_b"
+          - generic: run_mtveu4d7_9897384771
+        - cell "wh-pool"
+        - cell "f2-information-transfer-20260910 fixed-four-arm-v1":
+          - generic: f2-information-transfer-20260910
+          - button "fixed-four-arm-v1"
+        - cell "失败":
+          - generic: 失败
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "6m"
+        - cell "csv, json +1 · 4":
+          - generic: csv, json +1 · 4
+        - cell "stage=engineering_smoke_only, month=2025-01, arm=PY_B":
+          - generic: stage=engineering_smoke_only, month=2025-01, arm=PY_B
+        - cell "2026/9/10 18:54:29"
+        - cell "2026/9/10 19:00:52"
+      - row "选择 run e2-baseline-power e2-baseline-power run_mtve6y0n_80f409cab3 wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -- -- 12m report, image, json +2 · 23 stage=E2, arms=[3], cost_per_side_bp=10 2026/9/10 18:36:27 2026/9/10 18:48:04":
+        - cell "选择 run e2-baseline-power":
+          - checkbox "选择 run e2-baseline-power"
+        - cell "e2-baseline-power run_mtve6y0n_80f409cab3":
+          - button "e2-baseline-power"
+          - generic: run_mtve6y0n_80f409cab3
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "12m"
+        - cell "report, image, json +2 · 23":
+          - generic: report, image, json +2 · 23
+        - cell "stage=E2, arms=[3], cost_per_side_bp=10":
+          - generic: stage=E2, arms=[3], cost_per_side_bp=10
+        - cell "2026/9/10 18:36:27"
+        - cell "2026/9/10 18:48:04"
+      - row "选择 run b2-10bp b2-10bp run_mtvealak_e60bda89ed wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -0.65 -77.82 9m markdown, table_csv +1 · 5 stage=E2, arm=B2, accounting=factor_total_return_user_accepted_entitlement_approximation 2026/9/10 18:39:18 2026/9/10 18:48:02":
+        - cell "选择 run b2-10bp":
+          - checkbox "选择 run b2-10bp"
+        - cell "b2-10bp run_mtvealak_e60bda89ed":
+          - button "b2-10bp"
+          - generic: run_mtvealak_e60bda89ed
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-0.65"
+        - cell "-77.82"
+        - cell "9m"
+        - cell "markdown, table_csv +1 · 5":
+          - generic: markdown, table_csv +1 · 5
+        - cell "stage=E2, arm=B2, accounting=factor_total_return_user_accepted_entitlement_approximation":
+          - generic: stage=E2, arm=B2, accounting=factor_total_return_user_accepted_entitlement_approximation
+        - cell "2026/9/10 18:39:18"
+        - cell "2026/9/10 18:48:02"
+      - row "选择 run b1-10bp b1-10bp run_mtveal48_e2da02ca1c wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -0.83 -61.86 9m markdown, table_csv +1 · 5 stage=E2, arm=B1, accounting=factor_total_return_user_accepted_entitlement_approximation 2026/9/10 18:39:17 2026/9/10 18:48:00":
+        - cell "选择 run b1-10bp":
+          - checkbox "选择 run b1-10bp"
+        - cell "b1-10bp run_mtveal48_e2da02ca1c":
+          - button "b1-10bp"
+          - generic: run_mtveal48_e2da02ca1c
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-0.83"
+        - cell "-61.86"
+        - cell "9m"
+        - cell "markdown, table_csv +1 · 5":
+          - generic: markdown, table_csv +1 · 5
+        - cell "stage=E2, arm=B1, accounting=factor_total_return_user_accepted_entitlement_approximation":
+          - generic: stage=E2, arm=B1, accounting=factor_total_return_user_accepted_entitlement_approximation
+        - cell "2026/9/10 18:39:17"
+        - cell "2026/9/10 18:48:00"
+      - row "选择 run b0-10bp b0-10bp run_mtveakym_16722ee478 wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -1.07 -91.95 9m markdown, table_csv +1 · 5 stage=E2, arm=B0, accounting=factor_total_return_user_accepted_entitlement_approximation 2026/9/10 18:39:17 2026/9/10 18:47:58":
+        - cell "选择 run b0-10bp":
+          - checkbox "选择 run b0-10bp"
+        - cell "b0-10bp run_mtveakym_16722ee478":
+          - button "b0-10bp"
+          - generic: run_mtveakym_16722ee478
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-1.07"
+        - cell "-91.95"
+        - cell "9m"
+        - cell "markdown, table_csv +1 · 5":
+          - generic: markdown, table_csv +1 · 5
+        - cell "stage=E2, arm=B0, accounting=factor_total_return_user_accepted_entitlement_approximation":
+          - generic: stage=E2, arm=B0, accounting=factor_total_return_user_accepted_entitlement_approximation
+        - cell "2026/9/10 18:39:17"
+        - cell "2026/9/10 18:47:58"
+      - row "选择 run e1-adjustment-smoke e1-adjustment-smoke run_mtvdo6cc_a783d6e3e1 wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -- -- 20m json, markdown +1 · 6 stage=E1, accounting=factor_total_return, user_accepted_entitlement_approximation=true 2026/9/10 18:21:52 2026/9/10 18:42:14":
+        - cell "选择 run e1-adjustment-smoke":
+          - checkbox "选择 run e1-adjustment-smoke"
+        - cell "e1-adjustment-smoke run_mtvdo6cc_a783d6e3e1":
+          - button "e1-adjustment-smoke"
+          - generic: run_mtvdo6cc_a783d6e3e1
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "20m"
+        - cell "json, markdown +1 · 6":
+          - generic: json, markdown +1 · 6
+        - cell "stage=E1, accounting=factor_total_return, user_accepted_entitlement_approximation=true":
+          - generic: stage=E1, accounting=factor_total_return, user_accepted_entitlement_approximation=true
+        - cell "2026/9/10 18:21:52"
+        - cell "2026/9/10 18:42:14"
+      - row "选择 run e1-smoke-20bp e1-smoke-20bp run_mtveecgk_d4461d33a4 wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -2.98 -21.10 1s table_csv, table_json · 4 stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=20 2026/9/10 18:42:13 2026/9/10 18:42:14":
+        - cell "选择 run e1-smoke-20bp":
+          - checkbox "选择 run e1-smoke-20bp"
+        - cell "e1-smoke-20bp run_mtveecgk_d4461d33a4":
+          - button "e1-smoke-20bp"
+          - generic: run_mtveecgk_d4461d33a4
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-2.98"
+        - cell "-21.10"
+        - cell "1s"
+        - cell "table_csv, table_json · 4":
+          - generic: table_csv, table_json · 4
+        - cell "stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=20":
+          - generic: stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=20
+        - cell "2026/9/10 18:42:13"
+        - cell "2026/9/10 18:42:14"
+      - row "选择 run e1-smoke-10bp e1-smoke-10bp run_mtvedjzx_f0c3bbbedf wh-pool concept-dp-20260910 adjustment-v2 已完成 agent / codex -2.46 -20.37 37s table_csv, table_json · 4 stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=10 2026/9/10 18:41:36 2026/9/10 18:42:13":
+        - cell "选择 run e1-smoke-10bp":
+          - checkbox "选择 run e1-smoke-10bp"
+        - cell "e1-smoke-10bp run_mtvedjzx_f0c3bbbedf":
+          - button "e1-smoke-10bp"
+          - generic: run_mtvedjzx_f0c3bbbedf
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 adjustment-v2":
+          - generic: concept-dp-20260910
+          - button "adjustment-v2"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "-2.46"
+        - cell "-20.37"
+        - cell "37s"
+        - cell "table_csv, table_json · 4":
+          - generic: table_csv, table_json · 4
+        - cell "stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=10":
+          - generic: stage=E1, accounting=factor_total_return_user_accepted_entitlement_approximation, cost_per_side_bp=10
+        - cell "2026/9/10 18:41:36"
+        - cell "2026/9/10 18:42:13"
+      - row "选择 run e0-data-audit e0-data-audit run_mtuc2mjz_406fef2009 wh-pool concept-dp-20260910 approved-v1 已完成 agent / codex -- -- 14m image, json +2 · 12 stage=E0, rules_hash=b53fa8d8ea22d95f, data_end=2026-09-07 2026/9/10 00:49:21 2026/9/10 01:03:00":
+        - cell "选择 run e0-data-audit":
+          - checkbox "选择 run e0-data-audit"
+        - cell "e0-data-audit run_mtuc2mjz_406fef2009":
+          - button "e0-data-audit"
+          - generic: run_mtuc2mjz_406fef2009
+        - cell "wh-pool"
+        - cell "concept-dp-20260910 approved-v1":
+          - generic: concept-dp-20260910
+          - button "approved-v1"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "14m"
+        - cell "image, json +2 · 12":
+          - generic: image, json +2 · 12
+        - cell "stage=E0, rules_hash=b53fa8d8ea22d95f, data_end=2026-09-07":
+          - generic: stage=E0, rules_hash=b53fa8d8ea22d95f, data_end=2026-09-07
+        - cell "2026/9/10 00:49:21"
+        - cell "2026/9/10 01:03:00"
+      - row "选择 run wh-f2-oaks-crosect-2026-20260909-performance-v1 wh-f2-oaks-crosect-2026-20260909-performance-v1 run_mtuaox4w_88486c54ff strategy-daily-backtests wh-f2 oaks-crosect-2026 已完成 agent / codex 1.92 -17.20 0s json, table_csv · 15 strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect 2026/9/10 00:10:41 2026/9/10 00:10:42":
+        - cell "选择 run wh-f2-oaks-crosect-2026-20260909-performance-v1":
+          - checkbox "选择 run wh-f2-oaks-crosect-2026-20260909-performance-v1"
+        - cell "wh-f2-oaks-crosect-2026-20260909-performance-v1 run_mtuaox4w_88486c54ff":
+          - button "wh-f2-oaks-crosect-2026-20260909-performance-v1"
+          - generic: run_mtuaox4w_88486c54ff
+        - cell "strategy-daily-backtests"
+        - cell "wh-f2 oaks-crosect-2026":
+          - generic: wh-f2
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.92"
+        - cell "-17.20"
+        - cell "0s"
+        - cell "json, table_csv · 15":
+          - generic: json, table_csv · 15
+        - cell "strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect":
+          - generic: strategy=wh-f2, model_name=wh-f2, engine=oaks_crosect
+        - cell "2026/9/10 00:10:41"
+        - cell "2026/9/10 00:10:42"
+      - row "选择 run wh-v2-2025-oaks-crosect-2026-20260909-performance-v1 wh-v2-2025-oaks-crosect-2026-20260909-performance-v1 run_mtuaowym_d62d701a8c strategy-daily-backtests wh-v2-2025 oaks-crosect-2026 已完成 agent / codex 0.88 -27.55 0s json, table_csv · 13 strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect 2026/9/10 00:10:41 2026/9/10 00:10:41":
+        - cell "选择 run wh-v2-2025-oaks-crosect-2026-20260909-performance-v1":
+          - checkbox "选择 run wh-v2-2025-oaks-crosect-2026-20260909-performance-v1"
+        - cell "wh-v2-2025-oaks-crosect-2026-20260909-performance-v1 run_mtuaowym_d62d701a8c":
+          - button "wh-v2-2025-oaks-crosect-2026-20260909-performance-v1"
+          - generic: run_mtuaowym_d62d701a8c
+        - cell "strategy-daily-backtests"
+        - cell "wh-v2-2025 oaks-crosect-2026":
+          - generic: wh-v2-2025
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "0.88"
+        - cell "-27.55"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect":
+          - generic: strategy=wh-v2-2025, model_name=wh-v2-2025, engine=oaks_crosect
+        - cell "2026/9/10 00:10:41"
+        - cell "2026/9/10 00:10:41"
+      - row "选择 run wh-v1-oaks-crosect-2026-20260909-performance-v1 wh-v1-oaks-crosect-2026-20260909-performance-v1 run_mtuaowsm_a7ff098451 strategy-daily-backtests wh-v1 oaks-crosect-2026 已完成 agent / codex 1.68 -30.03 0s json, table_csv · 13 strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect 2026/9/10 00:10:41 2026/9/10 00:10:41":
+        - cell "选择 run wh-v1-oaks-crosect-2026-20260909-performance-v1":
+          - checkbox "选择 run wh-v1-oaks-crosect-2026-20260909-performance-v1"
+        - cell "wh-v1-oaks-crosect-2026-20260909-performance-v1 run_mtuaowsm_a7ff098451":
+          - button "wh-v1-oaks-crosect-2026-20260909-performance-v1"
+          - generic: run_mtuaowsm_a7ff098451
+        - cell "strategy-daily-backtests"
+        - cell "wh-v1 oaks-crosect-2026":
+          - generic: wh-v1
+          - button "oaks-crosect-2026"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "1.68"
+        - cell "-30.03"
+        - cell "0s"
+        - cell "json, table_csv · 13":
+          - generic: json, table_csv · 13
+        - cell "strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect":
+          - generic: strategy=wh-v1, model_name=wh-v1, engine=oaks_crosect
+        - cell "2026/9/10 00:10:41"
+        - cell "2026/9/10 00:10:41"
+      - row "选择 run wh-f2-stock-continuation-60d-20260909-results wh-f2-stock-continuation-60d-20260909-results run_mttiozqy_20df4c2446 wh-f2 wh-f2-stock-continuation-20260909 frozen60-triage 已完成 agent / codex -- -- 47s report, figure, json +3 · 16 -- 2026/9/9 11:06:56 2026/9/9 11:07:43":
+        - cell "选择 run wh-f2-stock-continuation-60d-20260909-results":
+          - checkbox "选择 run wh-f2-stock-continuation-60d-20260909-results"
+        - cell "wh-f2-stock-continuation-60d-20260909-results run_mttiozqy_20df4c2446":
+          - button "wh-f2-stock-continuation-60d-20260909-results"
+          - generic: run_mttiozqy_20df4c2446
+        - cell "wh-f2"
+        - cell "wh-f2-stock-continuation-20260909 frozen60-triage":
+          - generic: wh-f2-stock-continuation-20260909
+          - button "frozen60-triage"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "47s"
+        - cell "report, figure, json +3 · 16":
+          - generic: report, figure, json +3 · 16
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/9 11:06:56"
+        - cell "2026/9/9 11:07:43"
+      - row "选择 run wh-f2-stock-continuation-60d-20260909 wh-f2-stock-continuation-60d-20260909 run_mttiaw62_194335ace8 wh-f2 wh-f2-stock-continuation-20260909 frozen60-triage 已取消 agent / codex -- -- 12m report, figure, json +3 · 16 -- 2026/9/9 10:55:58 2026/9/9 11:07:39":
+        - cell "选择 run wh-f2-stock-continuation-60d-20260909":
+          - checkbox "选择 run wh-f2-stock-continuation-60d-20260909"
+        - cell "wh-f2-stock-continuation-60d-20260909 run_mttiaw62_194335ace8":
+          - button "wh-f2-stock-continuation-60d-20260909"
+          - generic: run_mttiaw62_194335ace8
+        - cell "wh-f2"
+        - cell "wh-f2-stock-continuation-20260909 frozen60-triage":
+          - generic: wh-f2-stock-continuation-20260909
+          - button "frozen60-triage"
+        - cell "已取消":
+          - generic: 已取消
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "12m"
+        - cell "report, figure, json +3 · 16":
+          - generic: report, figure, json +3 · 16
+        - cell "--":
+          - generic: "--"
+        - cell "2026/9/9 10:55:58"
+        - cell "2026/9/9 11:07:39"
+      - row "选择 run a-c2 a-c2 run_mtstoteb_e0a715034d wh-pool acceleration-events-20260908 e2-frozen 已完成 agent / codex -- -- 12m report, csv, figure +3 · 12 event=A-C2, rules_hash=b53fa8d8ea22d95f, entry=T+1 open 2026/9/8 23:26:57 2026/9/8 23:39:17":
+        - cell "选择 run a-c2":
+          - checkbox "选择 run a-c2"
+        - cell "a-c2 run_mtstoteb_e0a715034d":
+          - button "a-c2"
+          - generic: run_mtstoteb_e0a715034d
+        - cell "wh-pool"
+        - cell "acceleration-events-20260908 e2-frozen":
+          - generic: acceleration-events-20260908
+          - button "e2-frozen"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "12m"
+        - cell "report, csv, figure +3 · 12":
+          - generic: report, csv, figure +3 · 12
+        - cell "event=A-C2, rules_hash=b53fa8d8ea22d95f, entry=T+1 open":
+          - generic: event=A-C2, rules_hash=b53fa8d8ea22d95f, entry=T+1 open
+        - cell "2026/9/8 23:26:57"
+        - cell "2026/9/8 23:39:17"
+      - row "选择 run a-on a-on run_mtstot82_e4db9410ef wh-pool acceleration-events-20260908 e2-frozen 已完成 agent / codex -- -- 12m report, csv, figure +3 · 12 event=A-ON, rules_hash=b53fa8d8ea22d95f, entry=T+1 open 2026/9/8 23:26:57 2026/9/8 23:39:14":
+        - cell "选择 run a-on":
+          - checkbox "选择 run a-on"
+        - cell "a-on run_mtstot82_e4db9410ef":
+          - button "a-on"
+          - generic: run_mtstot82_e4db9410ef
+        - cell "wh-pool"
+        - cell "acceleration-events-20260908 e2-frozen":
+          - generic: acceleration-events-20260908
+          - button "e2-frozen"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "12m"
+        - cell "report, csv, figure +3 · 12":
+          - generic: report, csv, figure +3 · 12
+        - cell "event=A-ON, rules_hash=b53fa8d8ea22d95f, entry=T+1 open":
+          - generic: event=A-ON, rules_hash=b53fa8d8ea22d95f, entry=T+1 open
+        - cell "2026/9/8 23:26:57"
+        - cell "2026/9/8 23:39:14"
+      - row "选择 run r-bo r-bo run_mtstot1n_84af418711 wh-pool consolidation-restart-20260908 e2-frozen 已完成 agent / codex -- -- 12m report, csv, figure +3 · 12 event=R-BO, rules_hash=b53fa8d8ea22d95f, entry=T+1 open 2026/9/8 23:26:57 2026/9/8 23:39:10":
+        - cell "选择 run r-bo":
+          - checkbox "选择 run r-bo"
+        - cell "r-bo run_mtstot1n_84af418711":
+          - button "r-bo"
+          - generic: run_mtstot1n_84af418711
+        - cell "wh-pool"
+        - cell "consolidation-restart-20260908 e2-frozen":
+          - generic: consolidation-restart-20260908
+          - button "e2-frozen"
+        - cell "已完成":
+          - generic: 已完成
+        - cell "agent / codex"
+        - cell "--"
+        - cell "--"
+        - cell "12m"
+        - cell "report, csv, figure +3 · 12":
+          - generic: report, csv, figure +3 · 12
+        - cell "event=R-BO, rules_hash=b53fa8d8ea22d95f, entry=T+1 open":
+          - generic: event=R-BO, rules_hash=b53fa8d8ea22d95f, entry=T+1 open
+        - cell "2026/9/8 23:26:57"
+        - cell "2026/9/8 23:39:10"
+  - generic: Page 1 / 4 · 50 rows on this page
+  - button "上一页" [disabled]
+  - button "下一页"

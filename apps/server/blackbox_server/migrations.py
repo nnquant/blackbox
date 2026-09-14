@@ -9,7 +9,7 @@ from sqlalchemy.schema import CreateColumn
 from .db import Base
 
 
-CURRENT_SCHEMA_VERSION = 7
+CURRENT_SCHEMA_VERSION = 9
 MIGRATION_TABLE = "schema_migrations"
 
 

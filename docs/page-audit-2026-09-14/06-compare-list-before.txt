@@ -1,0 +1,488 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比" [active]:
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理":
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "WH-Pool 自建强势股池"
+  - generic: 对比
+  - heading "对比工作台" [level=1]
+  - paragraph: 按项目和研究阶段管理保存的对比集合，再进入具体对比结果。
+  - generic: 对比集
+  - generic "17":
+    - generic: "17"
+  - generic: 项目
+  - generic "6":
+    - generic: "6"
+  - generic: 研究线
+  - generic "9":
+    - generic: "9"
+  - generic: Run References
+  - generic "128":
+    - generic: "128"
+  - heading "项目 / 阶段对比表" [level=2]
+  - text: 项目
+  - combobox "项目":
+    - option "全部项目" [selected]
+    - option "Bond ETF T0"
+    - option "WH Events V1"
+    - option "WH Strategy V2"
+    - option "WH-F2 强势股策略"
+    - option "wh-strategy-v1"
+    - option "WH策略分钟级择时研究"
+  - text: 研究线
+  - combobox "研究线":
+    - option "全部研究" [selected]
+    - option "stock_pyramid可交易日频事件因子挖掘20260626"
+    - option "TL88 mid diff factor drives 511090"
+    - option "WH-F2 13:01涨停递延 Crosect 对照"
+    - option "WH-F2 龙虎榜近期入榜剔除"
+    - option "WH-F2 龙虎榜连续席位与资金流因子"
+    - option "WH-F2 全市场龙虎榜状态因子"
+    - option "WH-V1 隔夜排名提前退出八方案家族研究"
+    - option "WH-V1 与 alpha32 raw4 Crosect 执行消融"
+    - option "WH-V1/V2 10:00买入与8%过滤快速验证"
+  - text: 搜索
+  - textbox "搜索":
+    - /placeholder: 项目、研究、阶段、对比名称、指标
+  - generic: 17 / 17 shown
+  - table:
+    - rowgroup:
+      - row "Project Research / 阶段 Compare Set Runs 模板 Created Action":
+        - columnheader "Project"
+        - columnheader "Research / 阶段"
+        - columnheader "Compare Set"
+        - columnheader "Runs"
+        - columnheader "模板"
+        - columnheader "Created"
+        - columnheader "Action"
+    - rowgroup:
+      - row "Bond ETF T0 bond-etf-t0 TL88 mid diff factor drives 511090 未标注阶段 TL88 511090 50W strategy comparison 20250827-20260624 run_mr09x8n4_33decd7be3, run_mr09xt3o_f9d02eb544, run_mr09ydu3_2a7b28aa33, run_mr09yzdd_357abdaa80 +1 5 6 metrics / 1 series 2026/6/30 16:07:09 打开":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "TL88 mid diff factor drives 511090 未标注阶段":
+          - button "TL88 mid diff factor drives 511090"
+          - generic: 未标注阶段
+        - cell "TL88 511090 50W strategy comparison 20250827-20260624 run_mr09x8n4_33decd7be3, run_mr09xt3o_f9d02eb544, run_mr09ydu3_2a7b28aa33, run_mr09yzdd_357abdaa80 +1":
+          - button "TL88 511090 50W strategy comparison 20250827-20260624"
+          - generic: run_mr09x8n4_33decd7be3, run_mr09xt3o_f9d02eb544, run_mr09ydu3_2a7b28aa33, run_mr09yzdd_357abdaa80 +1
+        - cell "5"
+        - cell "6 metrics / 1 series"
+        - cell "2026/6/30 16:07:09"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "Bond ETF T0 bond-etf-t0 TL88 mid diff factor drives 511090 未标注阶段 TL88 511090 100W strategy comparison 20250827-20260624 run_mr09xeen_d412441bb2, run_mr09xy04_557b4b84c7, run_mr09yjdi_417c60cbbe, run_mr09z3o1_724a4c3096 +1 5 6 metrics / 1 series 2026/6/30 16:07:07 打开":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "TL88 mid diff factor drives 511090 未标注阶段":
+          - button "TL88 mid diff factor drives 511090"
+          - generic: 未标注阶段
+        - cell "TL88 511090 100W strategy comparison 20250827-20260624 run_mr09xeen_d412441bb2, run_mr09xy04_557b4b84c7, run_mr09yjdi_417c60cbbe, run_mr09z3o1_724a4c3096 +1":
+          - button "TL88 511090 100W strategy comparison 20250827-20260624"
+          - generic: run_mr09xeen_d412441bb2, run_mr09xy04_557b4b84c7, run_mr09yjdi_417c60cbbe, run_mr09z3o1_724a4c3096 +1
+        - cell "5"
+        - cell "6 metrics / 1 series"
+        - cell "2026/6/30 16:07:07"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "Bond ETF T0 bond-etf-t0 TL88 mid diff factor drives 511090 未标注阶段 TL88 511090 20W strategy comparison 20250827-20260624 run_mr09x1xp_0080376bf5, run_mr09xph3_55d982fa69, run_mr09y9w1_e8980b17c1, run_mr09ytf1_cd334afb27 +1 5 6 metrics / 1 series 2026/6/30 16:07:06 打开":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "TL88 mid diff factor drives 511090 未标注阶段":
+          - button "TL88 mid diff factor drives 511090"
+          - generic: 未标注阶段
+        - cell "TL88 511090 20W strategy comparison 20250827-20260624 run_mr09x1xp_0080376bf5, run_mr09xph3_55d982fa69, run_mr09y9w1_e8980b17c1, run_mr09ytf1_cd334afb27 +1":
+          - button "TL88 511090 20W strategy comparison 20250827-20260624"
+          - generic: run_mr09x1xp_0080376bf5, run_mr09xph3_55d982fa69, run_mr09y9w1_e8980b17c1, run_mr09ytf1_cd334afb27 +1
+        - cell "5"
+        - cell "6 metrics / 1 series"
+        - cell "2026/6/30 16:07:06"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "Bond ETF T0 bond-etf-t0 TL88 mid diff factor drives 511090 未标注阶段 TL88 511090 10W strategy comparison 20250827-20260624 run_mr09tdow_aec7e6fc6f, run_mr09xmhp_7a70c19d94, run_mr09y4v3_8ab95cf52e, run_mr09yopt_39fba7811e +1 5 6 metrics / 1 series 2026/6/30 16:07:06 打开":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "TL88 mid diff factor drives 511090 未标注阶段":
+          - button "TL88 mid diff factor drives 511090"
+          - generic: 未标注阶段
+        - cell "TL88 511090 10W strategy comparison 20250827-20260624 run_mr09tdow_aec7e6fc6f, run_mr09xmhp_7a70c19d94, run_mr09y4v3_8ab95cf52e, run_mr09yopt_39fba7811e +1":
+          - button "TL88 511090 10W strategy comparison 20250827-20260624"
+          - generic: run_mr09tdow_aec7e6fc6f, run_mr09xmhp_7a70c19d94, run_mr09y4v3_8ab95cf52e, run_mr09yopt_39fba7811e +1
+        - cell "5"
+        - cell "6 metrics / 1 series"
+        - cell "2026/6/30 16:07:06"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "Bond ETF T0 bond-etf-t0 TL88 mid diff factor drives 511090 未标注阶段 TL88 511090 strategy capacity comparison 20250827-20260624 run_mr09tdow_aec7e6fc6f, run_mr09x1xp_0080376bf5, run_mr09x8n4_33decd7be3, run_mr09xeen_d412441bb2 +16 20 6 metrics / 1 series 2026/6/30 14:38:37 打开":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "TL88 mid diff factor drives 511090 未标注阶段":
+          - button "TL88 mid diff factor drives 511090"
+          - generic: 未标注阶段
+        - cell "TL88 511090 strategy capacity comparison 20250827-20260624 run_mr09tdow_aec7e6fc6f, run_mr09x1xp_0080376bf5, run_mr09x8n4_33decd7be3, run_mr09xeen_d412441bb2 +16":
+          - button "TL88 511090 strategy capacity comparison 20250827-20260624"
+          - generic: run_mr09tdow_aec7e6fc6f, run_mr09x1xp_0080376bf5, run_mr09x8n4_33decd7be3, run_mr09xeen_d412441bb2 +16
+        - cell "20"
+        - cell "6 metrics / 1 series"
+        - cell "2026/6/30 14:38:37"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Events V1 wh-events-v1 stock_pyramid可交易日频事件因子挖掘20260626 未标注阶段 tradable-event-2022-20-single-factor-compare-20260627 run_mqv8fipf_f6ef7054f9, run_mqv8fkjb_2a2c60adc6, run_mqv8fmc2_e42e165af3, run_mqv8fo5s_f193092c22 +16 20 5 metrics / 1 series 2026/6/27 01:58:25 打开":
+        - cell "WH Events V1 wh-events-v1":
+          - button "WH Events V1"
+          - generic: wh-events-v1
+        - cell "stock_pyramid可交易日频事件因子挖掘20260626 未标注阶段":
+          - button "stock_pyramid可交易日频事件因子挖掘20260626"
+          - generic: 未标注阶段
+        - cell "tradable-event-2022-20-single-factor-compare-20260627 run_mqv8fipf_f6ef7054f9, run_mqv8fkjb_2a2c60adc6, run_mqv8fmc2_e42e165af3, run_mqv8fo5s_f193092c22 +16":
+          - button "tradable-event-2022-20-single-factor-compare-20260627"
+          - generic: run_mqv8fipf_f6ef7054f9, run_mqv8fkjb_2a2c60adc6, run_mqv8fmc2_e42e165af3, run_mqv8fo5s_f193092c22 +16
+        - cell "20"
+        - cell "5 metrics / 1 series"
+        - cell "2026/6/27 01:58:25"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Events V1 wh-events-v1 stock_pyramid可交易日频事件因子挖掘20260626 未标注阶段 tradable-event-20-single-factor-compare-20260627 run_mqv7jjnm_87d6f22f2d, run_mqv7jm8e_ea2ec761ab, run_mqv7jp8x_22462719a6, run_mqv7jtxn_26846b0de4 +16 20 5 metrics / 1 series 2026/6/27 01:37:33 打开":
+        - cell "WH Events V1 wh-events-v1":
+          - button "WH Events V1"
+          - generic: wh-events-v1
+        - cell "stock_pyramid可交易日频事件因子挖掘20260626 未标注阶段":
+          - button "stock_pyramid可交易日频事件因子挖掘20260626"
+          - generic: 未标注阶段
+        - cell "tradable-event-20-single-factor-compare-20260627 run_mqv7jjnm_87d6f22f2d, run_mqv7jm8e_ea2ec761ab, run_mqv7jp8x_22462719a6, run_mqv7jtxn_26846b0de4 +16":
+          - button "tradable-event-20-single-factor-compare-20260627"
+          - generic: run_mqv7jjnm_87d6f22f2d, run_mqv7jm8e_ea2ec761ab, run_mqv7jp8x_22462719a6, run_mqv7jtxn_26846b0de4 +16
+        - cell "20"
+        - cell "5 metrics / 1 series"
+        - cell "2026/6/27 01:37:33"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Strategy V2 wh-strategy-v2 WH-F2 13:01涨停递延 Crosect 对照 未标注阶段 WH-F2 Top10/Top8/Top5 集中仓位（2026-08-07） run_ms2n3ufj_152785dec3, run_msizfupe_d5faebc551, run_msizfvce_84183dff39 3 7 metrics / 2 series 2026/8/7 21:30:34 打开":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "WH-F2 13:01涨停递延 Crosect 对照 未标注阶段":
+          - button "WH-F2 13:01涨停递延 Crosect 对照"
+          - generic: 未标注阶段
+        - cell "WH-F2 Top10/Top8/Top5 集中仓位（2026-08-07） run_ms2n3ufj_152785dec3, run_msizfupe_d5faebc551, run_msizfvce_84183dff39":
+          - button "WH-F2 Top10/Top8/Top5 集中仓位（2026-08-07）"
+          - generic: run_ms2n3ufj_152785dec3, run_msizfupe_d5faebc551, run_msizfvce_84183dff39
+        - cell "3"
+        - cell "7 metrics / 2 series"
+        - cell "2026/8/7 21:30:34"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Strategy V2 wh-strategy-v2 WH-F2 13:01涨停递延 Crosect 对照 未标注阶段 WH-F2 Top10 vs Top30 首触涨停打板上界（2026-07-29） run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f, run_ms5q1bvh_e442b8c4b5, run_ms5q1clr_a5c821f0f2 4 6 metrics / 2 series 2026/7/29 14:46:20 打开":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "WH-F2 13:01涨停递延 Crosect 对照 未标注阶段":
+          - button "WH-F2 13:01涨停递延 Crosect 对照"
+          - generic: 未标注阶段
+        - cell "WH-F2 Top10 vs Top30 首触涨停打板上界（2026-07-29） run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f, run_ms5q1bvh_e442b8c4b5, run_ms5q1clr_a5c821f0f2":
+          - button "WH-F2 Top10 vs Top30 首触涨停打板上界（2026-07-29）"
+          - generic: run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f, run_ms5q1bvh_e442b8c4b5, run_ms5q1clr_a5c821f0f2
+        - cell "4"
+        - cell "6 metrics / 2 series"
+        - cell "2026/7/29 14:46:20"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Strategy V2 wh-strategy-v2 WH-F2 13:01涨停递延 Crosect 对照 未标注阶段 WH-F2 开盘基线与 T+1 首触涨停买入上界 run_ms2n3ufj_152785dec3, run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f 3 6 metrics / 1 series 2026/7/29 13:20:20 打开":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "WH-F2 13:01涨停递延 Crosect 对照 未标注阶段":
+          - button "WH-F2 13:01涨停递延 Crosect 对照"
+          - generic: 未标注阶段
+        - cell "WH-F2 开盘基线与 T+1 首触涨停买入上界 run_ms2n3ufj_152785dec3, run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f":
+          - button "WH-F2 开盘基线与 T+1 首触涨停买入上界"
+          - generic: run_ms2n3ufj_152785dec3, run_ms5mxpvu_b23cb3470d, run_ms5mxqfo_a91432746f
+        - cell "3"
+        - cell "6 metrics / 1 series"
+        - cell "2026/7/29 13:20:20"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Strategy V2 wh-strategy-v2 WH-F2 13:01涨停递延 Crosect 对照 未标注阶段 WH-F2 13:01涨停递延双账户对比 run_ms2n3uew_5f1a19102c, run_ms2n3ufj_152785dec3 2 6 metrics / 1 series 2026/7/27 11:08:13 打开":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "WH-F2 13:01涨停递延 Crosect 对照 未标注阶段":
+          - button "WH-F2 13:01涨停递延 Crosect 对照"
+          - generic: 未标注阶段
+        - cell "WH-F2 13:01涨停递延双账户对比 run_ms2n3uew_5f1a19102c, run_ms2n3ufj_152785dec3":
+          - button "WH-F2 13:01涨停递延双账户对比"
+          - generic: run_ms2n3uew_5f1a19102c, run_ms2n3ufj_152785dec3
+        - cell "2"
+        - cell "6 metrics / 1 series"
+        - cell "2026/7/27 11:08:13"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH Strategy V2 wh-strategy-v2 WH-F2 龙虎榜近期入榜剔除 未标注阶段 WH-F2 龙虎榜近期入榜剔除（2026-08-31） run_mthaab97_1417d69e85, run_mthaaoqd_bac91f2f77, run_mthaaoqs_70b19116ea, run_mthaaor1_3cfd415283 +3 7 8 metrics / 2 series 2026/8/31 23:08:55 打开":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "WH-F2 龙虎榜近期入榜剔除 未标注阶段":
+          - button "WH-F2 龙虎榜近期入榜剔除"
+          - generic: 未标注阶段
+        - cell "WH-F2 龙虎榜近期入榜剔除（2026-08-31） run_mthaab97_1417d69e85, run_mthaaoqd_bac91f2f77, run_mthaaoqs_70b19116ea, run_mthaaor1_3cfd415283 +3":
+          - button "WH-F2 龙虎榜近期入榜剔除（2026-08-31）"
+          - generic: run_mthaab97_1417d69e85, run_mthaaoqd_bac91f2f77, run_mthaaoqs_70b19116ea, run_mthaaor1_3cfd415283 +3
+        - cell "7"
+        - cell "8 metrics / 2 series"
+        - cell "2026/8/31 23:08:55"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH-F2 强势股策略 wh-f2 WH-F2 龙虎榜连续席位与资金流因子 未标注阶段 龙虎榜连续因子七身份最终对比 run_mti418le_5a89adc05f, run_mti418ic_e0d10e9460, run_mti418mt_2d6dc59923, run_mti418lh_456ac8cbed +3 7 3 metrics / 1 series 2026/9/1 12:04:18 打开":
+        - cell "WH-F2 强势股策略 wh-f2":
+          - button "WH-F2 强势股策略"
+          - generic: wh-f2
+        - cell "WH-F2 龙虎榜连续席位与资金流因子 未标注阶段":
+          - button "WH-F2 龙虎榜连续席位与资金流因子"
+          - generic: 未标注阶段
+        - cell "龙虎榜连续因子七身份最终对比 run_mti418le_5a89adc05f, run_mti418ic_e0d10e9460, run_mti418mt_2d6dc59923, run_mti418lh_456ac8cbed +3":
+          - button "龙虎榜连续因子七身份最终对比"
+          - generic: run_mti418le_5a89adc05f, run_mti418ic_e0d10e9460, run_mti418mt_2d6dc59923, run_mti418lh_456ac8cbed +3
+        - cell "7"
+        - cell "3 metrics / 1 series"
+        - cell "2026/9/1 12:04:18"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH-F2 强势股策略 wh-f2 WH-F2 全市场龙虎榜状态因子 未标注阶段 龙虎榜市场状态五身份最终对比 run_mti9t0ni_22c9af2298, run_mti9t0ui_294e2b9395, run_mti9t10d_f107ec5035, run_mti9t166_5a256f0bb3 +1 5 3 metrics / 1 series 2026/9/1 14:53:17 打开":
+        - cell "WH-F2 强势股策略 wh-f2":
+          - button "WH-F2 强势股策略"
+          - generic: wh-f2
+        - cell "WH-F2 全市场龙虎榜状态因子 未标注阶段":
+          - button "WH-F2 全市场龙虎榜状态因子"
+          - generic: 未标注阶段
+        - cell "龙虎榜市场状态五身份最终对比 run_mti9t0ni_22c9af2298, run_mti9t0ui_294e2b9395, run_mti9t10d_f107ec5035, run_mti9t166_5a256f0bb3 +1":
+          - button "龙虎榜市场状态五身份最终对比"
+          - generic: run_mti9t0ni_22c9af2298, run_mti9t0ui_294e2b9395, run_mti9t10d_f107ec5035, run_mti9t166_5a256f0bb3 +1
+        - cell "5"
+        - cell "3 metrics / 1 series"
+        - cell "2026/9/1 14:53:17"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "wh-strategy-v1 wh-strategy-v1 WH-V1 与 alpha32 raw4 Crosect 执行消融 未标注阶段 新旧模型 × 8%过滤/TP8 执行矩阵 run_mrvqm8i2_c4edb322f2, run_mrvqm8jw_07c497bdaa, run_mrvqm8j2_010c8863b3, run_mrvqm8ic_cdffc017cf 4 -- 2026/7/22 15:09:11 打开":
+        - cell "wh-strategy-v1 wh-strategy-v1":
+          - button "wh-strategy-v1"
+          - generic: wh-strategy-v1
+        - cell "WH-V1 与 alpha32 raw4 Crosect 执行消融 未标注阶段":
+          - button "WH-V1 与 alpha32 raw4 Crosect 执行消融"
+          - generic: 未标注阶段
+        - cell "新旧模型 × 8%过滤/TP8 执行矩阵 run_mrvqm8i2_c4edb322f2, run_mrvqm8jw_07c497bdaa, run_mrvqm8j2_010c8863b3, run_mrvqm8ic_cdffc017cf":
+          - button "新旧模型 × 8%过滤/TP8 执行矩阵"
+          - generic: run_mrvqm8i2_c4edb322f2, run_mrvqm8jw_07c497bdaa, run_mrvqm8j2_010c8863b3, run_mrvqm8ic_cdffc017cf
+        - cell "4"
+        - cell "--"
+        - cell "2026/7/22 15:09:11"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH策略分钟级择时研究 wh-intraday-timing-research WH-V1 隔夜排名提前退出八方案家族研究 未标注阶段 WH-V1 隔夜排名提前退出八方案家族（2026-07-19） run_mrrapd2j_ebbd0110ae, run_mrrapdub_bfdacb9bfe, run_mrrapeh4_e0fc3cfab9, run_mrrapf57_cab43f0e9b +5 9 7 metrics / 2 series 2026/7/19 12:28:27 打开":
+        - cell "WH策略分钟级择时研究 wh-intraday-timing-research":
+          - button "WH策略分钟级择时研究"
+          - generic: wh-intraday-timing-research
+        - cell "WH-V1 隔夜排名提前退出八方案家族研究 未标注阶段":
+          - button "WH-V1 隔夜排名提前退出八方案家族研究"
+          - generic: 未标注阶段
+        - cell "WH-V1 隔夜排名提前退出八方案家族（2026-07-19） run_mrrapd2j_ebbd0110ae, run_mrrapdub_bfdacb9bfe, run_mrrapeh4_e0fc3cfab9, run_mrrapf57_cab43f0e9b +5":
+          - button "WH-V1 隔夜排名提前退出八方案家族（2026-07-19）"
+          - generic: run_mrrapd2j_ebbd0110ae, run_mrrapdub_bfdacb9bfe, run_mrrapeh4_e0fc3cfab9, run_mrrapf57_cab43f0e9b +5
+        - cell "9"
+        - cell "7 metrics / 2 series"
+        - cell "2026/7/19 12:28:27"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+      - row "WH策略分钟级择时研究 wh-intraday-timing-research WH-V1/V2 10:00买入与8%过滤快速验证 未标注阶段 WH-V1/V2 开盘与10:00买入快速验证（2026-07-24） run_mryjehu9_bc12616f53, run_mryjhc7j_1855520db7, run_mryjhcqf_e102d61d1c, run_mryjhd67_19b1119349 4 7 metrics / 2 series 2026/7/24 14:08:26 打开":
+        - cell "WH策略分钟级择时研究 wh-intraday-timing-research":
+          - button "WH策略分钟级择时研究"
+          - generic: wh-intraday-timing-research
+        - cell "WH-V1/V2 10:00买入与8%过滤快速验证 未标注阶段":
+          - button "WH-V1/V2 10:00买入与8%过滤快速验证"
+          - generic: 未标注阶段
+        - cell "WH-V1/V2 开盘与10:00买入快速验证（2026-07-24） run_mryjehu9_bc12616f53, run_mryjhc7j_1855520db7, run_mryjhcqf_e102d61d1c, run_mryjhd67_19b1119349":
+          - button "WH-V1/V2 开盘与10:00买入快速验证（2026-07-24）"
+          - generic: run_mryjehu9_bc12616f53, run_mryjhc7j_1855520db7, run_mryjhcqf_e102d61d1c, run_mryjhd67_19b1119349
+        - cell "4"
+        - cell "7 metrics / 2 series"
+        - cell "2026/7/24 14:08:26"
+        - cell "打开":
+          - button "打开":
+            - text: 打开
+  - generic "临时 Run 对比与保存":
+    - generic: 临时 Run 对比与保存
+  - option "全部项目" [selected]
+  - option "strategy-daily-backtests"
+  - option "wh-a1"
+  - option "wh-f2"
+  - option "wh-multi-factor-v2"
+  - option "wh-pool"
+  - option "全部状态" [selected]
+  - option "已取消"
+  - option "已完成"
+  - option "失败"
+  - option "运行中"

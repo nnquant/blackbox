@@ -59,3 +59,52 @@ class PointKind(StrEnum):
     time = "time"
     coordinate = "coordinate"
     summary = "summary"
+
+
+class RunMode(StrEnum):
+    backtest = "backtest"
+    paper = "paper"
+    sim = "sim"
+    live = "live"
+
+
+class ResearchMapStatus(StrEnum):
+    active = "active"
+    archived = "archived"
+
+
+class ResearchMapStage(StrEnum):
+    """Where a research-map node is in the research lifecycle (ordered, normally advances only)."""
+
+    idea = "idea"
+    hypothesis = "hypothesis"
+    experiment = "experiment"
+    validation = "validation"
+    tracking = "tracking"
+    simulation = "simulation"
+    live = "live"
+    retired = "retired"
+
+
+STAGE_ORDER = [stage.value for stage in ResearchMapStage]
+
+
+class ResearchMapDecision(StrEnum):
+    """What review decided about a node. Empty means undecided."""
+
+    pending = "pending"
+    kept = "kept"
+    accepted = "accepted"
+    rejected = "rejected"
+    superseded = "superseded"
+
+
+def research_map_family(stage: str | None, decision: str | None) -> str:
+    """Colour family shown on the map: active / accepted / kept / ended."""
+    if stage == ResearchMapStage.retired.value or decision in {ResearchMapDecision.rejected.value, ResearchMapDecision.superseded.value}:
+        return "ended"
+    if decision == ResearchMapDecision.accepted.value:
+        return "accepted"
+    if decision == ResearchMapDecision.kept.value:
+        return "kept"
+    return "active"

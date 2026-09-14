@@ -28,6 +28,7 @@ Use this skill to execute or explain reliable Blackbox agent workflows. Prefer c
 - `bbox run finish` and SDK `bb.finish()` run the result quality gate by default and block red/error diagnostics. Use CLI `--fail-on-warning` or SDK `fail_on_warning=True` for strict release workflows. Use `--skip-quality-gate` / `skip_quality_gate=True` only as an explicit manual override, and document why the run is allowed to finish.
 - `bbox compare runs` also applies the result quality gate to selected runs by default. Use `--skip-quality-gate` only for legacy/manual diagnostics where invalid runs must be inspected side by side.
 - Quick Compare is exposed on Project / Research / Branch pages. It resolves Project and Research scopes to representative runs, and Branch scopes to comparable runs. Single Run Detail pages use the dedicated net value chart, not Quick Compare.
+- Research maps (`bbox map`) are maintained by hand and never generated from runs. Register a node when starting an experiment (`bbox map node set --stage experiment --run <run_id>`), write the conclusion with `bbox map node decide --decision <kept|accepted|rejected|pending|superseded> --verdict ... --note`, advance accepted work with `bbox map node advance --stage <validation|tracking|simulation|live>`, and move the comparison baseline with `bbox map baseline --key <node> --reason ...`. Check `bbox map status` and `bbox map lint` before finishing a research step. Format and rules live in `docs/research-map.md`.
 - After writing data, verify in WebUI when a local browser target is available.
 
 ## Workflow
@@ -47,6 +48,7 @@ Use this skill to execute or explain reliable Blackbox agent workflows. Prefer c
    - For WebUI Quick Compare, expect Project to compare child Research targets, Research to compare child Branch targets, and Branch to compare Run targets.
 7. Review the research loop with `bbox research review --research-id <research_id>` to see state, ranked candidates, saved compare sets, decision notes, and archive suggestions before changing branch status.
 8. Write a decision note with `--author-type agent`.
+   - Reflect the decision in the research map with `bbox map node decide --note` (decision, reading, verdict, caveats, next); move the baseline pointer with `bbox map baseline` when the baseline changes.
 9. Verify Dashboard, Search, Compare, Sweep, Branch, and Run Detail in WebUI.
 
 For exact command examples, offline sync, retry policy, and WebUI verification checklist, read `references/agent-workflow.md`.

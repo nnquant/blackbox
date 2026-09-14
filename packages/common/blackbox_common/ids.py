@@ -19,6 +19,9 @@ PREFIXES = {
     "sweep_run": "swr",
     "compare_set": "cmp",
     "search_view": "svw",
+    "research_map": "rmap",
+    "research_map_node": "rmn",
+    "research_map_revision": "rmr",
     "idempotency": "idem",
 }
 

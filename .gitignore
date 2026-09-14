@@ -23,3 +23,5 @@ webui/.vite/
 
 .DS_Store
 Thumbs.db
+
+.dev-data/

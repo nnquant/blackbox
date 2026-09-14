@@ -1,0 +1,2211 @@
+- banner:
+  - generic: Blackbox
+  - button "打开搜索":
+    - generic: 搜索
+    - generic: Ctrl K
+  - button "切换为浅色":
+  - button "新建":
+    - text: 新建
+- complementary:
+  - navigation:
+    - button "总览":
+      - text: 总览
+    - button "项目":
+      - text: 项目
+    - button "研究线":
+      - text: 研究线
+    - button "研究分支":
+      - text: 研究分支
+    - button "Run":
+      - text: Run
+    - button "对比":
+      - text: 对比
+    - button "研究地图":
+      - text: 研究地图
+    - button "搜索":
+      - text: 搜索
+    - button "管理" [active]:
+      - text: 管理
+  - generic: 项目
+  - button "新建项目": +
+  - list:
+    - button "▾ WH-Pool 自建强势股池 47":
+      - text: ▾
+      - generic: WH-Pool 自建强势股池
+      - generic: "47"
+    - button "V5 状态定义与忠实性验收 1":
+      - generic: V5 状态定义与忠实性验收
+      - generic: "1"
+    - button "F2信息集合与股池匹配诊断 6":
+      - generic: F2信息集合与股池匹配诊断
+      - generic: "6"
+    - button "强势股池概念轮动：路径标签消融 8":
+      - generic: 强势股池概念轮动：路径标签消融
+      - generic: "8"
+    - button "A线：加速事件与专门模型研究 2":
+      - generic: A线：加速事件与专门模型研究
+      - generic: "2"
+    - button "R线：整固后再启动事件研究 2":
+      - generic: R线：整固后再启动事件研究
+      - generic: "2"
+    - button "事件驱动E0-E1：数据审计与收益结构 6":
+      - generic: 事件驱动E0-E1：数据审计与收益结构
+      - generic: "6"
+    - button "s1 相对与绝对强势分 TopN 毛收益基准 11":
+      - generic: s1 相对与绝对强势分 TopN 毛收益基准
+      - generic: "11"
+    - button "v3 股池双 sleeve 理论毛收益基准 11":
+      - generic: v3 股池双 sleeve 理论毛收益基准
+      - generic: "11"
+    - button "▸ WH-A2 继承F2优势的改进策略 0":
+      - text: ▸
+      - generic: WH-A2 继承F2优势的改进策略
+      - generic: "0"
+    - button "▸ WH-A1 强势股路径效用与动态退出 101":
+      - text: ▸
+      - generic: WH-A1 强势股路径效用与动态退出
+      - generic: "101"
+    - button "▸ WH-N3 强势行业 SIR 参数应用价值 0":
+      - text: ▸
+      - generic: WH-N3 强势行业 SIR 参数应用价值
+      - generic: "0"
+    - button "▸ WH策略族择时门控研究 0":
+      - text: ▸
+      - generic: WH策略族择时门控研究
+      - generic: "0"
+    - button "▸ WH-N2 资金注意力传染模型 0":
+      - text: ▸
+      - generic: WH-N2 资金注意力传染模型
+      - generic: "0"
+    - button "▸ WH-N1 叙事传染线 0":
+      - text: ▸
+      - generic: WH-N1 叙事传染线
+      - generic: "0"
+    - button "▸ WH-F2 强势股策略 36":
+      - text: ▸
+      - generic: WH-F2 强势股策略
+      - generic: "36"
+    - button "▸ 强势股个股网络机制研究 0":
+      - text: ▸
+      - generic: 强势股个股网络机制研究
+      - generic: "0"
+    - button "▸ 强势股行业网络轮动 0":
+      - text: ▸
+      - generic: 强势股行业网络轮动
+      - generic: "0"
+    - button "▸ WH策略分钟级择时研究 0":
+      - text: ▸
+      - generic: WH策略分钟级择时研究
+      - generic: "0"
+    - button "▸ 策略每日回测结果 15":
+      - text: ▸
+      - generic: 策略每日回测结果
+      - generic: "15"
+    - button "▸ 暂停跟踪策略回测归档 0":
+      - text: ▸
+      - generic: 暂停跟踪策略回测归档
+      - generic: "0"
+    - button "▸ 策略组合回测归档 0":
+      - text: ▸
+      - generic: 策略组合回测归档
+      - generic: "0"
+    - button "▸ WH 多因子模型研究 1":
+      - text: ▸
+      - generic: WH 多因子模型研究
+      - generic: "1"
+    - button "▸ WH Minions 微盘股策略 0":
+      - text: ▸
+      - generic: WH Minions 微盘股策略
+      - generic: "0"
+    - button "▸ Bond ETF T0 0":
+      - text: ▸
+      - generic: Bond ETF T0
+      - generic: "0"
+    - button "▸ WH Strategy 3D 0":
+      - text: ▸
+      - generic: WH Strategy 3D
+      - generic: "0"
+    - button "▸ WH Events V1 0":
+      - text: ▸
+      - generic: WH Events V1
+      - generic: "0"
+    - button "▸ Convertible T0 Factor Research 0":
+      - text: ▸
+      - generic: Convertible T0 Factor Research
+      - generic: "0"
+    - button "▸ wh-strategy-v1 0":
+      - text: ▸
+      - generic: wh-strategy-v1
+      - generic: "0"
+    - button "▸ WH Strategy V2 0":
+      - text: ▸
+      - generic: WH Strategy V2
+      - generic: "0"
+  - generic: 研究地图
+  - list:
+    - listitem: 还没有研究地图
+- main:
+  - navigation "页面上下文":
+    - button "Dashboard"
+    - generic: /
+    - button "研究管理"
+  - generic: 管理
+  - heading "研究资产管理" [level=1]
+  - paragraph: 活跃研究、重产物、陈旧运行和批量实验压力
+  - button "刷新":
+    - text: 刷新
+  - generic: 研究线
+  - generic "244 / active 231":
+    - generic: 244 / active 231
+  - generic: Stale Active
+  - generic "198":
+    - generic: "198"
+  - generic: Run
+  - generic "12840":
+    - generic: "12840"
+  - generic: 运行中
+  - generic "41 / stale 40":
+    - generic: 41 / stale 40
+  - generic: 产物
+  - generic "93981 · 43.6 GB":
+    - generic: 93981 · 43.6 GB
+  - generic: 已保存视图
+  - generic "0 search / 17 compare":
+    - generic: 0 search / 17 compare
+  - heading "项目压力" [level=2]
+  - table:
+    - rowgroup:
+      - row "Project Research Branches Runs Artifacts Size Latest":
+        - columnheader "Project"
+        - columnheader "Research"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "WH Strategy V2 wh-strategy-v2 149 540 11653 80555 38.0 GB 2026/8/31 23:08:55":
+        - cell "WH Strategy V2 wh-strategy-v2":
+          - button "WH Strategy V2"
+          - generic: wh-strategy-v2
+        - cell "149"
+        - cell "540"
+        - cell "11653"
+        - cell "80555"
+        - cell "38.0 GB"
+        - cell "2026/8/31 23:08:55"
+      - row "wh-strategy-v1 wh-strategy-v1 10 68 74 706 36.4 MB 2026/8/30 01:09:11":
+        - cell "wh-strategy-v1 wh-strategy-v1":
+          - button "wh-strategy-v1"
+          - generic: wh-strategy-v1
+        - cell "10"
+        - cell "68"
+        - cell "74"
+        - cell "706"
+        - cell "36.4 MB"
+        - cell "2026/8/30 01:09:11"
+      - row "Convertible T0 Factor Research cbt0-factor-research 2 4 30 190 21.9 MB 2026/6/16 13:21:47":
+        - cell "Convertible T0 Factor Research cbt0-factor-research":
+          - button "Convertible T0 Factor Research"
+          - generic: cbt0-factor-research
+        - cell "2"
+        - cell "4"
+        - cell "30"
+        - cell "190"
+        - cell "21.9 MB"
+        - cell "2026/6/16 13:21:47"
+      - row "策略每日回测结果 strategy-daily-backtests 3 3 136 1786 65.9 MB 2026/9/11 21:08:45":
+        - cell "策略每日回测结果 strategy-daily-backtests":
+          - button "策略每日回测结果"
+          - generic: strategy-daily-backtests
+        - cell "3"
+        - cell "3"
+        - cell "136"
+        - cell "1786"
+        - cell "65.9 MB"
+        - cell "2026/9/11 21:08:45"
+      - row "WH Events V1 wh-events-v1 4 29 100 702 1.14 GB 2026/7/3 09:31:47":
+        - cell "WH Events V1 wh-events-v1":
+          - button "WH Events V1"
+          - generic: wh-events-v1
+        - cell "4"
+        - cell "29"
+        - cell "100"
+        - cell "702"
+        - cell "1.14 GB"
+        - cell "2026/7/3 09:31:47"
+      - row "WH Strategy 3D wh-strategy-3d 4 24 48 458 438.7 MB 2026/7/12 16:52:12":
+        - cell "WH Strategy 3D wh-strategy-3d":
+          - button "WH Strategy 3D"
+          - generic: wh-strategy-3d
+        - cell "4"
+        - cell "24"
+        - cell "48"
+        - cell "458"
+        - cell "438.7 MB"
+        - cell "2026/7/12 16:52:12"
+      - row "Bond ETF T0 bond-etf-t0 1 5 20 80 15.4 MB 2026/6/30 14:38:34":
+        - cell "Bond ETF T0 bond-etf-t0":
+          - button "Bond ETF T0"
+          - generic: bond-etf-t0
+        - cell "1"
+        - cell "5"
+        - cell "20"
+        - cell "80"
+        - cell "15.4 MB"
+        - cell "2026/6/30 14:38:34"
+      - row "WH Minions 微盘股策略 wh-minions 16 22 23 355 327.4 MB 2026/7/24 02:03:34":
+        - cell "WH Minions 微盘股策略 wh-minions":
+          - button "WH Minions 微盘股策略"
+          - generic: wh-minions
+        - cell "16"
+        - cell "22"
+        - cell "23"
+        - cell "355"
+        - cell "327.4 MB"
+        - cell "2026/7/24 02:03:34"
+      - row "WH 多因子模型研究 wh-multi-factor-v2 3 11 11 123 11.7 MB 2026/9/8 11:15:17":
+        - cell "WH 多因子模型研究 wh-multi-factor-v2":
+          - button "WH 多因子模型研究"
+          - generic: wh-multi-factor-v2
+        - cell "3"
+        - cell "11"
+        - cell "11"
+        - cell "123"
+        - cell "11.7 MB"
+        - cell "2026/9/8 11:15:17"
+      - row "策略组合回测归档 strategy-combination-backtests 3 3 4 48 1.11 MB 2026/7/13 14:55:04":
+        - cell "策略组合回测归档 strategy-combination-backtests":
+          - button "策略组合回测归档"
+          - generic: strategy-combination-backtests
+        - cell "3"
+        - cell "3"
+        - cell "4"
+        - cell "48"
+        - cell "1.11 MB"
+        - cell "2026/7/13 14:55:04"
+      - row "暂停跟踪策略回测归档 strategy-paused-backtests 1 1 4 52 1.49 MB 2026/7/6 22:49:35":
+        - cell "暂停跟踪策略回测归档 strategy-paused-backtests":
+          - button "暂停跟踪策略回测归档"
+          - generic: strategy-paused-backtests
+        - cell "1"
+        - cell "1"
+        - cell "4"
+        - cell "52"
+        - cell "1.49 MB"
+        - cell "2026/7/6 22:49:35"
+      - row "WH策略分钟级择时研究 wh-intraday-timing-research 5 15 51 936 79.6 MB 2026/7/24 14:08:26":
+        - cell "WH策略分钟级择时研究 wh-intraday-timing-research":
+          - button "WH策略分钟级择时研究"
+          - generic: wh-intraday-timing-research
+        - cell "5"
+        - cell "15"
+        - cell "51"
+        - cell "936"
+        - cell "79.6 MB"
+        - cell "2026/7/24 14:08:26"
+      - row "强势股行业网络轮动 stock-pyramid-industry-network 1 1 3 18 1.09 MB 2026/7/23 01:34:57":
+        - cell "强势股行业网络轮动 stock-pyramid-industry-network":
+          - button "强势股行业网络轮动"
+          - generic: stock-pyramid-industry-network
+        - cell "1"
+        - cell "1"
+        - cell "3"
+        - cell "18"
+        - cell "1.09 MB"
+        - cell "2026/7/23 01:34:57"
+      - row "强势股个股网络机制研究 stock-pyramid-stock-network-mechanism 1 1 3 16 1.44 MB 2026/7/23 18:48:44":
+        - cell "强势股个股网络机制研究 stock-pyramid-stock-network-mechanism":
+          - button "强势股个股网络机制研究"
+          - generic: stock-pyramid-stock-network-mechanism
+        - cell "1"
+        - cell "1"
+        - cell "3"
+        - cell "16"
+        - cell "1.44 MB"
+        - cell "2026/7/23 18:48:44"
+      - row "WH-F2 强势股策略 wh-f2 15 22 63 629 239.1 MB 2026/9/14 14:05:19":
+        - cell "WH-F2 强势股策略 wh-f2":
+          - button "WH-F2 强势股策略"
+          - generic: wh-f2
+        - cell "15"
+        - cell "22"
+        - cell "63"
+        - cell "629"
+        - cell "239.1 MB"
+        - cell "2026/9/14 14:05:19"
+      - row "WH-N1 叙事传染线 wh-n1 2 2 20 99 46.9 MB 2026/8/30 02:17:39":
+        - cell "WH-N1 叙事传染线 wh-n1":
+          - button "WH-N1 叙事传染线"
+          - generic: wh-n1
+        - cell "2"
+        - cell "2"
+        - cell "20"
+        - cell "99"
+        - cell "46.9 MB"
+        - cell "2026/8/30 02:17:39"
+      - row "WH-N2 资金注意力传染模型 wh-n2 1 6 8 46 9.00 MB 2026/9/1 14:11:39":
+        - cell "WH-N2 资金注意力传染模型 wh-n2":
+          - button "WH-N2 资金注意力传染模型"
+          - generic: wh-n2
+        - cell "1"
+        - cell "6"
+        - cell "8"
+        - cell "46"
+        - cell "9.00 MB"
+        - cell "2026/9/1 14:11:39"
+      - row "WH策略族择时门控研究 wh-strategy-timing-overlays 4 6 13 64 4.75 MB 2026/9/4 10:55:21":
+        - cell "WH策略族择时门控研究 wh-strategy-timing-overlays":
+          - button "WH策略族择时门控研究"
+          - generic: wh-strategy-timing-overlays
+        - cell "4"
+        - cell "6"
+        - cell "13"
+        - cell "64"
+        - cell "4.75 MB"
+        - cell "2026/9/4 10:55:21"
+      - row "WH-N3 强势行业 SIR 参数应用价值 wh-n3 2 2 2 14 536.5 KB 2026/9/2 22:40:50":
+        - cell "WH-N3 强势行业 SIR 参数应用价值 wh-n3":
+          - button "WH-N3 强势行业 SIR 参数应用价值"
+          - generic: wh-n3
+        - cell "2"
+        - cell "2"
+        - cell "2"
+        - cell "14"
+        - cell "536.5 KB"
+        - cell "2026/9/2 22:40:50"
+      - row "WH-A1 强势股路径效用与动态退出 wh-a1 7 19 512 6826 3.12 GB 2026/9/6 21:47:36":
+        - cell "WH-A1 强势股路径效用与动态退出 wh-a1":
+          - button "WH-A1 强势股路径效用与动态退出"
+          - generic: wh-a1
+        - cell "7"
+        - cell "19"
+        - cell "512"
+        - cell "6826"
+        - cell "3.12 GB"
+        - cell "2026/9/6 21:47:36"
+      - row "WH-A2 继承F2优势的改进策略 wh-a2 2 2 15 46 1.35 MB 2026/9/6 01:54:35":
+        - cell "WH-A2 继承F2优势的改进策略 wh-a2":
+          - button "WH-A2 继承F2优势的改进策略"
+          - generic: wh-a2
+        - cell "2"
+        - cell "2"
+        - cell "15"
+        - cell "46"
+        - cell "1.35 MB"
+        - cell "2026/9/6 01:54:35"
+      - row "WH-Pool 自建强势股池 wh-pool 8 9 47 232 88.3 MB 2026/9/14 13:55:54":
+        - cell "WH-Pool 自建强势股池 wh-pool":
+          - button "WH-Pool 自建强势股池"
+          - generic: wh-pool
+        - cell "8"
+        - cell "9"
+        - cell "47"
+        - cell "232"
+        - cell "88.3 MB"
+        - cell "2026/9/14 13:55:54"
+  - heading "Run 压力研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "日频因子切割论因子挖掘 daily-factor-slicing wh-strategy-v2 活跃 12 1029 5159 2026/6/3 11:37:07":
+        - cell "日频因子切割论因子挖掘 daily-factor-slicing":
+          - button "日频因子切割论因子挖掘"
+          - generic: daily-factor-slicing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "12"
+        - cell "1029"
+        - cell "5159"
+        - cell "2026/6/3 11:37:07"
+      - row "HFT 1分钟低波压缩释放因子研究 hft-volatility-squeeze-release wh-strategy-v2 活跃 3 603 4218 2026/6/8 18:27:27":
+        - cell "HFT 1分钟低波压缩释放因子研究 hft-volatility-squeeze-release":
+          - button "HFT 1分钟低波压缩释放因子研究"
+          - generic: hft-volatility-squeeze-release
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "603"
+        - cell "4218"
+        - cell "2026/6/8 18:27:27"
+      - row "HFT 1分钟极端市场尾部 Beta 因子研究 hft-market-tail-beta-v2 wh-strategy-v2 活跃 3 563 3934 2026/6/8 16:44:30":
+        - cell "HFT 1分钟极端市场尾部 Beta 因子研究 hft-market-tail-beta-v2":
+          - button "HFT 1分钟极端市场尾部 Beta 因子研究"
+          - generic: hft-market-tail-beta-v2
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "563"
+        - cell "3934"
+        - cell "2026/6/8 16:44:30"
+      - row "HFT 1分钟跨周期收益迁移因子研究 hft-multi-scale-return-migration wh-strategy-v2 活跃 5 445 3094 2026/6/8 13:40:05":
+        - cell "HFT 1分钟跨周期收益迁移因子研究 hft-multi-scale-return-migration":
+          - button "HFT 1分钟跨周期收益迁移因子研究"
+          - generic: hft-multi-scale-return-migration
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "445"
+        - cell "3094"
+        - cell "2026/6/8 13:40:05"
+      - row "HFT 1分钟市场领先滞后画像因子研究 hft-market-lead-lag-profile wh-strategy-v2 活跃 3 443 3104 2026/6/8 22:27:55":
+        - cell "HFT 1分钟市场领先滞后画像因子研究 hft-market-lead-lag-profile":
+          - button "HFT 1分钟市场领先滞后画像因子研究"
+          - generic: hft-market-lead-lag-profile
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "443"
+        - cell "3104"
+        - cell "2026/6/8 22:27:55"
+      - row "HFT 1分钟日内筹码迁移因子研究 hft-chip-migration wh-strategy-v2 活跃 5 441 3121 2026/6/8 23:29:16":
+        - cell "HFT 1分钟日内筹码迁移因子研究 hft-chip-migration":
+          - button "HFT 1分钟日内筹码迁移因子研究"
+          - generic: hft-chip-migration
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "441"
+        - cell "3121"
+        - cell "2026/6/8 23:29:16"
+      - row "WH-A1 动态退出持续改进：F2基座与版本冻结 wh-a1-exit-improvement-20260906 wh-a1 活跃 13 402 3184 2026/9/6 21:47:36":
+        - cell "WH-A1 动态退出持续改进：F2基座与版本冻结 wh-a1-exit-improvement-20260906":
+          - button "WH-A1 动态退出持续改进：F2基座与版本冻结"
+          - generic: wh-a1-exit-improvement-20260906
+        - cell "wh-a1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "13"
+        - cell "402"
+        - cell "3184"
+        - cell "2026/9/6 21:47:36"
+      - row "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext wh-strategy-v2 活跃 5 387 2713 2026/6/10 00:15:11":
+        - cell "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext":
+          - button "HFT 1分钟市场相对资金流扩展因子研究"
+          - generic: hft-market-flow-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "387"
+        - cell "2713"
+        - cell "2026/6/10 00:15:11"
+      - row "HFT 1分钟收益成交状态因子研究 hft-return-volume-state wh-strategy-v2 活跃 4 382 2672 2026/6/5 16:06:00":
+        - cell "HFT 1分钟收益成交状态因子研究 hft-return-volume-state":
+          - button "HFT 1分钟收益成交状态因子研究"
+          - generic: hft-return-volume-state
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "382"
+        - cell "2672"
+        - cell "2026/6/5 16:06:00"
+      - row "HFT 1分钟成交活跃与振幅耦合因子研究 hft-amplitude-turnover-coupling wh-strategy-v2 活跃 5 365 2571 2026/6/10 00:08:44":
+        - cell "HFT 1分钟成交活跃与振幅耦合因子研究 hft-amplitude-turnover-coupling":
+          - button "HFT 1分钟成交活跃与振幅耦合因子研究"
+          - generic: hft-amplitude-turnover-coupling
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "365"
+        - cell "2571"
+        - cell "2026/6/10 00:08:44"
+      - row "HFT 1分钟成交节奏因子研究 hft-liquidity-timing wh-strategy-v2 活跃 4 364 2532 2026/6/5 19:20:13":
+        - cell "HFT 1分钟成交节奏因子研究 hft-liquidity-timing":
+          - button "HFT 1分钟成交节奏因子研究"
+          - generic: hft-liquidity-timing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "364"
+        - cell "2532"
+        - cell "2026/6/5 19:20:13"
+      - row "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext wh-strategy-v2 活跃 4 346 2397 2026/6/5 14:58:29":
+        - cell "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext":
+          - button "HFT 1分钟日内路径扩展因子研究"
+          - generic: hft-intraday-path-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "346"
+        - cell "2397"
+        - cell "2026/6/5 14:58:29"
+      - row "HFT 1分钟状态切分因子研究 hft-state-split wh-strategy-v2 活跃 5 341 2370 2026/6/5 11:45:51":
+        - cell "HFT 1分钟状态切分因子研究 hft-state-split":
+          - button "HFT 1分钟状态切分因子研究"
+          - generic: hft-state-split
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "341"
+        - cell "2370"
+        - cell "2026/6/5 11:45:51"
+      - row "HFT 1分钟成交节奏可预测性因子研究 hft-volume-predictability wh-strategy-v2 活跃 2 322 2246 2026/6/7 22:27:11":
+        - cell "HFT 1分钟成交节奏可预测性因子研究 hft-volume-predictability":
+          - button "HFT 1分钟成交节奏可预测性因子研究"
+          - generic: hft-volume-predictability
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "2"
+        - cell "322"
+        - cell "2246"
+        - cell "2026/6/7 22:27:11"
+      - row "alpha-exp-v1 fixed expression pool alpha-exp-v1 wh-strategy-v2 活跃 20 319 2175 2026/6/3 13:41:06":
+        - cell "alpha-exp-v1 fixed expression pool alpha-exp-v1":
+          - button "alpha-exp-v1 fixed expression pool"
+          - generic: alpha-exp-v1
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "20"
+        - cell "319"
+        - cell "2175"
+        - cell "2026/6/3 13:41:06"
+      - row "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow wh-strategy-v2 活跃 5 309 2141 2026/6/4 17:47:20":
+        - cell "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow":
+          - button "HFT 1分钟量价手册路径/资金流因子研究"
+          - generic: hft-manual-path-flow
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "309"
+        - cell "2141"
+        - cell "2026/6/4 17:47:20"
+      - row "HFT 1分钟条件筹码轮廓因子研究 hft-chip-profile-variant wh-strategy-v2 活跃 6 287 2031 2026/6/10 00:01:46":
+        - cell "HFT 1分钟条件筹码轮廓因子研究 hft-chip-profile-variant":
+          - button "HFT 1分钟条件筹码轮廓因子研究"
+          - generic: hft-chip-profile-variant
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "6"
+        - cell "287"
+        - cell "2031"
+        - cell "2026/6/10 00:01:46"
+      - row "HFT 1分钟价格冲击弹性因子研究 hft-impact-resilience wh-strategy-v2 活跃 3 283 1970 2026/6/9 19:40:11":
+        - cell "HFT 1分钟价格冲击弹性因子研究 hft-impact-resilience":
+          - button "HFT 1分钟价格冲击弹性因子研究"
+          - generic: hft-impact-resilience
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "283"
+        - cell "1970"
+        - cell "2026/6/9 19:40:11"
+      - row "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr wh-strategy-v2 活跃 3 270 1868 2026/6/4 15:06:00":
+        - cell "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr":
+          - button "HFT 1分钟价量相关/聪明钱因子研究"
+          - generic: hft-price-volume-corr
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "270"
+        - cell "1868"
+        - cell "2026/6/4 15:06:00"
+      - row "HFT 1分钟成交量/成交额分布因子研究 hft-volume-distribution wh-strategy-v2 活跃 4 244 1700 2026/6/4 11:51:24":
+        - cell "HFT 1分钟成交量/成交额分布因子研究 hft-volume-distribution":
+          - button "HFT 1分钟成交量/成交额分布因子研究"
+          - generic: hft-volume-distribution
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "244"
+        - cell "1700"
+        - cell "2026/6/4 11:51:24"
+      - row "HFT 1分钟市场相对结构因子研究 hft-market-structure wh-strategy-v2 活跃 3 234 1626 2026/6/4 23:42:31":
+        - cell "HFT 1分钟市场相对结构因子研究 hft-market-structure":
+          - button "HFT 1分钟市场相对结构因子研究"
+          - generic: hft-market-structure
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "234"
+        - cell "1626"
+        - cell "2026/6/4 23:42:31"
+      - row "HFT 1分钟日内趋势/反转/惊恐因子研究 hft-intraday-reversal wh-strategy-v2 活跃 3 227 1577 2026/6/4 12:41:13":
+        - cell "HFT 1分钟日内趋势/反转/惊恐因子研究 hft-intraday-reversal":
+          - button "HFT 1分钟日内趋势/反转/惊恐因子研究"
+          - generic: hft-intraday-reversal
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "227"
+        - cell "1577"
+        - cell "2026/6/4 12:41:13"
+      - row "HFT 1分钟 Markov 状态资金流因子研究 hft-markov-state-flow wh-strategy-v2 活跃 3 219 1520 2026/6/7 23:01:20":
+        - cell "HFT 1分钟 Markov 状态资金流因子研究 hft-markov-state-flow":
+          - button "HFT 1分钟 Markov 状态资金流因子研究"
+          - generic: hft-markov-state-flow
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "219"
+        - cell "1520"
+        - cell "2026/6/7 23:01:20"
+      - row "HFT 1分钟尾盘流动性恢复因子研究 hft-tail-liquidity-recovery wh-strategy-v2 活跃 4 204 1457 2026/6/9 23:20:41":
+        - cell "HFT 1分钟尾盘流动性恢复因子研究 hft-tail-liquidity-recovery":
+          - button "HFT 1分钟尾盘流动性恢复因子研究"
+          - generic: hft-tail-liquidity-recovery
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "204"
+        - cell "1457"
+        - cell "2026/6/9 23:20:41"
+      - row "HFT 1分钟价格路径噪声效率因子研究 hft-path-noise-efficiency wh-strategy-v2 活跃 5 185 1319 2026/6/9 22:50:27":
+        - cell "HFT 1分钟价格路径噪声效率因子研究 hft-path-noise-efficiency":
+          - button "HFT 1分钟价格路径噪声效率因子研究"
+          - generic: hft-path-noise-efficiency
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "185"
+        - cell "1319"
+        - cell "2026/6/9 22:50:27"
+  - heading "Artifact 压力研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Size Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "个股局部定价模式原型 stock-local-pricing-mode-prototypes wh-strategy-v2 活跃 6 11 153 20.7 GB 2026/7/22 14:17:08":
+        - cell "个股局部定价模式原型 stock-local-pricing-mode-prototypes":
+          - button "个股局部定价模式原型"
+          - generic: stock-local-pricing-mode-prototypes
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "6"
+        - cell "11"
+        - cell "153"
+        - cell "20.7 GB"
+        - cell "2026/7/22 14:17:08"
+      - row "WH-A1 动态退出持续改进：F2基座与版本冻结 wh-a1-exit-improvement-20260906 wh-a1 活跃 13 402 3184 1.38 GB 2026/9/6 21:47:36":
+        - cell "WH-A1 动态退出持续改进：F2基座与版本冻结 wh-a1-exit-improvement-20260906":
+          - button "WH-A1 动态退出持续改进：F2基座与版本冻结"
+          - generic: wh-a1-exit-improvement-20260906
+        - cell "wh-a1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "13"
+        - cell "402"
+        - cell "3184"
+        - cell "1.38 GB"
+        - cell "2026/9/6 21:47:36"
+      - row "日频因子切割论因子挖掘 daily-factor-slicing wh-strategy-v2 活跃 12 1029 5159 1.37 GB 2026/6/3 11:37:07":
+        - cell "日频因子切割论因子挖掘 daily-factor-slicing":
+          - button "日频因子切割论因子挖掘"
+          - generic: daily-factor-slicing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "12"
+        - cell "1029"
+        - cell "5159"
+        - cell "1.37 GB"
+        - cell "2026/6/3 11:37:07"
+      - row "stock_pyramid可交易日频事件因子挖掘20260626 stock-pyramid-tradable-event-factor-mining-20260626 wh-events-v1 活跃 21 89 564 1.08 GB 2026/6/29 17:03:56":
+        - cell "stock_pyramid可交易日频事件因子挖掘20260626 stock-pyramid-tradable-event-factor-mining-20260626":
+          - button "stock_pyramid可交易日频事件因子挖掘20260626"
+          - generic: stock-pyramid-tradable-event-factor-mining-20260626
+        - cell "wh-events-v1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "21"
+        - cell "89"
+        - cell "564"
+        - cell "1.08 GB"
+        - cell "2026/6/29 17:03:56"
+      - row "HFT 1分钟低波压缩释放因子研究 hft-volatility-squeeze-release wh-strategy-v2 活跃 3 603 4218 891.3 MB 2026/6/8 18:27:27":
+        - cell "HFT 1分钟低波压缩释放因子研究 hft-volatility-squeeze-release":
+          - button "HFT 1分钟低波压缩释放因子研究"
+          - generic: hft-volatility-squeeze-release
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "603"
+        - cell "4218"
+        - cell "891.3 MB"
+        - cell "2026/6/8 18:27:27"
+      - row "HFT 1分钟极端市场尾部 Beta 因子研究 hft-market-tail-beta-v2 wh-strategy-v2 活跃 3 563 3934 832.5 MB 2026/6/8 16:44:30":
+        - cell "HFT 1分钟极端市场尾部 Beta 因子研究 hft-market-tail-beta-v2":
+          - button "HFT 1分钟极端市场尾部 Beta 因子研究"
+          - generic: hft-market-tail-beta-v2
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "563"
+        - cell "3934"
+        - cell "832.5 MB"
+        - cell "2026/6/8 16:44:30"
+      - row "HFT 1分钟跨周期收益迁移因子研究 hft-multi-scale-return-migration wh-strategy-v2 活跃 5 445 3094 652.2 MB 2026/6/8 13:40:05":
+        - cell "HFT 1分钟跨周期收益迁移因子研究 hft-multi-scale-return-migration":
+          - button "HFT 1分钟跨周期收益迁移因子研究"
+          - generic: hft-multi-scale-return-migration
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "445"
+        - cell "3094"
+        - cell "652.2 MB"
+        - cell "2026/6/8 13:40:05"
+      - row "HFT 1分钟市场领先滞后画像因子研究 hft-market-lead-lag-profile wh-strategy-v2 活跃 3 443 3104 650.3 MB 2026/6/8 22:27:55":
+        - cell "HFT 1分钟市场领先滞后画像因子研究 hft-market-lead-lag-profile":
+          - button "HFT 1分钟市场领先滞后画像因子研究"
+          - generic: hft-market-lead-lag-profile
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "443"
+        - cell "3104"
+        - cell "650.3 MB"
+        - cell "2026/6/8 22:27:55"
+      - row "HFT 1分钟日内筹码迁移因子研究 hft-chip-migration wh-strategy-v2 活跃 5 441 3121 638.5 MB 2026/6/8 23:29:16":
+        - cell "HFT 1分钟日内筹码迁移因子研究 hft-chip-migration":
+          - button "HFT 1分钟日内筹码迁移因子研究"
+          - generic: hft-chip-migration
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "441"
+        - cell "3121"
+        - cell "638.5 MB"
+        - cell "2026/6/8 23:29:16"
+      - row "WH-A1 V3：条件对数效用与同测度多头分解（最后第3/3轮） conditional-log-utility-v3 wh-a1 活跃 1 13 1444 598.6 MB 2026/9/5 18:33:40":
+        - cell "WH-A1 V3：条件对数效用与同测度多头分解（最后第3/3轮） conditional-log-utility-v3":
+          - button "WH-A1 V3：条件对数效用与同测度多头分解（最后第3/3轮）"
+          - generic: conditional-log-utility-v3
+        - cell "wh-a1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "13"
+        - cell "1444"
+        - cell "598.6 MB"
+        - cell "2026/9/5 18:33:40"
+      - row "HFT 1分钟收益成交状态因子研究 hft-return-volume-state wh-strategy-v2 活跃 4 382 2672 563.3 MB 2026/6/5 16:06:00":
+        - cell "HFT 1分钟收益成交状态因子研究 hft-return-volume-state":
+          - button "HFT 1分钟收益成交状态因子研究"
+          - generic: hft-return-volume-state
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "382"
+        - cell "2672"
+        - cell "563.3 MB"
+        - cell "2026/6/5 16:06:00"
+      - row "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext wh-strategy-v2 活跃 5 387 2713 559.9 MB 2026/6/10 00:15:11":
+        - cell "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext":
+          - button "HFT 1分钟市场相对资金流扩展因子研究"
+          - generic: hft-market-flow-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "387"
+        - cell "2713"
+        - cell "559.9 MB"
+        - cell "2026/6/10 00:15:11"
+      - row "HFT 1分钟成交节奏因子研究 hft-liquidity-timing wh-strategy-v2 活跃 4 364 2532 536.6 MB 2026/6/5 19:20:13":
+        - cell "HFT 1分钟成交节奏因子研究 hft-liquidity-timing":
+          - button "HFT 1分钟成交节奏因子研究"
+          - generic: hft-liquidity-timing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "364"
+        - cell "2532"
+        - cell "536.6 MB"
+        - cell "2026/6/5 19:20:13"
+      - row "HFT 1分钟成交活跃与振幅耦合因子研究 hft-amplitude-turnover-coupling wh-strategy-v2 活跃 5 365 2571 536.3 MB 2026/6/10 00:08:44":
+        - cell "HFT 1分钟成交活跃与振幅耦合因子研究 hft-amplitude-turnover-coupling":
+          - button "HFT 1分钟成交活跃与振幅耦合因子研究"
+          - generic: hft-amplitude-turnover-coupling
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "365"
+        - cell "2571"
+        - cell "536.3 MB"
+        - cell "2026/6/10 00:08:44"
+      - row "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext wh-strategy-v2 活跃 4 346 2397 488.9 MB 2026/6/5 14:58:29":
+        - cell "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext":
+          - button "HFT 1分钟日内路径扩展因子研究"
+          - generic: hft-intraday-path-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "346"
+        - cell "2397"
+        - cell "488.9 MB"
+        - cell "2026/6/5 14:58:29"
+      - row "WH-A1 E2 同条件拆分标签路径与收益变换 wh-a1-pro-e2-label-bridge-20260905 wh-a1 活跃 1 24 325 483.7 MB 2026/9/5 23:17:10":
+        - cell "WH-A1 E2 同条件拆分标签路径与收益变换 wh-a1-pro-e2-label-bridge-20260905":
+          - button "WH-A1 E2 同条件拆分标签路径与收益变换"
+          - generic: wh-a1-pro-e2-label-bridge-20260905
+        - cell "wh-a1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "24"
+        - cell "325"
+        - cell "483.7 MB"
+        - cell "2026/9/5 23:17:10"
+      - row "HFT 1分钟状态切分因子研究 hft-state-split wh-strategy-v2 活跃 5 341 2370 477.3 MB 2026/6/5 11:45:51":
+        - cell "HFT 1分钟状态切分因子研究 hft-state-split":
+          - button "HFT 1分钟状态切分因子研究"
+          - generic: hft-state-split
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "341"
+        - cell "2370"
+        - cell "477.3 MB"
+        - cell "2026/6/5 11:45:51"
+      - row "HFT 1分钟成交节奏可预测性因子研究 hft-volume-predictability wh-strategy-v2 活跃 2 322 2246 473.6 MB 2026/6/7 22:27:11":
+        - cell "HFT 1分钟成交节奏可预测性因子研究 hft-volume-predictability":
+          - button "HFT 1分钟成交节奏可预测性因子研究"
+          - generic: hft-volume-predictability
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "2"
+        - cell "322"
+        - cell "2246"
+        - cell "473.6 MB"
+        - cell "2026/6/7 22:27:11"
+      - row "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow wh-strategy-v2 活跃 5 309 2141 450.0 MB 2026/6/4 17:47:20":
+        - cell "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow":
+          - button "HFT 1分钟量价手册路径/资金流因子研究"
+          - generic: hft-manual-path-flow
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "309"
+        - cell "2141"
+        - cell "450.0 MB"
+        - cell "2026/6/4 17:47:20"
+      - row "alpha-exp-v1 fixed expression pool alpha-exp-v1 wh-strategy-v2 活跃 20 319 2175 429.2 MB 2026/6/3 13:41:06":
+        - cell "alpha-exp-v1 fixed expression pool alpha-exp-v1":
+          - button "alpha-exp-v1 fixed expression pool"
+          - generic: alpha-exp-v1
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "20"
+        - cell "319"
+        - cell "2175"
+        - cell "429.2 MB"
+        - cell "2026/6/3 13:41:06"
+      - row "WH-A1 Pro复审：冻结名单交叉退出与损益归因 wh-a1-pro-e1-crossed-exit-20260905 wh-a1 活跃 1 47 542 424.6 MB 2026/9/5 21:27:14":
+        - cell "WH-A1 Pro复审：冻结名单交叉退出与损益归因 wh-a1-pro-e1-crossed-exit-20260905":
+          - button "WH-A1 Pro复审：冻结名单交叉退出与损益归因"
+          - generic: wh-a1-pro-e1-crossed-exit-20260905
+        - cell "wh-a1"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "47"
+        - cell "542"
+        - cell "424.6 MB"
+        - cell "2026/9/5 21:27:14"
+      - row "Alpha5 五日持有因子筛选与模型构建 alpha5d-fixed-t5-1455-factor-model wh-strategy-3d 活跃 10 28 279 410.8 MB 2026/7/12 12:34:32":
+        - cell "Alpha5 五日持有因子筛选与模型构建 alpha5d-fixed-t5-1455-factor-model":
+          - button "Alpha5 五日持有因子筛选与模型构建"
+          - generic: alpha5d-fixed-t5-1455-factor-model
+        - cell "wh-strategy-3d"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "10"
+        - cell "28"
+        - cell "279"
+        - cell "410.8 MB"
+        - cell "2026/7/12 12:34:32"
+      - row "HFT 1分钟条件筹码轮廓因子研究 hft-chip-profile-variant wh-strategy-v2 活跃 6 287 2031 408.7 MB 2026/6/10 00:01:46":
+        - cell "HFT 1分钟条件筹码轮廓因子研究 hft-chip-profile-variant":
+          - button "HFT 1分钟条件筹码轮廓因子研究"
+          - generic: hft-chip-profile-variant
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "6"
+        - cell "287"
+        - cell "2031"
+        - cell "408.7 MB"
+        - cell "2026/6/10 00:01:46"
+      - row "HFT 1分钟价格冲击弹性因子研究 hft-impact-resilience wh-strategy-v2 活跃 3 283 1970 402.8 MB 2026/6/9 19:40:11":
+        - cell "HFT 1分钟价格冲击弹性因子研究 hft-impact-resilience":
+          - button "HFT 1分钟价格冲击弹性因子研究"
+          - generic: hft-impact-resilience
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "283"
+        - cell "1970"
+        - cell "402.8 MB"
+        - cell "2026/6/9 19:40:11"
+      - row "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr wh-strategy-v2 活跃 3 270 1868 388.2 MB 2026/6/4 15:06:00":
+        - cell "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr":
+          - button "HFT 1分钟价量相关/聪明钱因子研究"
+          - generic: hft-price-volume-corr
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "270"
+        - cell "1868"
+        - cell "388.2 MB"
+        - cell "2026/6/4 15:06:00"
+  - heading "Run 压力分支" [level=2]
+  - table:
+    - rowgroup:
+      - row "Branch Research Status Runs Artifacts Latest":
+        - columnheader "Branch"
+        - columnheader "Research"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31 hft-volatility-squeeze-release-ts-is-20251231 hft-volatility-squeeze-release 活跃 601 4203 2026/6/8 18:24:45":
+        - cell "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31 hft-volatility-squeeze-release-ts-is-20251231":
+          - button "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31"
+          - generic: hft-volatility-squeeze-release-ts-is-20251231
+        - cell "hft-volatility-squeeze-release"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "601"
+        - cell "4203"
+        - cell "2026/6/8 18:24:45"
+      - row "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31 hft-market-tail-beta-v2-ts-is-20251231 hft-market-tail-beta-v2 活跃 561 3923 2026/6/8 16:37:48":
+        - cell "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31 hft-market-tail-beta-v2-ts-is-20251231":
+          - button "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31"
+          - generic: hft-market-tail-beta-v2-ts-is-20251231
+        - cell "hft-market-tail-beta-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "561"
+        - cell "3923"
+        - cell "2026/6/8 16:37:48"
+      - row "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31 amount-range-gaprepair-is-20251231 daily-factor-slicing 活跃 477 2387 2026/6/2 13:22:52":
+        - cell "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31 amount-range-gaprepair-is-20251231":
+          - button "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31"
+          - generic: amount-range-gaprepair-is-20251231
+        - cell "daily-factor-slicing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "477"
+        - cell "2387"
+        - cell "2026/6/2 13:22:52"
+      - row "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31 hft-multi-scale-return-migration-ts-is-20251231 hft-multi-scale-return-migration 活跃 441 3083 2026/6/8 13:25:09":
+        - cell "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31 hft-multi-scale-return-migration-ts-is-20251231":
+          - button "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31"
+          - generic: hft-multi-scale-return-migration-ts-is-20251231
+        - cell "hft-multi-scale-return-migration"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "441"
+        - cell "3083"
+        - cell "2026/6/8 13:25:09"
+      - row "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31 hft-market-lead-lag-profile-ts-is-20251231 hft-market-lead-lag-profile 活跃 441 3083 2026/6/8 22:25:46":
+        - cell "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31 hft-market-lead-lag-profile-ts-is-20251231":
+          - button "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31"
+          - generic: hft-market-lead-lag-profile-ts-is-20251231
+        - cell "hft-market-lead-lag-profile"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "441"
+        - cell "3083"
+        - cell "2026/6/8 22:25:46"
+      - row "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31 hft-chip-migration-ts-is-20251231 hft-chip-migration 活跃 437 3055 2026/6/8 23:17:13":
+        - cell "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31 hft-chip-migration-ts-is-20251231":
+          - button "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31"
+          - generic: hft-chip-migration-ts-is-20251231
+        - cell "hft-chip-migration"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "437"
+        - cell "3055"
+        - cell "2026/6/8 23:17:13"
+      - row "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31 hft-market-flow-ext-ts-transform-is-20251231 hft-market-flow-ext 活跃 361 2523 2026/6/5 12:25:45":
+        - cell "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31 hft-market-flow-ext-ts-transform-is-20251231":
+          - button "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31"
+          - generic: hft-market-flow-ext-ts-transform-is-20251231
+        - cell "hft-market-flow-ext"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "2026/6/5 12:25:45"
+      - row "HFT 收益成交状态因子 TS 变换 IS 2025-12-31 hft-return-volume-state-ts-transform-is-20251231 hft-return-volume-state 活跃 361 2523 2026/6/5 15:54:02":
+        - cell "HFT 收益成交状态因子 TS 变换 IS 2025-12-31 hft-return-volume-state-ts-transform-is-20251231":
+          - button "HFT 收益成交状态因子 TS 变换 IS 2025-12-31"
+          - generic: hft-return-volume-state-ts-transform-is-20251231
+        - cell "hft-return-volume-state"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "2026/6/5 15:54:02"
+      - row "HFT 成交节奏因子 TS 变换 IS 2025-12-31 hft-liquidity-timing-ts-transform-is-20251231 hft-liquidity-timing 活跃 361 2523 2026/6/5 16:37:57":
+        - cell "HFT 成交节奏因子 TS 变换 IS 2025-12-31 hft-liquidity-timing-ts-transform-is-20251231":
+          - button "HFT 成交节奏因子 TS 变换 IS 2025-12-31"
+          - generic: hft-liquidity-timing-ts-transform-is-20251231
+        - cell "hft-liquidity-timing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "2026/6/5 16:37:57"
+      - row "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31 hft-amplitude-turnover-coupling-ts-is-20251231 hft-amplitude-turnover-coupling 活跃 361 2523 2026/6/8 12:42:04":
+        - cell "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31 hft-amplitude-turnover-coupling-ts-is-20251231":
+          - button "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31"
+          - generic: hft-amplitude-turnover-coupling-ts-is-20251231
+        - cell "hft-amplitude-turnover-coupling"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "2026/6/8 12:42:04"
+      - row "对象与工具扩展 IS 因子挖掘 2025-12-31 object-tool-is-20251231 daily-factor-slicing 活跃 334 1643 2026/6/2 11:18:29":
+        - cell "对象与工具扩展 IS 因子挖掘 2025-12-31 object-tool-is-20251231":
+          - button "对象与工具扩展 IS 因子挖掘 2025-12-31"
+          - generic: object-tool-is-20251231
+        - cell "daily-factor-slicing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "334"
+        - cell "1643"
+        - cell "2026/6/2 11:18:29"
+      - row "HFT 状态切分因子 TS 变换 IS 2025-12-31 hft-state-split-ts-transform-is-20251231 hft-state-split 活跃 321 2243 2026/6/5 10:46:42":
+        - cell "HFT 状态切分因子 TS 变换 IS 2025-12-31 hft-state-split-ts-transform-is-20251231":
+          - button "HFT 状态切分因子 TS 变换 IS 2025-12-31"
+          - generic: hft-state-split-ts-transform-is-20251231
+        - cell "hft-state-split"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "2026/6/5 10:46:42"
+      - row "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31 hft-intraday-path-ext-ts-transform-is-20251231 hft-intraday-path-ext 活跃 321 2243 2026/6/5 14:37:51":
+        - cell "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31 hft-intraday-path-ext-ts-transform-is-20251231":
+          - button "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31"
+          - generic: hft-intraday-path-ext-ts-transform-is-20251231
+        - cell "hft-intraday-path-ext"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "2026/6/5 14:37:51"
+      - row "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31 hft-volume-predictability-ts-is-20251231 hft-volume-predictability 活跃 321 2243 2026/6/7 22:27:11":
+        - cell "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31 hft-volume-predictability-ts-is-20251231":
+          - button "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31"
+          - generic: hft-volume-predictability-ts-is-20251231
+        - cell "hft-volume-predictability"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "2026/6/7 22:27:11"
+      - row "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31 hft-manual-path-flow-ts-is-20251231 hft-manual-path-flow 活跃 286 1998 2026/6/4 16:18:46":
+        - cell "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31 hft-manual-path-flow-ts-is-20251231":
+          - button "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31"
+          - generic: hft-manual-path-flow-ts-is-20251231
+        - cell "hft-manual-path-flow"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "286"
+        - cell "1998"
+        - cell "2026/6/4 16:18:46"
+      - row "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31 hft-chip-profile-variant-ts-is-20251231 hft-chip-profile-variant 活跃 281 1963 2026/6/7 20:43:16":
+        - cell "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31 hft-chip-profile-variant-ts-is-20251231":
+          - button "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31"
+          - generic: hft-chip-profile-variant-ts-is-20251231
+        - cell "hft-chip-profile-variant"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "281"
+        - cell "1963"
+        - cell "2026/6/7 20:43:16"
+      - row "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31 hft-impact-resilience-ts-is-20251231 hft-impact-resilience 活跃 281 1963 2026/6/9 19:33:27":
+        - cell "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31 hft-impact-resilience-ts-is-20251231":
+          - button "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31"
+          - generic: hft-impact-resilience-ts-is-20251231
+        - cell "hft-impact-resilience"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "281"
+        - cell "1963"
+        - cell "2026/6/9 19:33:27"
+      - row "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31 hft-price-volume-corr-ts-is-20251231 hft-price-volume-corr 活跃 251 1753 2026/6/4 14:53:20":
+        - cell "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31 hft-price-volume-corr-ts-is-20251231":
+          - button "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31"
+          - generic: hft-price-volume-corr-ts-is-20251231
+        - cell "hft-price-volume-corr"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "251"
+        - cell "1753"
+        - cell "2026/6/4 14:53:20"
+      - row "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31 hft-volume-ts-transform-is-20251231 hft-volume-distribution 活跃 226 1578 2026/6/4 10:41:10":
+        - cell "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31 hft-volume-ts-transform-is-20251231":
+          - button "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31"
+          - generic: hft-volume-ts-transform-is-20251231
+        - cell "hft-volume-distribution"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "226"
+        - cell "1578"
+        - cell "2026/6/4 10:41:10"
+      - row "HFT 1分钟市场结构因子 TS 衍生 IS 2025-12-31 hft-market-structure-ts-transform-is-20251231 hft-market-structure 活跃 221 1543 2026/6/4 23:42:31":
+        - cell "HFT 1分钟市场结构因子 TS 衍生 IS 2025-12-31 hft-market-structure-ts-transform-is-20251231":
+          - button "HFT 1分钟市场结构因子 TS 衍生 IS 2025-12-31"
+          - generic: hft-market-structure-ts-transform-is-20251231
+        - cell "hft-market-structure"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "221"
+        - cell "1543"
+        - cell "2026/6/4 23:42:31"
+      - row "HFT 1分钟 Markov 状态资金流 TS 变换 IS 2025-12-31 hft-markov-state-flow-ts-is-20251231 hft-markov-state-flow 活跃 217 1514 2026/6/7 22:53:46":
+        - cell "HFT 1分钟 Markov 状态资金流 TS 变换 IS 2025-12-31 hft-markov-state-flow-ts-is-20251231":
+          - button "HFT 1分钟 Markov 状态资金流 TS 变换 IS 2025-12-31"
+          - generic: hft-markov-state-flow-ts-is-20251231
+        - cell "hft-markov-state-flow"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "217"
+        - cell "1514"
+        - cell "2026/6/7 22:53:46"
+      - row "HFT 日内趋势/反转/惊恐因子 TS 变换 IS 2025-12-31 hft-intraday-reversal-ts-transform-is-20251231 hft-intraday-reversal 活跃 211 1473 2026/6/4 12:22:17":
+        - cell "HFT 日内趋势/反转/惊恐因子 TS 变换 IS 2025-12-31 hft-intraday-reversal-ts-transform-is-20251231":
+          - button "HFT 日内趋势/反转/惊恐因子 TS 变换 IS 2025-12-31"
+          - generic: hft-intraday-reversal-ts-transform-is-20251231
+        - cell "hft-intraday-reversal"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "211"
+        - cell "1473"
+        - cell "2026/6/4 12:22:17"
+      - row "HFT 1分钟尾盘流动性恢复 TS 变换 IS 2025-12-31 hft-tail-liquidity-recovery-ts-is-20251231 hft-tail-liquidity-recovery 活跃 201 1403 2026/6/9 23:16:49":
+        - cell "HFT 1分钟尾盘流动性恢复 TS 变换 IS 2025-12-31 hft-tail-liquidity-recovery-ts-is-20251231":
+          - button "HFT 1分钟尾盘流动性恢复 TS 变换 IS 2025-12-31"
+          - generic: hft-tail-liquidity-recovery-ts-is-20251231
+        - cell "hft-tail-liquidity-recovery"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "201"
+        - cell "1403"
+        - cell "2026/6/9 23:16:49"
+      - row "HFT 1分钟价格路径噪声效率 TS 变换 IS 2025-12-31 hft-path-noise-efficiency-ts-is-20251231 hft-path-noise-efficiency 活跃 181 1263 2026/6/9 22:44:33":
+        - cell "HFT 1分钟价格路径噪声效率 TS 变换 IS 2025-12-31 hft-path-noise-efficiency-ts-is-20251231":
+          - button "HFT 1分钟价格路径噪声效率 TS 变换 IS 2025-12-31"
+          - generic: hft-path-noise-efficiency-ts-is-20251231
+        - cell "hft-path-noise-efficiency"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "181"
+        - cell "1263"
+        - cell "2026/6/9 22:44:33"
+      - row "HFT 1分钟市场相对价格冲击 TS 变换 IS 2025-12-31 hft-market-impact-relative-ts-is-20251231 hft-market-impact-relative 活跃 161 1123 2026/6/9 20:53:13":
+        - cell "HFT 1分钟市场相对价格冲击 TS 变换 IS 2025-12-31 hft-market-impact-relative-ts-is-20251231":
+          - button "HFT 1分钟市场相对价格冲击 TS 变换 IS 2025-12-31"
+          - generic: hft-market-impact-relative-ts-is-20251231
+        - cell "hft-market-impact-relative"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "161"
+        - cell "1123"
+        - cell "2026/6/9 20:53:13"
+  - heading "Artifact 压力分支" [level=2]
+  - table:
+    - rowgroup:
+      - row "Branch Research Status Runs Artifacts Size Latest":
+        - columnheader "Branch"
+        - columnheader "Research"
+        - columnheader "Status"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "E02 全形成期定价指纹构建 e02-formation-fingerprint-build stock-local-pricing-mode-prototypes 活跃 5 63 20.7 GB 2026/7/20 21:35:58":
+        - cell "E02 全形成期定价指纹构建 e02-formation-fingerprint-build":
+          - button "E02 全形成期定价指纹构建"
+          - generic: e02-formation-fingerprint-build
+        - cell "stock-local-pricing-mode-prototypes"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "63"
+        - cell "20.7 GB"
+        - cell "2026/7/20 21:35:58"
+      - row "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31 hft-volatility-squeeze-release-ts-is-20251231 hft-volatility-squeeze-release 活跃 601 4203 890.9 MB 2026/6/8 18:24:45":
+        - cell "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31 hft-volatility-squeeze-release-ts-is-20251231":
+          - button "HFT 1分钟低波压缩释放 TS 变换 IS 2025-12-31"
+          - generic: hft-volatility-squeeze-release-ts-is-20251231
+        - cell "hft-volatility-squeeze-release"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "601"
+        - cell "4203"
+        - cell "890.9 MB"
+        - cell "2026/6/8 18:24:45"
+      - row "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31 hft-market-tail-beta-v2-ts-is-20251231 hft-market-tail-beta-v2 活跃 561 3923 832.3 MB 2026/6/8 16:37:48":
+        - cell "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31 hft-market-tail-beta-v2-ts-is-20251231":
+          - button "HFT 1分钟极端市场尾部 Beta TS 变换 IS 2025-12-31"
+          - generic: hft-market-tail-beta-v2-ts-is-20251231
+        - cell "hft-market-tail-beta-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "561"
+        - cell "3923"
+        - cell "832.3 MB"
+        - cell "2026/6/8 16:37:48"
+      - row "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31 amount-range-gaprepair-is-20251231 daily-factor-slicing 活跃 477 2387 662.2 MB 2026/6/2 13:22:52":
+        - cell "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31 amount-range-gaprepair-is-20251231":
+          - button "Amount/Range/Gap-Repair IS 因子挖掘 2025-12-31"
+          - generic: amount-range-gaprepair-is-20251231
+        - cell "daily-factor-slicing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "477"
+        - cell "2387"
+        - cell "662.2 MB"
+        - cell "2026/6/2 13:22:52"
+      - row "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31 hft-multi-scale-return-migration-ts-is-20251231 hft-multi-scale-return-migration 活跃 441 3083 652.1 MB 2026/6/8 13:25:09":
+        - cell "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31 hft-multi-scale-return-migration-ts-is-20251231":
+          - button "HFT 1分钟跨周期收益迁移 TS 变换 IS 2025-12-31"
+          - generic: hft-multi-scale-return-migration-ts-is-20251231
+        - cell "hft-multi-scale-return-migration"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "441"
+        - cell "3083"
+        - cell "652.1 MB"
+        - cell "2026/6/8 13:25:09"
+      - row "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31 hft-market-lead-lag-profile-ts-is-20251231 hft-market-lead-lag-profile 活跃 441 3083 649.8 MB 2026/6/8 22:25:46":
+        - cell "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31 hft-market-lead-lag-profile-ts-is-20251231":
+          - button "HFT 1分钟市场领先滞后画像 TS 变换 IS 2025-12-31"
+          - generic: hft-market-lead-lag-profile-ts-is-20251231
+        - cell "hft-market-lead-lag-profile"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "441"
+        - cell "3083"
+        - cell "649.8 MB"
+        - cell "2026/6/8 22:25:46"
+      - row "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31 hft-chip-migration-ts-is-20251231 hft-chip-migration 活跃 437 3055 636.6 MB 2026/6/8 23:17:13":
+        - cell "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31 hft-chip-migration-ts-is-20251231":
+          - button "HFT 1分钟日内筹码迁移 TS 变换 IS 2025-12-31"
+          - generic: hft-chip-migration-ts-is-20251231
+        - cell "hft-chip-migration"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "437"
+        - cell "3055"
+        - cell "636.6 MB"
+        - cell "2026/6/8 23:17:13"
+      - row "V3 冻结四臂：同测度净对数效用（月度预序） v3 conditional-log-utility-v3 活跃 13 1444 598.6 MB 2026/9/5 18:33:40":
+        - cell "V3 冻结四臂：同测度净对数效用（月度预序） v3":
+          - button "V3 冻结四臂：同测度净对数效用（月度预序）"
+          - generic: v3
+        - cell "conditional-log-utility-v3"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "13"
+        - cell "1444"
+        - cell "598.6 MB"
+        - cell "2026/9/5 18:33:40"
+      - row "事件因子 family 聚合组合 event-family-aggregate-combo-v1 stock-pyramid-tradable-event-factor-mining-20260626 活跃 1 10 592.8 MB 2026/6/29 11:26:13":
+        - cell "事件因子 family 聚合组合 event-family-aggregate-combo-v1":
+          - button "事件因子 family 聚合组合"
+          - generic: event-family-aggregate-combo-v1
+        - cell "stock-pyramid-tradable-event-factor-mining-20260626"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "1"
+        - cell "10"
+        - cell "592.8 MB"
+        - cell "2026/6/29 11:26:13"
+      - row "HFT 成交节奏因子 TS 变换 IS 2025-12-31 hft-liquidity-timing-ts-transform-is-20251231 hft-liquidity-timing 活跃 361 2523 536.5 MB 2026/6/5 16:37:57":
+        - cell "HFT 成交节奏因子 TS 变换 IS 2025-12-31 hft-liquidity-timing-ts-transform-is-20251231":
+          - button "HFT 成交节奏因子 TS 变换 IS 2025-12-31"
+          - generic: hft-liquidity-timing-ts-transform-is-20251231
+        - cell "hft-liquidity-timing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "536.5 MB"
+        - cell "2026/6/5 16:37:57"
+      - row "HFT 收益成交状态因子 TS 变换 IS 2025-12-31 hft-return-volume-state-ts-transform-is-20251231 hft-return-volume-state 活跃 361 2523 536.5 MB 2026/6/5 15:54:02":
+        - cell "HFT 收益成交状态因子 TS 变换 IS 2025-12-31 hft-return-volume-state-ts-transform-is-20251231":
+          - button "HFT 收益成交状态因子 TS 变换 IS 2025-12-31"
+          - generic: hft-return-volume-state-ts-transform-is-20251231
+        - cell "hft-return-volume-state"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "536.5 MB"
+        - cell "2026/6/5 15:54:02"
+      - row "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31 hft-amplitude-turnover-coupling-ts-is-20251231 hft-amplitude-turnover-coupling 活跃 361 2523 535.0 MB 2026/6/8 12:42:04":
+        - cell "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31 hft-amplitude-turnover-coupling-ts-is-20251231":
+          - button "HFT 1分钟成交活跃与振幅耦合 TS 变换 IS 2025-12-31"
+          - generic: hft-amplitude-turnover-coupling-ts-is-20251231
+        - cell "hft-amplitude-turnover-coupling"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "535.0 MB"
+        - cell "2026/6/8 12:42:04"
+      - row "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31 hft-market-flow-ext-ts-transform-is-20251231 hft-market-flow-ext 活跃 361 2523 532.3 MB 2026/6/5 12:25:45":
+        - cell "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31 hft-market-flow-ext-ts-transform-is-20251231":
+          - button "HFT 市场相对资金流因子 TS 变换 IS 2025-12-31"
+          - generic: hft-market-flow-ext-ts-transform-is-20251231
+        - cell "hft-market-flow-ext"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "361"
+        - cell "2523"
+        - cell "532.3 MB"
+        - cell "2026/6/5 12:25:45"
+      - row "三臂共同成熟样本与固定退出 e2 wh-a1-pro-e2-label-bridge-20260905 活跃 24 325 483.7 MB 2026/9/5 23:17:10":
+        - cell "三臂共同成熟样本与固定退出 e2":
+          - button "三臂共同成熟样本与固定退出"
+          - generic: e2
+        - cell "wh-a1-pro-e2-label-bridge-20260905"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "24"
+        - cell "325"
+        - cell "483.7 MB"
+        - cell "2026/9/5 23:17:10"
+      - row "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31 hft-volume-predictability-ts-is-20251231 hft-volume-predictability 活跃 321 2243 473.6 MB 2026/6/7 22:27:11":
+        - cell "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31 hft-volume-predictability-ts-is-20251231":
+          - button "HFT 1分钟成交节奏可预测性 TS 变换 IS 2025-12-31"
+          - generic: hft-volume-predictability-ts-is-20251231
+        - cell "hft-volume-predictability"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "473.6 MB"
+        - cell "2026/6/7 22:27:11"
+      - row "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31 hft-intraday-path-ext-ts-transform-is-20251231 hft-intraday-path-ext 活跃 321 2243 465.8 MB 2026/6/5 14:37:51":
+        - cell "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31 hft-intraday-path-ext-ts-transform-is-20251231":
+          - button "HFT 日内路径扩展因子 TS 变换 IS 2025-12-31"
+          - generic: hft-intraday-path-ext-ts-transform-is-20251231
+        - cell "hft-intraday-path-ext"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "465.8 MB"
+        - cell "2026/6/5 14:37:51"
+      - row "HFT 状态切分因子 TS 变换 IS 2025-12-31 hft-state-split-ts-transform-is-20251231 hft-state-split 活跃 321 2243 457.7 MB 2026/6/5 10:46:42":
+        - cell "HFT 状态切分因子 TS 变换 IS 2025-12-31 hft-state-split-ts-transform-is-20251231":
+          - button "HFT 状态切分因子 TS 变换 IS 2025-12-31"
+          - generic: hft-state-split-ts-transform-is-20251231
+        - cell "hft-state-split"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "321"
+        - cell "2243"
+        - cell "457.7 MB"
+        - cell "2026/6/5 10:46:42"
+      - row "对象与工具扩展 IS 因子挖掘 2025-12-31 object-tool-is-20251231 daily-factor-slicing 活跃 334 1643 446.8 MB 2026/6/2 11:18:29":
+        - cell "对象与工具扩展 IS 因子挖掘 2025-12-31 object-tool-is-20251231":
+          - button "对象与工具扩展 IS 因子挖掘 2025-12-31"
+          - generic: object-tool-is-20251231
+        - cell "daily-factor-slicing"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "334"
+        - cell "1643"
+        - cell "446.8 MB"
+        - cell "2026/6/2 11:18:29"
+      - row "E1 固定批次与统一退出诊断 e1 wh-a1-pro-e1-crossed-exit-20260905 活跃 47 542 424.6 MB 2026/9/5 21:27:14":
+        - cell "E1 固定批次与统一退出诊断 e1":
+          - button "E1 固定批次与统一退出诊断"
+          - generic: e1
+        - cell "wh-a1-pro-e1-crossed-exit-20260905"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "47"
+        - cell "542"
+        - cell "424.6 MB"
+        - cell "2026/9/5 21:27:14"
+      - row "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31 hft-manual-path-flow-ts-is-20251231 hft-manual-path-flow 活跃 286 1998 423.2 MB 2026/6/4 16:18:46":
+        - cell "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31 hft-manual-path-flow-ts-is-20251231":
+          - button "HFT 1分钟量价手册路径/资金流因子 TS 变换 IS 2025-12-31"
+          - generic: hft-manual-path-flow-ts-is-20251231
+        - cell "hft-manual-path-flow"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "286"
+        - cell "1998"
+        - cell "423.2 MB"
+        - cell "2026/6/4 16:18:46"
+      - row "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31 hft-chip-profile-variant-ts-is-20251231 hft-chip-profile-variant 活跃 281 1963 406.2 MB 2026/6/7 20:43:16":
+        - cell "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31 hft-chip-profile-variant-ts-is-20251231":
+          - button "HFT 1分钟条件筹码轮廓 TS 衍生因子 IS 2025-12-31"
+          - generic: hft-chip-profile-variant-ts-is-20251231
+        - cell "hft-chip-profile-variant"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "281"
+        - cell "1963"
+        - cell "406.2 MB"
+        - cell "2026/6/7 20:43:16"
+      - row "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31 hft-impact-resilience-ts-is-20251231 hft-impact-resilience 活跃 281 1963 402.8 MB 2026/6/9 19:33:27":
+        - cell "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31 hft-impact-resilience-ts-is-20251231":
+          - button "HFT 1分钟价格冲击弹性 TS 变换 IS 2025-12-31"
+          - generic: hft-impact-resilience-ts-is-20251231
+        - cell "hft-impact-resilience"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "281"
+        - cell "1963"
+        - cell "402.8 MB"
+        - cell "2026/6/9 19:33:27"
+      - row "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31 hft-price-volume-corr-ts-is-20251231 hft-price-volume-corr 活跃 251 1753 372.9 MB 2026/6/4 14:53:20":
+        - cell "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31 hft-price-volume-corr-ts-is-20251231":
+          - button "HFT1分钟价量相关聪明钱TS衍生因子IS2025-12-31"
+          - generic: hft-price-volume-corr-ts-is-20251231
+        - cell "hft-price-volume-corr"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "251"
+        - cell "1753"
+        - cell "372.9 MB"
+        - cell "2026/6/4 14:53:20"
+      - row "WH-F2.1 Batch 1 G0 预注册与首因子 S0 batch-1-g0-preregistered wh-f2-1-factor-program 活跃 34 130 357.3 MB 2026/8/8 15:49:39":
+        - cell "WH-F2.1 Batch 1 G0 预注册与首因子 S0 batch-1-g0-preregistered":
+          - button "WH-F2.1 Batch 1 G0 预注册与首因子 S0"
+          - generic: batch-1-g0-preregistered
+        - cell "wh-f2-1-factor-program"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "34"
+        - cell "130"
+        - cell "357.3 MB"
+        - cell "2026/8/8 15:49:39"
+      - row "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31 hft-volume-ts-transform-is-20251231 hft-volume-distribution 活跃 226 1578 333.2 MB 2026/6/4 10:41:10":
+        - cell "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31 hft-volume-ts-transform-is-20251231":
+          - button "HFT 成交量/成交额分布因子 TS 变换 IS 2025-12-31"
+          - generic: hft-volume-ts-transform-is-20251231
+        - cell "hft-volume-distribution"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "226"
+        - cell "1578"
+        - cell "333.2 MB"
+        - cell "2026/6/4 10:41:10"
+  - heading "陈旧 Running Runs" [level=2]
+  - table:
+    - rowgroup:
+      - row "Run Research Branch Updated":
+        - columnheader "Run"
+        - columnheader "Research"
+        - columnheader "Branch"
+        - columnheader "Updated"
+    - rowgroup:
+      - row "因子切割论-slice_down_ret_high_body_signed_w10 daily-factor-slicing object-tool-is-20251231 2026/6/2 07:59:34":
+        - cell "因子切割论-slice_down_ret_high_body_signed_w10":
+          - button "因子切割论-slice_down_ret_high_body_signed_w10"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 07:59:34"
+      - row "因子切割论-slice_down_ret_high_share_body_signed_w10 daily-factor-slicing object-tool-is-20251231 2026/6/2 07:59:37":
+        - cell "因子切割论-slice_down_ret_high_share_body_signed_w10":
+          - button "因子切割论-slice_down_ret_high_share_body_signed_w10"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 07:59:37"
+      - row "因子切割论-slice_down_ret_high_body_signed_w20 daily-factor-slicing object-tool-is-20251231 2026/6/2 07:59:38":
+        - cell "因子切割论-slice_down_ret_high_body_signed_w20":
+          - button "因子切割论-slice_down_ret_high_body_signed_w20"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 07:59:38"
+      - row "因子切割论-slice_down_ret_high_share_body_signed_w20 daily-factor-slicing object-tool-is-20251231 2026/6/2 07:59:40":
+        - cell "因子切割论-slice_down_ret_high_share_body_signed_w20":
+          - button "因子切割论-slice_down_ret_high_share_body_signed_w20"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 07:59:40"
+      - row "因子切割论-slice_down_ret_high_price_impact_w5 daily-factor-slicing object-tool-is-20251231 2026/6/2 08:00:04":
+        - cell "因子切割论-slice_down_ret_high_price_impact_w5":
+          - button "因子切割论-slice_down_ret_high_price_impact_w5"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 08:00:04"
+      - row "因子切割论-slice_down_ret_high_share_price_impact_w5 daily-factor-slicing object-tool-is-20251231 2026/6/2 08:00:06":
+        - cell "因子切割论-slice_down_ret_high_share_price_impact_w5":
+          - button "因子切割论-slice_down_ret_high_share_price_impact_w5"
+        - cell "daily-factor-slicing":
+          - button "daily-factor-slicing"
+        - cell "object-tool-is-20251231"
+        - cell "2026/6/2 08:00:06"
+      - row "HFT-TS变换-volume_same_minute_spike_share_20__TS_MEAN_5 hft-same-minute-profile hft-same-minute-profile-ts-is-20251231 2026/6/5 20:59:31":
+        - cell "HFT-TS变换-volume_same_minute_spike_share_20__TS_MEAN_5":
+          - button "HFT-TS变换-volume_same_minute_spike_share_20__TS_MEAN_5"
+        - cell "hft-same-minute-profile":
+          - button "hft-same-minute-profile"
+        - cell "hft-same-minute-profile-ts-is-20251231"
+        - cell "2026/6/5 20:59:31"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_5 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:16":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_5":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_5"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:16"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_5 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:20":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_5":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_5"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:20"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_10 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:23":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_10":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_10"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:23"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_10 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:27":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_10":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_10"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:27"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_20 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:31":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_20":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_20"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:31"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_20 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:34":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_20":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_20"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:34"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_60 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:38":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_60":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_60"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:38"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_60 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:42":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_60":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_60"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:42"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_60 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:45":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_60":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_60"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:45"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_120 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:48":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_120":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_120"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:48"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_120 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:52":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_120":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_ADD_STD_120"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:52"
+      - row "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_120 hft-price-bucket-contest hft-price-bucket-contest-ts-is-20251231 2026/6/7 13:57:55":
+        - cell "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_120":
+          - button "HFT-TS变换-dominant_price_time_share__TS_MEAN_DIV_STD_120"
+        - cell "hft-price-bucket-contest":
+          - button "hft-price-bucket-contest"
+        - cell "hft-price-bucket-contest-ts-is-20251231"
+        - cell "2026/6/7 13:57:55"
+      - row "HFT-TS变换-high_zone_amount_z__TS_MEAN_60 hft-support-resistance-flow hft-support-resistance-flow-ts-is-20251231 2026/6/7 17:23:55":
+        - cell "HFT-TS变换-high_zone_amount_z__TS_MEAN_60":
+          - button "HFT-TS变换-high_zone_amount_z__TS_MEAN_60"
+        - cell "hft-support-resistance-flow":
+          - button "hft-support-resistance-flow"
+        - cell "hft-support-resistance-flow-ts-is-20251231"
+        - cell "2026/6/7 17:23:55"
+      - row "HFT-TS变换-high_zone_amount_z__TS_STD_60 hft-support-resistance-flow hft-support-resistance-flow-ts-is-20251231 2026/6/7 17:23:58":
+        - cell "HFT-TS变换-high_zone_amount_z__TS_STD_60":
+          - button "HFT-TS变换-high_zone_amount_z__TS_STD_60"
+        - cell "hft-support-resistance-flow":
+          - button "hft-support-resistance-flow"
+        - cell "hft-support-resistance-flow-ts-is-20251231"
+        - cell "2026/6/7 17:23:58"
+      - row "HFT-TS变换-high_zone_amount_z__TS_MEAN_ADD_STD_60 hft-support-resistance-flow hft-support-resistance-flow-ts-is-20251231 2026/6/7 17:24:01":
+        - cell "HFT-TS变换-high_zone_amount_z__TS_MEAN_ADD_STD_60":
+          - button "HFT-TS变换-high_zone_amount_z__TS_MEAN_ADD_STD_60"
+        - cell "hft-support-resistance-flow":
+          - button "hft-support-resistance-flow"
+        - cell "hft-support-resistance-flow-ts-is-20251231"
+        - cell "2026/6/7 17:24:01"
+      - row "HFT-TS变换-high_zone_amount_z__TS_MEAN_DIV_STD_60 hft-support-resistance-flow hft-support-resistance-flow-ts-is-20251231 2026/6/7 17:24:03":
+        - cell "HFT-TS变换-high_zone_amount_z__TS_MEAN_DIV_STD_60":
+          - button "HFT-TS变换-high_zone_amount_z__TS_MEAN_DIV_STD_60"
+        - cell "hft-support-resistance-flow":
+          - button "hft-support-resistance-flow"
+        - cell "hft-support-resistance-flow-ts-is-20251231"
+        - cell "2026/6/7 17:24:03"
+      - row "HFT-TS变换-up_abnormal_amount_ac1__TS_MEAN_120 hft-markov-state-flow hft-markov-state-flow-ts-is-20251231 2026/6/7 22:53:46":
+        - cell "HFT-TS变换-up_abnormal_amount_ac1__TS_MEAN_120":
+          - button "HFT-TS变换-up_abnormal_amount_ac1__TS_MEAN_120"
+        - cell "hft-markov-state-flow":
+          - button "hft-markov-state-flow"
+        - cell "hft-markov-state-flow-ts-is-20251231"
+        - cell "2026/6/7 22:53:46"
+      - row "HFT-TS变换-rule_highvol_share__TS_STD_10 hft-high-vol-state-profile hft-high-vol-state-profile-ts-is-20251231 2026/6/9 10:55:00":
+        - cell "HFT-TS变换-rule_highvol_share__TS_STD_10":
+          - button "HFT-TS变换-rule_highvol_share__TS_STD_10"
+        - cell "hft-high-vol-state-profile":
+          - button "hft-high-vol-state-profile"
+        - cell "hft-high-vol-state-profile-ts-is-20251231"
+        - cell "2026/6/9 10:55:00"
+  - heading "Artifact 体积排行" [level=2]
+  - table:
+    - rowgroup:
+      - row "Name Kind Count Size Max":
+        - columnheader "Name"
+        - columnheader "Kind"
+        - columnheader "Count"
+        - columnheader "Size"
+        - columnheader "Max"
+    - rowgroup:
+      - row "e02-full-formation-panel-external external_dataset 2 20.4 GB 10.2 GB":
+        - cell "e02-full-formation-panel-external"
+        - cell "external_dataset"
+        - cell "2"
+        - cell "20.4 GB"
+        - cell "10.2 GB"
+      - row "oaks_xsec_report image_png 10725 7.78 GB 881.7 KB":
+        - cell "oaks_xsec_report"
+        - cell "image_png"
+        - cell "10725"
+        - cell "7.78 GB"
+        - cell "881.7 KB"
+      - row "grouped_return_curve table_csv 10747 5.95 GB 614.5 KB":
+        - cell "grouped_return_curve"
+        - cell "table_csv"
+        - cell "10747"
+        - cell "5.95 GB"
+        - cell "614.5 KB"
+      - row "ic_rankic_curve table_csv 10731 849.4 MB 85.5 KB":
+        - cell "ic_rankic_curve"
+        - cell "table_csv"
+        - cell "10731"
+        - cell "849.4 MB"
+        - cell "85.5 KB"
+      - row "top_slot_members table_csv 3 609.3 MB 587.3 MB":
+        - cell "top_slot_members"
+        - cell "table_csv"
+        - cell "3"
+        - cell "609.3 MB"
+        - cell "587.3 MB"
+      - row "performance_primary_curve table_csv 9625 452.9 MB 51.5 KB":
+        - cell "performance_primary_curve"
+        - cell "table_csv"
+        - cell "9625"
+        - cell "452.9 MB"
+        - cell "51.5 KB"
+      - row "performance_drawdown table_csv 9625 299.2 MB 35.5 KB":
+        - cell "performance_drawdown"
+        - cell "table_csv"
+        - cell "9625"
+        - cell "299.2 MB"
+        - cell "35.5 KB"
+      - row "factor_panel factor_parquet 8 246.9 MB 53.3 MB":
+        - cell "factor_panel"
+        - cell "factor_parquet"
+        - cell "8"
+        - cell "246.9 MB"
+        - cell "53.3 MB"
+      - row "candidate_diagnostic_parquet table_parquet 12 185.2 MB 17.0 MB":
+        - cell "candidate_diagnostic_parquet"
+        - cell "table_parquet"
+        - cell "12"
+        - cell "185.2 MB"
+        - cell "17.0 MB"
+      - row "stock_pool table_csv 18 171.9 MB 42.5 MB":
+        - cell "stock_pool"
+        - cell "table_csv"
+        - cell "18"
+        - cell "171.9 MB"
+        - cell "42.5 MB"
+      - row "e02b_exact_uncertainty_dataset parquet_dataset 1 161.4 MB 161.4 MB":
+        - cell "e02b_exact_uncertainty_dataset"
+        - cell "parquet_dataset"
+        - cell "1"
+        - cell "161.4 MB"
+        - cell "161.4 MB"
+      - row "auction-state-092450-v1 dataset 2 155.7 MB 77.8 MB":
+        - cell "auction-state-092450-v1"
+        - cell "dataset"
+        - cell "2"
+        - cell "155.7 MB"
+        - cell "77.8 MB"
+      - row "risk_style_research_data_package_2025_2026_tar_gz dataset_archive 1 136.9 MB 136.9 MB":
+        - cell "risk_style_research_data_package_2025_2026_tar_gz"
+        - cell "dataset_archive"
+        - cell "1"
+        - cell "136.9 MB"
+        - cell "136.9 MB"
+      - row "alpha5_labels_2022_2025 dataset_parquet 1 124.6 MB 124.6 MB":
+        - cell "alpha5_labels_2022_2025"
+        - cell "dataset_parquet"
+        - cell "1"
+        - cell "124.6 MB"
+        - cell "124.6 MB"
+      - row "trades table_csv 60 110.2 MB 28.9 MB":
+        - cell "trades"
+        - cell "table_csv"
+        - cell "60"
+        - cell "110.2 MB"
+        - cell "28.9 MB"
+      - row "alpha5_factor_screen_labels_2022_2024 dataset_parquet 1 95.4 MB 95.4 MB":
+        - cell "alpha5_factor_screen_labels_2022_2024"
+        - cell "dataset_parquet"
+        - cell "1"
+        - cell "95.4 MB"
+        - cell "95.4 MB"
+      - row "e2_development-L2-models_4 file 1 93.9 MB 93.9 MB":
+        - cell "e2_development-L2-models_4"
+        - cell "file"
+        - cell "1"
+        - cell "93.9 MB"
+        - cell "93.9 MB"
+      - row "e2_development-L1-models_4 file 1 93.8 MB 93.8 MB":
+        - cell "e2_development-L1-models_4"
+        - cell "file"
+        - cell "1"
+        - cell "93.8 MB"
+        - cell "93.8 MB"
+      - row "e2_development-L0-models_4 file 1 93.6 MB 93.6 MB":
+        - cell "e2_development-L0-models_4"
+        - cell "file"
+        - cell "1"
+        - cell "93.6 MB"
+        - cell "93.6 MB"
+      - row "development_partitioned_evidence archive 2 88.3 MB 44.1 MB":
+        - cell "development_partitioned_evidence"
+        - cell "archive"
+        - cell "2"
+        - cell "88.3 MB"
+        - cell "44.1 MB"
+      - row "e06_full_market_controls_external table 1 70.4 MB 70.4 MB":
+        - cell "e06_full_market_controls_external"
+        - cell "table"
+        - cell "1"
+        - cell "70.4 MB"
+        - cell "70.4 MB"
+      - row "e02b_formal_fingerprint_dataset parquet_dataset 1 69.7 MB 69.7 MB":
+        - cell "e02b_formal_fingerprint_dataset"
+        - cell "parquet_dataset"
+        - cell "1"
+        - cell "69.7 MB"
+        - cell "69.7 MB"
+      - row "k5_context_feature_delta_parquet parquet 1 69.6 MB 69.6 MB":
+        - cell "k5_context_feature_delta_parquet"
+        - cell "parquet"
+        - cell "1"
+        - cell "69.6 MB"
+        - cell "69.6 MB"
+      - row "order_log table_csv 31 68.0 MB 17.5 MB":
+        - cell "order_log"
+        - cell "table_csv"
+        - cell "31"
+        - cell "68.0 MB"
+        - cell "17.5 MB"
+      - row "candidate_daily_returns_blackbox json 2 67.9 MB 53.7 MB":
+        - cell "candidate_daily_returns_blackbox"
+        - cell "json"
+        - cell "2"
+        - cell "67.9 MB"
+        - cell "53.7 MB"
+  - heading "陈旧活跃研究线" [level=2]
+  - table:
+    - rowgroup:
+      - row "Research Project Status Branches Runs Artifacts Size Latest":
+        - columnheader "Research"
+        - columnheader "Project"
+        - columnheader "Status"
+        - columnheader "Branches"
+        - columnheader "Runs"
+        - columnheader "Artifacts"
+        - columnheader "Size"
+        - columnheader "Latest"
+    - rowgroup:
+      - row "alpha-exp-v1 fixed expression pool alpha-exp-v1 wh-strategy-v2 活跃 20 319 2175 429.2 MB 2026/6/3 13:41:06":
+        - cell "alpha-exp-v1 fixed expression pool alpha-exp-v1":
+          - button "alpha-exp-v1 fixed expression pool"
+          - generic: alpha-exp-v1
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "20"
+        - cell "319"
+        - cell "2175"
+        - cell "429.2 MB"
+        - cell "2026/6/3 13:41:06"
+      - row "日频因子切割论因子挖掘 daily-factor-slicing wh-strategy-v2 活跃 12 1029 5159 1.37 GB 2026/6/3 11:37:07":
+        - cell "日频因子切割论因子挖掘 daily-factor-slicing":
+          - button "日频因子切割论因子挖掘"
+          - generic: daily-factor-slicing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "12"
+        - cell "1029"
+        - cell "5159"
+        - cell "1.37 GB"
+        - cell "2026/6/3 11:37:07"
+      - row "手册日频行情因子挖掘 daily-manual-ohlcv-factors wh-strategy-v2 活跃 10 97 683 144.6 MB 2026/6/4 12:50:14":
+        - cell "手册日频行情因子挖掘 daily-manual-ohlcv-factors":
+          - button "手册日频行情因子挖掘"
+          - generic: daily-manual-ohlcv-factors
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "10"
+        - cell "97"
+        - cell "683"
+        - cell "144.6 MB"
+        - cell "2026/6/4 12:50:14"
+      - row "HFT 收益分布类因子研究 hft-return-distribution wh-strategy-v2 活跃 5 8 45 8.46 MB 2026/6/4 09:59:12":
+        - cell "HFT 收益分布类因子研究 hft-return-distribution":
+          - button "HFT 收益分布类因子研究"
+          - generic: hft-return-distribution
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "8"
+        - cell "45"
+        - cell "8.46 MB"
+        - cell "2026/6/4 09:59:12"
+      - row "HFT 1分钟成交量/成交额分布因子研究 hft-volume-distribution wh-strategy-v2 活跃 4 244 1700 356.8 MB 2026/6/4 11:51:24":
+        - cell "HFT 1分钟成交量/成交额分布因子研究 hft-volume-distribution":
+          - button "HFT 1分钟成交量/成交额分布因子研究"
+          - generic: hft-volume-distribution
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "244"
+        - cell "1700"
+        - cell "356.8 MB"
+        - cell "2026/6/4 11:51:24"
+      - row "HFT 1分钟日内趋势/反转/惊恐因子研究 hft-intraday-reversal wh-strategy-v2 活跃 3 227 1577 330.6 MB 2026/6/4 12:41:13":
+        - cell "HFT 1分钟日内趋势/反转/惊恐因子研究 hft-intraday-reversal":
+          - button "HFT 1分钟日内趋势/反转/惊恐因子研究"
+          - generic: hft-intraday-reversal
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "227"
+        - cell "1577"
+        - cell "330.6 MB"
+        - cell "2026/6/4 12:41:13"
+      - row "HFT 1分钟理想振幅因子研究 hft-adjust-swing wh-strategy-v2 活跃 2 18 115 22.1 MB 2026/6/4 13:07:21":
+        - cell "HFT 1分钟理想振幅因子研究 hft-adjust-swing":
+          - button "HFT 1分钟理想振幅因子研究"
+          - generic: hft-adjust-swing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "2"
+        - cell "18"
+        - cell "115"
+        - cell "22.1 MB"
+        - cell "2026/6/4 13:07:21"
+      - row "HFT 1分钟上下行波动占比与跳跃因子研究 hft-vol-ratio-jump wh-strategy-v2 活跃 3 52 348 69.8 MB 2026/6/4 15:09:19":
+        - cell "HFT 1分钟上下行波动占比与跳跃因子研究 hft-vol-ratio-jump":
+          - button "HFT 1分钟上下行波动占比与跳跃因子研究"
+          - generic: hft-vol-ratio-jump
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "52"
+        - cell "348"
+        - cell "69.8 MB"
+        - cell "2026/6/4 15:09:19"
+      - row "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr wh-strategy-v2 活跃 3 270 1868 388.2 MB 2026/6/4 15:06:00":
+        - cell "HFT 1分钟价量相关/聪明钱因子研究 hft-price-volume-corr":
+          - button "HFT 1分钟价量相关/聪明钱因子研究"
+          - generic: hft-price-volume-corr
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "270"
+        - cell "1868"
+        - cell "388.2 MB"
+        - cell "2026/6/4 15:06:00"
+      - row "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow wh-strategy-v2 活跃 5 309 2141 450.0 MB 2026/6/4 17:47:20":
+        - cell "HFT 1分钟量价手册路径/资金流因子研究 hft-manual-path-flow":
+          - button "HFT 1分钟量价手册路径/资金流因子研究"
+          - generic: hft-manual-path-flow
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "309"
+        - cell "2141"
+        - cell "450.0 MB"
+        - cell "2026/6/4 17:47:20"
+      - row "alpha-1d 与 alpha-1m 合成组合研究 alpha-1d-1m-combo wh-strategy-v2 活跃 5 5 38 931.5 KB 2026/6/4 17:59:32":
+        - cell "alpha-1d 与 alpha-1m 合成组合研究 alpha-1d-1m-combo":
+          - button "alpha-1d 与 alpha-1m 合成组合研究"
+          - generic: alpha-1d-1m-combo
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "5"
+        - cell "38"
+        - cell "931.5 KB"
+        - cell "2026/6/4 17:59:32"
+      - row "alpha-1d 与 alpha-1m 合成组合 OOS 2026 研究 alpha-1d-1m-combo-oos-2026 wh-strategy-v2 活跃 9 9 42 300.4 KB 2026/6/4 20:01:54":
+        - cell "alpha-1d 与 alpha-1m 合成组合 OOS 2026 研究 alpha-1d-1m-combo-oos-2026":
+          - button "alpha-1d 与 alpha-1m 合成组合 OOS 2026 研究"
+          - generic: alpha-1d-1m-combo-oos-2026
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "9"
+        - cell "9"
+        - cell "42"
+        - cell "300.4 KB"
+        - cell "2026/6/4 20:01:54"
+      - row "alpha-1d 与 alpha-1m XGBRanker 非线性组合 OOS 2026 前10只研究 alpha-1d-1m-xgb-ranker-oos-2026-top10 wh-strategy-v2 活跃 6 6 39 410.8 KB 2026/6/4 21:20:25":
+        - cell "alpha-1d 与 alpha-1m XGBRanker 非线性组合 OOS 2026 前10只研究 alpha-1d-1m-xgb-ranker-oos-2026-top10":
+          - button "alpha-1d 与 alpha-1m XGBRanker 非线性组合 OOS 2026 前10只研究"
+          - generic: alpha-1d-1m-xgb-ranker-oos-2026-top10
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "6"
+        - cell "6"
+        - cell "39"
+        - cell "410.8 KB"
+        - cell "2026/6/4 21:20:25"
+      - row "alpha-1d 与 alpha-1m XGBRanker Walk Forward 2022-2026 前10只研究 alpha-1d-1m-xgb-ranker-walk-forward-2022-2026-top10 wh-strategy-v2 活跃 7 7 51 3.83 MB 2026/6/4 22:01:07":
+        - cell "alpha-1d 与 alpha-1m XGBRanker Walk Forward 2022-2026 前10只研究 alpha-1d-1m-xgb-ranker-walk-forward-2022-2026-top10":
+          - button "alpha-1d 与 alpha-1m XGBRanker Walk Forward 2022-2026 前10只研究"
+          - generic: alpha-1d-1m-xgb-ranker-walk-forward-2022-2026-top10
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "7"
+        - cell "7"
+        - cell "51"
+        - cell "3.83 MB"
+        - cell "2026/6/4 22:01:07"
+      - row "HFT 1分钟市场相对结构因子研究 hft-market-structure wh-strategy-v2 活跃 3 234 1626 341.4 MB 2026/6/4 23:42:31":
+        - cell "HFT 1分钟市场相对结构因子研究 hft-market-structure":
+          - button "HFT 1分钟市场相对结构因子研究"
+          - generic: hft-market-structure
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "234"
+        - cell "1626"
+        - cell "341.4 MB"
+        - cell "2026/6/4 23:42:31"
+      - row "HFT 1分钟状态切分因子研究 hft-state-split wh-strategy-v2 活跃 5 341 2370 477.3 MB 2026/6/5 11:45:51":
+        - cell "HFT 1分钟状态切分因子研究 hft-state-split":
+          - button "HFT 1分钟状态切分因子研究"
+          - generic: hft-state-split
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "341"
+        - cell "2370"
+        - cell "477.3 MB"
+        - cell "2026/6/5 11:45:51"
+      - row "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext wh-strategy-v2 活跃 5 387 2713 559.9 MB 2026/6/10 00:15:11":
+        - cell "HFT 1分钟市场相对资金流扩展因子研究 hft-market-flow-ext":
+          - button "HFT 1分钟市场相对资金流扩展因子研究"
+          - generic: hft-market-flow-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "5"
+        - cell "387"
+        - cell "2713"
+        - cell "559.9 MB"
+        - cell "2026/6/10 00:15:11"
+      - row "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext wh-strategy-v2 活跃 4 346 2397 488.9 MB 2026/6/5 14:58:29":
+        - cell "HFT 1分钟日内路径扩展因子研究 hft-intraday-path-ext":
+          - button "HFT 1分钟日内路径扩展因子研究"
+          - generic: hft-intraday-path-ext
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "346"
+        - cell "2397"
+        - cell "488.9 MB"
+        - cell "2026/6/5 14:58:29"
+      - row "HFT 1分钟收益成交状态因子研究 hft-return-volume-state wh-strategy-v2 活跃 4 382 2672 563.3 MB 2026/6/5 16:06:00":
+        - cell "HFT 1分钟收益成交状态因子研究 hft-return-volume-state":
+          - button "HFT 1分钟收益成交状态因子研究"
+          - generic: hft-return-volume-state
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "382"
+        - cell "2672"
+        - cell "563.3 MB"
+        - cell "2026/6/5 16:06:00"
+      - row "HFT 1分钟成交节奏因子研究 hft-liquidity-timing wh-strategy-v2 活跃 4 364 2532 536.6 MB 2026/6/5 19:20:13":
+        - cell "HFT 1分钟成交节奏因子研究 hft-liquidity-timing":
+          - button "HFT 1分钟成交节奏因子研究"
+          - generic: hft-liquidity-timing
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "364"
+        - cell "2532"
+        - cell "536.6 MB"
+        - cell "2026/6/5 19:20:13"
+      - row "alpha-1m 因子池诊断 alpha-1m-factor-pool-diagnostics wh-strategy-v2 活跃 3 3 12 120.4 KB 2026/6/5 19:31:13":
+        - cell "alpha-1m 因子池诊断 alpha-1m-factor-pool-diagnostics":
+          - button "alpha-1m 因子池诊断"
+          - generic: alpha-1m-factor-pool-diagnostics
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "3"
+        - cell "12"
+        - cell "120.4 KB"
+        - cell "2026/6/5 19:31:13"
+      - row "HFT 1分钟同分钟成交节奏因子研究 hft-same-minute-profile wh-strategy-v2 活跃 4 5 22 489.4 KB 2026/6/10 10:22:50":
+        - cell "HFT 1分钟同分钟成交节奏因子研究 hft-same-minute-profile":
+          - button "HFT 1分钟同分钟成交节奏因子研究"
+          - generic: hft-same-minute-profile
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "5"
+        - cell "22"
+        - cell "489.4 KB"
+        - cell "2026/6/10 10:22:50"
+      - row "HFT 1分钟冲击后修复/回吐因子研究 hft-shock-repair wh-strategy-v2 活跃 2 2 6 60.9 KB 2026/6/6 01:38:35":
+        - cell "HFT 1分钟冲击后修复/回吐因子研究 hft-shock-repair":
+          - button "HFT 1分钟冲击后修复/回吐因子研究"
+          - generic: hft-shock-repair
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "2"
+        - cell "2"
+        - cell "6"
+        - cell "60.9 KB"
+        - cell "2026/6/6 01:38:35"
+      - row "HFT 1分钟主动买卖压力代理因子研究 hft-active-pressure wh-strategy-v2 活跃 4 4 12 163.4 KB 2026/6/6 18:10:43":
+        - cell "HFT 1分钟主动买卖压力代理因子研究 hft-active-pressure":
+          - button "HFT 1分钟主动买卖压力代理因子研究"
+          - generic: hft-active-pressure
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "4"
+        - cell "4"
+        - cell "12"
+        - cell "163.4 KB"
+        - cell "2026/6/6 18:10:43"
+      - row "HFT 1分钟状态转移与极端簇因子研究 hft-state-transition wh-strategy-v2 活跃 3 3 8 61.4 KB 2026/6/6 18:25:10":
+        - cell "HFT 1分钟状态转移与极端簇因子研究 hft-state-transition":
+          - button "HFT 1分钟状态转移与极端簇因子研究"
+          - generic: hft-state-transition
+        - cell "wh-strategy-v2"
+        - cell "活跃":
+          - generic: 活跃
+        - cell "3"
+        - cell "3"
+        - cell "8"
+        - cell "61.4 KB"
+        - cell "2026/6/6 18:25:10"
