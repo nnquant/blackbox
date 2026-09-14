@@ -224,7 +224,7 @@ function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId,
   }, [data?.summary?.runs, data?.researches?.length]);
   const currentProjectId = selectedProjectId || researches.find((r) => r.id === selectedResearchId)?.project_id || null;
   const isOpen = (id) => open.has(id) || id === currentProjectId;
-  const toggle = (id) => setOpen((current) => { const next = new Set(current); if (next.has(id) || id === currentProjectId) { next.delete(id); if (id === currentProjectId) next.add(`closed:${id}`); } else next.add(id); return next; });
+  const toggle = (id) => setOpen((current) => { const next = new Set(current); if (next.has(`closed:${id}`)) { next.delete(`closed:${id}`); next.add(id); } else if (next.has(id) || id === currentProjectId) { next.delete(id); if (id === currentProjectId) next.add(`closed:${id}`); } else next.add(id); return next; });
   const closed = (id) => open.has(`closed:${id}`);
   const runCount = (pred) => runs.filter(pred).length;
   const familyColor = { active: 'rgb(var(--c-info))', accepted: 'rgb(var(--c-positive))', kept: 'rgb(var(--c-purple))', ended: 'rgb(var(--c-subtle))' };
@@ -238,8 +238,7 @@ function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId,
           const projectResearches = researches.filter((r) => r.project_id === project.id);
           return (
             <li key={project.id}>
-              <button className={`row lv1 ${active === 'project' && selectedProjectId === project.id ? 'on' : ''}`} type="button" onClick={() => selectProject(project.id)}>
-                <span className="tw" role="presentation" onClick={(e) => { e.stopPropagation(); toggle(project.id); }}>{expanded ? '▾' : '▸'}</span>
+              <button className={`row lv1 ${active === 'project' && selectedProjectId === project.id ? 'on' : ''}`} type="button" aria-expanded={expanded} onClick={() => { if (active === 'project' && selectedProjectId === project.id) toggle(project.id); selectProject(project.id); }}>
                 <span className="lbl">{project.title || project.key}</span>
                 <span className="n">{runCount((run) => run.project_id === project.id)}</span>
               </button>
