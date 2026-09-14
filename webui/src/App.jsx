@@ -26,6 +26,7 @@ import {
   Moon,
   Network,
   Pencil,
+  Pin,
   PlusCircle,
   RefreshCw,
   Search,
@@ -1918,14 +1919,31 @@ function ResearchTable({ rows, branches = [], runs = [], onSelect, onSelectRun }
 }
 
 function ProjectTable({ rows, workspaces, researches, runs, onSelect }) {
+  const [pinnedIds, setPinnedIds] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('blackbox.pinnedProjects') || '[]');
+      return Array.isArray(saved) ? saved.filter((id) => typeof id === 'string') : [];
+    } catch { return []; }
+  });
+  const [pinError, setPinError] = useState('');
+  const togglePin = (id) => {
+    const next = pinnedIds.includes(id) ? pinnedIds.filter((item) => item !== id) : [...pinnedIds, id];
+    setPinnedIds(next);
+    try {
+      window.localStorage.setItem('blackbox.pinnedProjects', JSON.stringify(next));
+      setPinError('');
+    } catch { setPinError('浏览器无法保存置顶设置，本次排序仅临时生效。'); }
+  };
   const workspaceById = Object.fromEntries((workspaces || []).map((workspace) => [workspace.id, workspace]));
   const sortedRows = [...(rows || [])].sort((a, b) => (
-    latestRunMillisForProject(b, runs) - latestRunMillisForProject(a, runs)
+    Number(pinnedIds.includes(b.id)) - Number(pinnedIds.includes(a.id))
+    || latestRunMillisForProject(b, runs) - latestRunMillisForProject(a, runs)
     || entityUpdatedMillis(b) - entityUpdatedMillis(a)
   ));
   return (
     <Panel className="overflow-hidden">
       <PanelHeader title="Projects" icon={Database} />
+      {pinError ? <p role="status" className="px-4 py-2 text-sm text-warning">{pinError}</p> : null}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse">
           <thead className="table-head">
@@ -1936,20 +1954,27 @@ function ProjectTable({ rows, workspaces, researches, runs, onSelect }) {
               <th className="px-4 py-3 text-right">{t("Researches")}</th>
               <th className="px-4 py-3 text-right">{t("Runs")}</th>
               <th className="px-4 py-3 text-right">{t("Updated")}</th>
+              <th className="px-4 py-3 text-right">操作</th>
             </tr>
           </thead>
           <tbody>
             {sortedRows.length ? sortedRows.map((row) => (
               <tr className="cursor-pointer transition hover:bg-white/45" key={row.id} onClick={() => onSelect(row.id)}>
-                <td className="table-cell font-semibold text-ink">{row.title || row.key}</td>
+                <td className="table-cell font-semibold text-ink"><span className="inline-flex items-center gap-2">{pinnedIds.includes(row.id) ? <Pin className="h-4 w-4 shrink-0 text-accent" aria-label="已置顶" /> : null}{row.title || row.key}</span></td>
                 <td className="table-cell text-muted">{row.key}</td>
                 <td className="table-cell text-muted">{row.workspace_key || workspaceById[row.workspace_id]?.key || row.workspace_id || '--'}</td>
                 <td className="table-cell text-right">{row.research_count ?? researches.filter((item) => item.project_id === row.id).length}</td>
                 <td className="table-cell text-right">{row.run_count ?? runs.filter((item) => item.project_id === row.id).length}</td>
                 <td className="table-cell text-right text-muted">{formatDate(row.updated_at)}</td>
+                <td className="table-cell" onClick={(event) => event.stopPropagation()}>
+                  <div className="flex justify-end gap-2 whitespace-nowrap">
+                    <button type="button" className="secondary-button" aria-pressed={pinnedIds.includes(row.id)} aria-label={`${pinnedIds.includes(row.id) ? '取消置顶' : '置顶'} ${row.title || row.key}`} title="置顶设置保存在当前浏览器" onClick={() => togglePin(row.id)}><Pin className="h-4 w-4" aria-hidden="true" />{pinnedIds.includes(row.id) ? '取消置顶' : '置顶'}</button>
+                    <button type="button" className="secondary-button" aria-label={`打开项目 ${row.title || row.key}`} onClick={() => onSelect(row.id)}><ExternalLink className="h-4 w-4" aria-hidden="true" />打开项目</button>
+                  </div>
+                </td>
               </tr>
             )) : (
-              <tr><td className="table-cell text-muted" colSpan="6">{t("No projects yet.")}</td></tr>
+              <tr><td className="table-cell text-muted" colSpan="7">{t("No projects yet.")}</td></tr>
             )}
           </tbody>
         </table>
