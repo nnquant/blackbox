@@ -3730,7 +3730,7 @@ function SortableHeader({ label, sortKey, sort, onSort }) {
   return (
     <button className="inline-flex items-center gap-1 text-left uppercase hover:text-ink" type="button" onClick={() => onSort(sortKey)}>
       <span>{tx(label)}</span>
-      <span className={`text-[10px] ${active ? 'text-ink' : 'text-muted/50'}`}>{active ? (sort.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+      <span className={`text-xs ${active ? 'text-ink' : 'text-muted'}`}>{active ? (sort.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
     </button>
   );
 }
