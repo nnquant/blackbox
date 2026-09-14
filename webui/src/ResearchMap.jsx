@@ -606,7 +606,7 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
   const [query, setQuery] = usePageQuery('/maps', 'query', '');
   useEffect(() => {
     let cancelled = false;
-    apiGet('/api/v1/research-maps').then((payload) => { if (!cancelled) { setMaps(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
+    apiGet('/api/v1/research-maps?include_evidence=false').then((payload) => { if (!cancelled) { setMaps(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
   }, [refreshToken, retry]);
   const rows = (maps || []).filter(map => [map.title,map.key,map.project_key,map.research_key].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
@@ -659,7 +659,7 @@ export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelect
   useEffect(() => {
     if (!scopeId) { setMaps(null); return undefined; }
     let cancelled = false;
-    apiGet(`/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps`).then((payload) => { if (!cancelled) { setMaps(payload); setListError(null); } }).catch(err => { if (!cancelled) setListError(err.message); });
+    apiGet(`/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps?include_evidence=false`).then((payload) => { if (!cancelled) { setMaps(payload); setListError(null); } }).catch(err => { if (!cancelled) setListError(err.message); });
     return () => { cancelled = true; };
   }, [scope, scopeId, refreshToken, retry]);
   const rows = maps || [];
@@ -692,7 +692,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
   useEffect(() => {
     if (!researchId) { setMaps(null); setMapId(null); return undefined; }
     let cancelled = false;
-    apiGet(`/api/v1/researches/${researchId}/research-maps`).then((payload) => { if (!cancelled) { setListError(null); setMaps(payload); setMapId((current) => (payload.some((m) => m.id === current) ? current : payload[0]?.id || null)); } }).catch(err => { if (!cancelled) setListError(err.message); });
+    apiGet(`/api/v1/researches/${researchId}/research-maps?include_evidence=false`).then((payload) => { if (!cancelled) { setListError(null); setMaps(payload); setMapId((current) => (payload.some((m) => m.id === current) ? current : payload[0]?.id || null)); } }).catch(err => { if (!cancelled) setListError(err.message); });
     return () => { cancelled = true; };
   }, [researchId, refreshToken, retry]);
   const { map, error: mapError, reload } = useMap(mapId, refreshToken);

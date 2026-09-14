@@ -286,3 +286,31 @@ def test_cli_map_commands_build_expected_requests(monkeypatch, tmp_path: Path) -
 
     run(["run", "start", "--project", "alpha-lab", "--research", "r", "--branch", "b", "--name", "n", "--mode", "paper"])
     assert calls[-1]["json"]["mode"] == "paper"
+
+
+def test_map_list_skips_quality_and_detail_reuses_evidence(tmp_path, monkeypatch):
+    with make_client(tmp_path, monkeypatch) as client:
+        ctx = bootstrap(client)
+        project = ctx["project"]
+        research = ctx["research"]
+        run = next(iter(ctx["runs"].values()))
+        m = call(client, "POST", "/api/v1/research-maps", json={"project": project["id"], "research": research["id"], "key": "perf", "title": "Performance"})
+        for key in ["base", "same"]:
+            call(client, "POST", f"/api/v1/research-maps/{m['id']}/nodes", json={"key": key, "title": key, "binding": {"kind": "run", "id": run["id"]}})
+        call(client, "POST", f"/api/v1/research-maps/{m['id']}/baseline", json={"node_key": "base"})
+        module = importlib.import_module("blackbox_server.main")
+        checked = []
+        def report(db, item):
+            checked.append(item.id)
+            return {"severity": "ok"}
+        monkeypatch.setattr(module, "run_quality_gate_report", report)
+        for url in ["/api/v1/research-maps", f"/api/v1/projects/{project['id']}/research-maps", f"/api/v1/researches/{research['id']}/research-maps"]:
+            rows = call(client, "GET", url, params={"include_evidence": "false"})
+            assert rows[0]["baseline"]["run"]["id"] == run["id"]
+            assert "metrics" in rows[0]["baseline"]["run"]
+        assert checked == []
+        full = call(client, "GET", f"/api/v1/research-maps/{m['id']}")
+        assert checked == [run["id"]]
+        assert all(n["binding"]["run"]["quality"]["severity"] == "ok" for n in full["nodes"])
+        call(client, "GET", f"/api/v1/research-maps/{m['id']}")
+        assert checked == [run["id"], run["id"]]  # no cross-request stale quality cache

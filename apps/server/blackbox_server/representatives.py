@@ -1,10 +1,24 @@
 """Representative selection, without changing research decisions or execution state."""
 from datetime import datetime, timezone
 import math
+from types import SimpleNamespace
 
 from sqlalchemy import select
 
 from .models import ResearchMap, ResearchMapNode
+from .models import Run
+
+
+def representative_rows(db, metric="strategy.summary.sharpe", branch_ids=None):
+    namespace, _, _ = metric.rpartition(".")
+    query = select(Run.id, Run.branch_id, Run.status, Run.updated_at, Run.created_at,
+                   Run.summary_json[namespace].label("metrics"))
+    if branch_ids is not None:
+        query = query.where(Run.branch_id.in_(branch_ids))
+    for row in db.execute(query.execution_options(yield_per=200)):
+        yield SimpleNamespace(id=row.id, branch_id=row.branch_id, status=row.status,
+                              updated_at=row.updated_at, created_at=row.created_at,
+                              summary_json={namespace: row.metrics or {}})
 
 
 def manual_baseline_ids(db):

@@ -103,7 +103,7 @@ from .models import (
 )
 from .realtime import event_hub, publish_change
 from .research_maps import register_research_map_routes
-from .representatives import choose_representative, manual_baseline_ids
+from .representatives import choose_representative, manual_baseline_ids, representative_rows
 from .settings import get_settings
 from .storage import get_artifact_content_target, get_storage
 from .workers import get_worker
@@ -2155,13 +2155,14 @@ def dashboard_champion_runs_by_research(
 ) -> dict[str, dict[str, Any]]:
     # Read lightweight rows once; hydrate only the chosen representatives.
     pins = manual_baseline_ids(db)
-    rows = db.execute(select(Run.id, Run.branch_id, Run.summary_json, Run.status, Run.updated_at, Run.created_at)).all()
+    rows = representative_rows(db)
     grouped = {}
     for row in rows:
         branch = branch_by_id.get(row.branch_id)
         if branch:
-            grouped.setdefault(branch.research_id, []).append(row)
-    chosen = {key: choose_representative(items, pins).id for key, items in grouped.items()}
+            previous = grouped.get(branch.research_id)
+            grouped[branch.research_id] = choose_representative([previous, row] if previous else [row], pins)
+    chosen = {key: row.id for key, row in grouped.items()}
     selected = db.scalars(select(Run).where(Run.id.in_(chosen.values()))).all() if chosen else []
     by_id = {run.id: run for run in selected}
     return {key: {**run_summary_for_dashboard(by_id[ident], branch_by_id, research_by_id, project_by_id),

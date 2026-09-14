@@ -13,7 +13,7 @@ decision, or moves the baseline on its own.
 
 from __future__ import annotations
 
-from .representatives import choose_representative, manual_baseline_ids
+from .representatives import choose_representative, manual_baseline_ids, representative_rows
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -223,14 +223,25 @@ def run_quality(db: Session, run: Run) -> dict[str, Any]:
         return {"severity": "pending", "error_count": 0, "warning_count": 0}
     from .main import run_quality_gate_report
 
+    cache = db.info.get("map_detail_cache")
+    key = ("quality", run.id)
+    if cache is not None and key in cache:
+        return cache[key]
     try:
         report = run_quality_gate_report(db, run)
     except Exception:  # pragma: no cover - evidence must never break the map
         return {"severity": "unknown", "error_count": 0, "warning_count": 0}
-    return {"severity": report.get("severity"), "error_count": report.get("error_count", 0), "warning_count": report.get("warning_count", 0)}
+    result = {"severity": report.get("severity"), "error_count": report.get("error_count", 0), "warning_count": report.get("warning_count", 0)}
+    if cache is not None:
+        cache[key] = result
+    return result
 
 
 def run_evidence(db: Session, run: Run, primary_metric: str, *, with_notes: bool = True) -> dict[str, Any]:
+    cache = db.info.get("map_detail_cache")
+    key = ("evidence", run.id, primary_metric, with_notes)
+    if cache is not None and key in cache:
+        return cache[key]
     artifacts = db.scalars(select(Artifact).where(Artifact.run_id == run.id)).all()
     notes: list[dict[str, Any]] = []
     if with_notes:
@@ -242,7 +253,7 @@ def run_evidence(db: Session, run: Run, primary_metric: str, *, with_notes: bool
             for n in rows
         ]
     has_summary = bool(run.summary_json) and any(metric_value(run.summary_json, path) is not None for _, path in STANDARD_METRICS)
-    return {
+    result = {
         "id": run.id,
         "name": run.name,
         "title": run.title,
@@ -257,10 +268,25 @@ def run_evidence(db: Session, run: Run, primary_metric: str, *, with_notes: bool
         "notes": notes,
     }
 
+    if cache is not None:
+        cache[key] = result
+    return result
+
 
 def branch_champion(db: Session, branch: Branch, primary_metric: str) -> Run | None:
-    runs = db.scalars(select(Run).where(Run.branch_id == branch.id)).all()
-    return choose_representative(runs, manual_baseline_ids(db), primary_metric)
+    cache = db.info.get("map_detail_cache")
+    key = ("champion", branch.id, primary_metric)
+    if cache is not None and key in cache:
+        return cache[key]
+    pins = manual_baseline_ids(db)
+    rows = representative_rows(db, primary_metric, [branch.id])
+    chosen = None
+    for row in rows:
+        chosen = choose_representative([chosen, row] if chosen else [row], pins, primary_metric)
+    result = db.get(Run, chosen.id) if chosen else None
+    if cache is not None:
+        cache[key] = result
+    return result
 
 
 def resolve_binding(db: Session, node: ResearchMapNode, primary_metric: str) -> dict[str, Any] | None:
@@ -413,7 +439,7 @@ def counts_for(nodes: list[ResearchMapNode]) -> dict[str, Any]:
     return {"stages": stages, "decisions": decisions, "families": families, "undecided": sum(1 for n in nodes if not n.decision)}
 
 
-def map_summary(db: Session, research_map: ResearchMap, nodes: list[ResearchMapNode] | None = None) -> dict[str, Any]:
+def map_summary(db: Session, research_map: ResearchMap, nodes: list[ResearchMapNode] | None = None, *, include_evidence: bool = True) -> dict[str, Any]:
     nodes = map_nodes(db, research_map) if nodes is None else nodes
     project = db.get(Project, research_map.project_id)
     research = db.get(Research, research_map.research_id) if research_map.research_id else None
@@ -421,7 +447,7 @@ def map_summary(db: Session, research_map: ResearchMap, nodes: list[ResearchMapN
     baseline_summary = None
     if baseline:
         run = bound_run(db, baseline, research_map.primary_metric)
-        baseline_summary = {"key": baseline.key, "title": baseline.title, "stage": baseline.stage, "decision": baseline.decision, "run": run_evidence(db, run, research_map.primary_metric, with_notes=False) if run else None}
+        baseline_summary = {"key": baseline.key, "title": baseline.title, "stage": baseline.stage, "decision": baseline.decision, "run": (run_evidence(db, run, research_map.primary_metric, with_notes=False) if include_evidence else {"id": run.id, "metrics": run_metrics(run, research_map.primary_metric)}) if run else None}
     latest = sorted(nodes, key=lambda n: n.updated_at or n.created_at, reverse=True)
     return {
         "id": research_map.id,
@@ -454,15 +480,19 @@ def map_summary(db: Session, research_map: ResearchMap, nodes: list[ResearchMapN
 
 
 def map_detail(db: Session, research_map: ResearchMap) -> dict[str, Any]:
-    nodes = map_nodes(db, research_map)
-    key_by_id = {node.id: node.key for node in nodes}
-    mainline = mainline_keys(nodes, research_map.baseline_node_key)
-    now = datetime.now(timezone.utc)
-    rows = [node_read(db, node, key_by_id, research_map, mainline, now) for node in nodes]
-    data = map_summary(db, research_map, nodes)
-    data["nodes"] = rows
-    data["tree"] = build_tree(rows)
-    return data
+    db.info["map_detail_cache"] = {}
+    try:
+        nodes = map_nodes(db, research_map)
+        key_by_id = {node.id: node.key for node in nodes}
+        mainline = mainline_keys(nodes, research_map.baseline_node_key)
+        now = datetime.now(timezone.utc)
+        rows = [node_read(db, node, key_by_id, research_map, mainline, now) for node in nodes]
+        data = map_summary(db, research_map, nodes)
+        data["nodes"] = rows
+        data["tree"] = build_tree(rows)
+        return data
+    finally:
+        db.info.pop("map_detail_cache", None)
 
 
 def single_node(db: Session, research_map: ResearchMap, node: ResearchMapNode) -> dict[str, Any]:
@@ -951,6 +981,7 @@ def register_research_map_routes(app: FastAPI) -> None:
         research_id: str | None = None,
         key: str | None = None,
         status: str | None = None,
+        include_evidence: bool = True,
         db: Session = Depends(get_db),
     ) -> dict[str, Any]:
         query = select(ResearchMap)
@@ -968,20 +999,20 @@ def register_research_map_routes(app: FastAPI) -> None:
         if status:
             query = query.where(ResearchMap.status == status)
         items = db.scalars(query.order_by(ResearchMap.updated_at.desc())).all()
-        return ok([map_summary(db, item) for item in items])
+        return ok([map_summary(db, item, include_evidence=include_evidence) for item in items])
 
     @app.get("/api/v1/projects/{project_id}/research-maps")
-    def list_project_research_maps(project_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
+    def list_project_research_maps(project_id: str, include_evidence: bool = True, db: Session = Depends(get_db)) -> dict[str, Any]:
         project = resolve_project_ref(db, project_id)
         items = db.scalars(select(ResearchMap).where(ResearchMap.project_id == project.id).order_by(ResearchMap.updated_at.desc())).all()
-        return ok([map_summary(db, item) for item in items])
+        return ok([map_summary(db, item, include_evidence=include_evidence) for item in items])
 
     @app.get("/api/v1/researches/{research_id}/research-maps")
-    def list_research_research_maps(research_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
+    def list_research_research_maps(research_id: str, include_evidence: bool = True, db: Session = Depends(get_db)) -> dict[str, Any]:
         research = db.get(Research, research_id)
         if not research:
             raise ApiError(ErrorCode.not_found, "research not found")
-        return ok([map_summary(db, item) for item in maps_for_research(db, research)])
+        return ok([map_summary(db, item, include_evidence=include_evidence) for item in maps_for_research(db, research)])
 
     @app.post("/api/v1/research-maps/import")
     def import_research_map_document(payload: ResearchMapDocumentImport, db: Session = Depends(get_db)) -> dict[str, Any]:

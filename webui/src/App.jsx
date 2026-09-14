@@ -220,7 +220,7 @@ function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId,
   const [mapError, setMapError] = useState(null);
   useEffect(() => {
     let cancelled = false;
-    apiGet('/api/v1/research-maps').then((rows) => { if (!cancelled) { setMaps(rows || []); setMapError(null); } }).catch(err => { if (!cancelled) setMapError(err.message); });
+    apiGet('/api/v1/research-maps?include_evidence=false').then((rows) => { if (!cancelled) { setMaps(rows || []); setMapError(null); } }).catch(err => { if (!cancelled) setMapError(err.message); });
     return () => { cancelled = true; };
   }, [data?.summary?.runs, data?.researches?.length]);
   const currentProjectId = selectedProjectId || researches.find((r) => r.id === selectedResearchId)?.project_id || null;
