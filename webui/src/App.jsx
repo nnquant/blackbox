@@ -10595,7 +10595,7 @@ function monthlyReturnHeatmapOption(heatmap) {
       axisLine: { lineStyle: { color: tone('line') } },
       axisTick: { show: false },
       axisLabel: { color: tone('muted'), fontSize: 13, fontWeight: 600 },
-      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.18)'] } },
+      splitArea: { show: true, areaStyle: { color: [tone('surface2'), tone('panel2')] } },
     },
     yAxis: {
       type: 'category',
@@ -10604,7 +10604,7 @@ function monthlyReturnHeatmapOption(heatmap) {
       axisLine: { lineStyle: { color: tone('line') } },
       axisTick: { show: false },
       axisLabel: { color: tone('ink'), fontSize: 13, fontWeight: 700 },
-      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)'] } },
+      splitArea: { show: false },
     },
     visualMap: {
       type: 'piecewise',
@@ -10638,13 +10638,13 @@ function monthlyReturnHeatmapOption(heatmap) {
 }
 
 function monthlyReturnHeatmapCell(value, itemStyle = {}) {
-  const cellValue = Number(value[2]);
-  let labelColor = tone('ink');
-  if (Math.abs(cellValue) >= 0.15) labelColor = '#ffffff';
+  // The fixed red/green scale has light fills in both themes, including its extremes.
+  const labelColor = '#171614';
   return {
     value,
     itemStyle,
     label: { color: labelColor },
+    emphasis: { label: { color: labelColor } },
   };
 }
 
