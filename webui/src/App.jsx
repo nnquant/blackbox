@@ -7660,15 +7660,38 @@ function seriesChartOption(name, byRun, runById) {
   return {
     animation: false,
     color: CHART_SERIES_COLORS,
-    tooltip: { trigger: 'axis' },
-    legend: { top: 0, type: 'scroll' },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: tone('raised'),
+      borderColor: tone('lineStrong'),
+      textStyle: { color: tone('ink') },
+      axisPointer: { lineStyle: { color: tone('subtle'), type: 'dashed' } },
+    },
+    legend: {
+      top: 0, type: 'scroll',
+      textStyle: { color: tone('muted') },
+      inactiveColor: tone('dim'),
+      pageTextStyle: { color: tone('muted') },
+      pageIconColor: tone('subtle'),
+      pageIconInactiveColor: tone('lineStrong'),
+    },
     grid: { top: 42, left: 48, right: 24, bottom: 36 },
     xAxis: {
       type: xAxisType,
       boundaryGap: false,
       ...(categoryValues ? { data: categoryValues } : {}),
+      axisLine: { lineStyle: { color: tone('lineStrong') } },
+      axisTick: { show: false },
+      axisLabel: { color: tone('subtle'), hideOverlap: true },
+      splitLine: { show: false },
     },
-    yAxis: { type: 'value', scale: true },
+    yAxis: {
+      type: 'value', scale: true,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: tone('subtle') },
+      splitLine: { lineStyle: { color: tone('line'), type: 'dashed' } },
+    },
     series: seriesItems.length ? seriesItems : [{ name, type: 'line', showSymbol: false, data: [] }],
   };
 }
