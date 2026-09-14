@@ -745,10 +745,12 @@ WebUI Quick Compare is available on Project, Research, and Branch pages. Single 
 
 Target resolution:
 
-- Project page compares each child Research target by its representative completed run.
-- Research page compares each child Branch target by its representative completed run.
+- Project page compares each child Research target by its representative Run.
+- Research page compares each child Branch target by its representative Run.
 - Branch page compares the branch's Run targets directly.
-- A Project / Research / Branch target resolves to the completed run with the highest `strategy.summary.sharpe`; if no completed run exists, it falls back to the latest available run.
+- Within the target's candidate scope, select the manual baseline first, otherwise the completed Run with the highest valid `strategy.summary.sharpe`, otherwise the latest available Run. Research maps use their configured `primary_metric` for the metric fallback.
+- A manual baseline is a Run explicitly bound to the baseline node of an active research map. A baseline node bound to a Branch or Research resolves dynamic evidence and does not pin a Run. If several maps pin different candidate Runs, select the most recent candidate; do not change any map's baseline pointer.
+- Zero and negative metric values are valid. Missing, empty, boolean, and non-finite values do not participate in metric ranking. A manual or latest fallback Run need not be completed; selection does not indicate research approval, and comparison result quality gates still apply.
 
 Quick Compare only expects two data surfaces:
 
