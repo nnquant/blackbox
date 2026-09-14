@@ -645,7 +645,9 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
   const decisionRuns = researches.map(research => researchChampionRun(research, branches, runs)).filter(Boolean).slice(0, 8);
   return (
     <div className="space-y-4">
-      <Hero eyebrow="Workspace" title="研究总览" description="全工作区 · 先查看运行异常与近期证据，再进入研究线。质量提示不代表研究评审通过。" />
+      <Hero eyebrow="Workspace" title="研究总览" description="全工作区 · 查看活动历史与项目进展。质量提示不代表研究评审通过。" />
+      <DashboardActivityHeatmap data={data} />
+      <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
       <div className="dashboard-stats-grid">
         <StatTile label="Runs Today" value={summary.today_runs ?? windowStats.runsToday} tone="positive" />
         <StatTile label="Running" value={summary.running_runs || 0} tone="warning" />
@@ -662,8 +664,6 @@ function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRu
           <DecisionCandidatesPanel runs={decisionRuns} onSelectRun={selectRun} />
         </div>
       </div>
-      <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
-      <DashboardActivityHeatmap data={data} />
       <DashboardCollapsedSection title="System Overview">
         <div className="space-y-4 p-3">
           <DashboardActivityTimeline data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} />
