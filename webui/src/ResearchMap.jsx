@@ -453,7 +453,14 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
     pendingFocus.current = { key };
   }, [index]);
   const pick = (key) => { setSelectedKey(key); setTab('node'); };
-  useEffect(() => { if (locate?.key) reveal(locate.key); }, [locate?.key, locate?.nonce, reveal]);
+  const handledLocate = useRef(null);
+  useEffect(() => {
+    if (!locate?.key) return;
+    const request = JSON.stringify([map.id, locate.key, locate.nonce]);
+    if (handledLocate.current === request || !index.byKey[locate.key]) return;
+    handledLocate.current = request;
+    reveal(locate.key);
+  }, [map.id, locate?.key, locate?.nonce, index, reveal]);
   useEffect(() => {
     if (!fullscreen) return undefined;
     const onKey = (e) => { if (e.key === 'Escape') { setFullscreen(false); pendingFocus.current = { fit: true }; } };
@@ -579,13 +586,13 @@ function useMap(mapId, refreshToken) {
   const [error, setError] = useState(null);
   const [retry, setRetry] = useState(0);
   useEffect(() => {
-    setMap(null); setError(null);
+    setError(null);
     if (!mapId) { setMap(null); return undefined; }
     let cancelled = false;
-    apiGet(`/api/v1/research-maps/${mapId}`).then((payload) => { if (!cancelled) { setMap(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
+    apiGet(`/api/v1/research-maps/${mapId}`).then((payload) => { if (!cancelled) { setMap(current => JSON.stringify(current) === JSON.stringify(payload) ? current : payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
   }, [mapId, refreshToken, retry]);
-  return { map, error, reload: () => setRetry(value => value + 1) };
+  return { map: map?.id === mapId ? map : null, error, reload: () => setRetry(value => value + 1) };
 }
 
 export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject, selectResearch, selectBranch, selectRun, selectCompareSet }) {
@@ -594,7 +601,7 @@ export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject
   if (selectedMapId) {
     if (error && !map) return <div className="space-y-3"><button className="secondary-button" type="button" onClick={() => selectMap(null)}>{t('All research maps')}</button><div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}</div><button className="secondary-button" onClick={reload} type="button">重试加载地图</button></div>;
     if (!map) return <div className="flex items-center gap-2 px-2 py-6 text-sm text-muted"><RefreshCw className="h-4 w-4 animate-spin" />{t('Loading')}</div>;
-    return <ResearchMapView key={map.id} map={map} nav={nav} />;
+    return <ResearchMapView key={map.id} map={map} nav={nav} headerExtra={error ? <button className="secondary-button text-negative" onClick={reload} title={error}>更新失败，点击重试</button> : null} />;
   }
   return <ResearchMapList refreshToken={data} onSelectMap={selectMap} selectProject={selectProject} selectResearch={selectResearch} />;
 }
@@ -708,7 +715,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     });
     onIndex({ byRun, byBranch, mapId: map.id });
   }, [map, onIndex]);
-  if (listError || mapError) return <section className="bento-panel p-4 text-sm text-negative">地图加载失败：{listError || mapError}<button className="secondary-button ml-3" onClick={() => { setRetry(value => value + 1); reload(); }}>重试</button></section>;
+  if ((listError || mapError) && !map) return <section className="bento-panel p-4 text-sm text-negative">地图加载失败：{listError || mapError}<button className="secondary-button ml-3" onClick={() => { setRetry(value => value + 1); reload(); }}>重试</button></section>;
   if (maps === null) return <p className="text-sm text-muted">加载地图中…</p>;
   if (!maps.length) {
     return (
@@ -723,7 +730,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     </select>
   ) : null;
   if (!map) return <section className="bento-panel px-4 py-3 text-sm text-muted"><RefreshCw className="inline h-4 w-4 animate-spin" /> {t('Loading')}</section>;
-  return <ResearchMapView key={map.id} map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={switcher} />;
+  return <ResearchMapView key={map.id} map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={<>{switcher}{listError || mapError ? <button className="secondary-button text-negative" title={listError || mapError} onClick={() => { setRetry(value => value + 1); reload(); }}>更新失败，点击重试</button> : null}</>} />;
 }
 
 /** Table cell: which map nodes bind this entity. */
