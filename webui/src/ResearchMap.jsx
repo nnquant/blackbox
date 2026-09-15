@@ -10,10 +10,10 @@ import { usePageQuery } from './pageState';
 // (metrics, quality gate, artifacts, decision notes) is read from the bound entity by the API.
 
 export const FAMILIES = {
-  active: { label: 'In progress', color: 'rgb(var(--c-info))', soft: 'rgb(var(--c-infoSoft))', hint: 'Idea to validation, undecided' },
-  accepted: { label: 'Accepted', color: 'rgb(var(--c-positive))', soft: 'rgb(var(--c-positiveSoft))', hint: 'Accepted: validation / tracking / simulation / live' },
-  kept: { label: 'Kept', color: 'rgb(var(--c-purple))', soft: 'rgb(var(--c-purple) / 0.16)', hint: 'Not on the mainline, kept as a lead' },
-  ended: { label: 'Ended', color: 'rgb(var(--c-subtle))', soft: 'rgb(var(--c-subtle) / 0.16)', hint: 'Rejected / superseded / retired' },
+  active: { label: 'In progress', color: 'var(--map-blue)', soft: 'color-mix(in srgb, var(--map-blue) 14%, var(--raised))', hint: 'Idea to validation, undecided' },
+  accepted: { label: 'Accepted', color: 'var(--map-mint)', soft: 'color-mix(in srgb, var(--map-mint) 14%, var(--raised))', hint: 'Accepted: validation / tracking / simulation / live' },
+  kept: { label: 'Kept', color: 'var(--map-lilac)', soft: 'color-mix(in srgb, var(--map-lilac) 14%, var(--raised))', hint: 'Not on the mainline, kept as a lead' },
+  ended: { label: 'Ended', color: 'var(--map-rose)', soft: 'color-mix(in srgb, var(--map-rose) 14%, var(--raised))', hint: 'Rejected / superseded / retired' },
 };
 export const STAGES = ['idea', 'hypothesis', 'experiment', 'validation', 'tracking', 'simulation', 'live', 'retired'];
 const STAGE_LABEL = { idea: 'Idea', hypothesis: 'Hypothesis', experiment: 'Experiment', validation: 'Validation', tracking: 'Tracking', simulation: 'Simulation', live: 'Live', retired: 'Retired' };
