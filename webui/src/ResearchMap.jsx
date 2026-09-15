@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ExternalLink, Maximize2, Minimize2, Network, RefreshCw } from 'lucide-react';
+import { ArrowRight, ExternalLink, Maximize2, Minimize2, Network, RefreshCw } from 'lucide-react';
 import { apiGet, artifactContentUrl } from './api';
 import { t } from './i18n';
 import { usePageQuery } from './pageState';
@@ -484,7 +484,7 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
         <button className="secondary-button" type="button" onClick={() => { setQuery(''); setHiddenFamilies(new Set()); setHiddenStages(new Set()); }}>清除高亮条件</button>
         <button className="secondary-button" type="button" onClick={() => canvasRef.current?.fit()}><Maximize2 className="h-4 w-4" />{t('Fit')}</button>
         {embedded ? <button className="secondary-button" type="button" onClick={() => { setFullscreen((f) => !f); pendingFocus.current = { fit: true }; }}>{fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}{fullscreen ? t('Exit fullscreen') : t('Fullscreen')}</button> : null}
-        {embedded && onOpenPage ? <button className="secondary-button" type="button" onClick={onOpenPage}>{t('Open map page')} →</button> : null}
+        {embedded && onOpenPage ? <button className="secondary-button" type="button" onClick={onOpenPage}>{t('Open map page')}<ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></button> : null}
       </div>
     </div>
   );
