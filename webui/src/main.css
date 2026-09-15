@@ -322,7 +322,7 @@ table thead.table-head th button:hover {
 }
 
 table td.table-cell {
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 table tbody tr:hover > td.table-cell {

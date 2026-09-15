@@ -1968,8 +1968,8 @@ function ProjectTable({ rows, workspaces, researches, runs, onSelect }) {
                 <td className="table-cell text-right text-muted">{formatDate(row.updated_at)}</td>
                 <td className="table-cell" onClick={(event) => event.stopPropagation()}>
                   <div className="flex justify-end gap-2 whitespace-nowrap">
-                    <button type="button" className="secondary-button" aria-pressed={pinnedIds.includes(row.id)} aria-label={`${pinnedIds.includes(row.id) ? '取消置顶' : '置顶'} ${row.title || row.key}`} title="置顶设置保存在当前浏览器" onClick={() => togglePin(row.id)}><Pin className="h-4 w-4" aria-hidden="true" />{pinnedIds.includes(row.id) ? '取消置顶' : '置顶'}</button>
-                    <button type="button" className="secondary-button" aria-label={`打开项目 ${row.title || row.key}`} onClick={() => onSelect(row.id)}><ExternalLink className="h-4 w-4" aria-hidden="true" />打开项目</button>
+                    <button type="button" className={`icon-button ${pinnedIds.includes(row.id) ? 'text-accent bg-accent/10' : ''}`} aria-pressed={pinnedIds.includes(row.id)} aria-label={`${pinnedIds.includes(row.id) ? '取消置顶' : '置顶'} ${row.title || row.key}`} title={pinnedIds.includes(row.id) ? '取消置顶' : '置顶（保存在当前浏览器）'} onClick={() => togglePin(row.id)}><Pin className="h-4 w-4" aria-hidden="true" /></button>
+                    <button type="button" className="icon-button" aria-label={`打开项目 ${row.title || row.key}`} title="打开项目" onClick={() => onSelect(row.id)}><ExternalLink className="h-4 w-4" aria-hidden="true" /></button>
                   </div>
                 </td>
               </tr>
@@ -11596,7 +11596,7 @@ function App() {
         onCreated={onCreated}
         onOpenSearch={() => setQuickRunSearchOpen(true)}
         contextNav={<ContextNav items={contextItems} />}
-        loading={loading}
+        loading={loading && !data}
         navigator={navigator}
         theme={theme}
         onToggleTheme={toggleTheme}
