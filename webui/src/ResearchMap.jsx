@@ -12,8 +12,8 @@ import { usePageQuery } from './pageState';
 export const FAMILIES = {
   active: { label: 'In progress', color: 'var(--map-blue)', soft: 'color-mix(in srgb, var(--map-blue) 14%, var(--raised))', hint: 'Idea to validation, undecided' },
   accepted: { label: 'Accepted', color: 'var(--map-mint)', soft: 'color-mix(in srgb, var(--map-mint) 14%, var(--raised))', hint: 'Accepted: validation / tracking / simulation / live' },
-  kept: { label: 'Kept', color: 'var(--map-lilac)', soft: 'color-mix(in srgb, var(--map-lilac) 14%, var(--raised))', hint: 'Not on the mainline, kept as a lead' },
-  ended: { label: 'Ended', color: 'var(--map-rose)', soft: 'color-mix(in srgb, var(--map-rose) 14%, var(--raised))', hint: 'Rejected / superseded / retired' },
+  kept: { label: 'Kept', color: 'var(--map-yellow)', soft: 'color-mix(in srgb, var(--map-yellow) 14%, var(--raised))', hint: 'Not on the mainline, kept as a lead' },
+  ended: { label: 'Ended', color: 'var(--map-gray)', soft: 'color-mix(in srgb, var(--map-gray) 14%, var(--raised))', hint: 'Rejected / superseded / retired' },
 };
 export const STAGES = ['idea', 'hypothesis', 'experiment', 'validation', 'tracking', 'simulation', 'live', 'retired'];
 const STAGE_LABEL = { idea: 'Idea', hypothesis: 'Hypothesis', experiment: 'Experiment', validation: 'Validation', tracking: 'Tracking', simulation: 'Simulation', live: 'Live', retired: 'Retired' };
@@ -224,7 +224,7 @@ export const TreeCanvas = forwardRef(function TreeCanvas({ index, collapsed, onT
                   onClick={() => onSelect(n.key)} onKeyDown={(e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); if (n.children.length && (e.key === 'ArrowLeft' ? !isCollapsed : isCollapsed)) onToggleCollapse(n.key); } if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(n.key); } }}>
                   <rect className="box" width={NW} height={NH} rx={3} />
                   <rect className="tag" x={0} y={0} width={5} height={NH} />
-                  <text className="t" x={12} y={17}>{(n.is_baseline ? '★ ' : '') + clip(n.title, primary ? 13 : 16)}</text>
+                  <text className="t" x={12} y={17}>{clip(n.title, primary ? 13 : 16)}</text>
                   <text className="d" x={12} y={31}>{clip(subLine(n), primary ? 18 : 24)}</text>
                   {primary ? <><text className="m" x={NW - 10} y={17}>{fmtNum(primary.value)}</text><text className="ml" x={NW - 10} y={31}>{metricLabel(primary.metric)}</text></> : (n.binding && density === 'metric' ? <text className="ml" x={NW - 10} y={31}>{n.binding.kind === 'compare_set' ? 'compare' : n.binding.kind}</text> : null)}
                   {n.flags?.includes('ready') ? <circle className="ready" cx={NW - 6} cy={6} r={4} /> : null}
@@ -292,7 +292,7 @@ export function NodeDetail({ node, index, map, onSelectNode, nav }) {
         <div className="hdrow">
           <span className="pill" style={{ '--c': fam.color, '--cs': fam.soft }}><i />{stageLabel(node)}</span>
           {node.decision ? <span className="pill dec" style={{ '--c': fam.color }}>{decisionLabel(node)}</span> : null}
-          {node.is_baseline ? <span className="pill" style={{ '--c': 'rgb(var(--c-accentInk))', '--cs': 'rgb(var(--c-accent))' }}>★ {t('Current baseline')}</span> : null}
+          {node.is_baseline ? <span className="pill" style={{ '--c': 'var(--map-red)', '--cs': 'var(--raised)' }}>{t('Current baseline')}</span> : null}
           {node.is_mainline && !node.is_baseline ? <span className="tag">{t('Mainline')}</span> : null}
           {node.parentNode ? <button className="parent" type="button" title={t('Jump to parent')} onClick={() => onSelectNode(node.parentNode.key)}><small>{t('Parent')}</small>{node.parentNode.title}</button> : null}
         </div>
@@ -545,7 +545,7 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
         <h4>{t('Current baseline')}</h4>
         {baseline ? (
           <button className="rmap-baseline" type="button" onClick={() => reveal(baseline.key)} title={t('Jump to the baseline node')}>
-            <span className="k">★ {baseline.title}</span>
+            <span className="k">{baseline.title}</span>
             {baseMetrics ? <>
               <span className="m"><small>{t('Annual')}</small>{fmtPct(baseMetrics.annual_return)}</span>
               <span className="m"><small>Sharpe</small>{fmtNum(baseMetrics.sharpe)}</span>
