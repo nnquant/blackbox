@@ -62,3 +62,19 @@ def test_migrate_adds_missing_columns_and_stamps_version(tmp_path: Path) -> None
     second = migrate_database(engine)
     assert second["added_columns"] == []
     assert second["applied"] is False
+
+
+def test_migration_adds_run_indexes_to_existing_table(tmp_path: Path) -> None:
+    from blackbox_server.migrations import migrate_database
+    engine = create_engine(f"sqlite:///{tmp_path / 'existing.db'}")
+    migrate_database(engine)
+    names = ['ix_runs_updated_id', 'ix_runs_created_id', 'ix_runs_branch_updated']
+    with engine.begin() as conn:
+        for name in names:
+            conn.execute(text(f'DROP INDEX {name}'))
+    migrate_database(engine)
+    assert set(names) <= {i['name'] for i in inspect(engine).get_indexes('runs')}
+    with engine.connect() as conn:
+        plan = conn.execute(text('EXPLAIN QUERY PLAN SELECT id FROM runs ORDER BY updated_at DESC, id DESC LIMIT 50')).all()
+    assert any('ix_runs_updated_id' in row[-1] for row in plan)
+    assert not any('TEMP B-TREE' in row[-1] for row in plan)

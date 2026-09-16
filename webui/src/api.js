@@ -4,9 +4,38 @@ const API_BASE = import.meta.env.VITE_BLACKBOX_API_BASE || '';
 const STATIC_TOKEN = import.meta.env.VITE_BLACKBOX_TOKEN || '';
 const TOKEN_STORAGE_KEY = 'blackbox.apiToken';
 
-export async function apiGet(path) {
-  const response = await fetch(`${API_BASE}${path}`, { headers: authHeaders() });
-  return unwrap(response);
+const reads = new Map();
+export function notifyDataChange(event = null) {
+  window.dispatchEvent(new CustomEvent('blackbox:data-change', { detail: event }));
+}
+
+// All readers of a URL share one in-flight request, including timers and live events.
+export function apiGet(path) {
+  const key = `${getApiToken()}:${path}`;
+  let entry = reads.get(key);
+  if (entry?.pending) return entry.pending;
+  if (!entry) { entry = {}; reads.set(key, entry); }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
+  entry.pending = (async () => {
+    const headers = authHeaders();
+    if (entry.etag) headers['If-None-Match'] = entry.etag;
+    const response = await fetch(`${API_BASE}${path}`, { headers, signal: controller.signal });
+    if (response.status === 304 && entry.value !== undefined) return entry.value;
+    const value = await unwrap(response);
+    entry.etag = response.headers.get('ETag');
+    const encoded = JSON.stringify(value);
+    if (entry.encoded !== encoded) { entry.value = value; entry.encoded = encoded; }
+    return entry.value;
+  })().finally(() => {
+    clearTimeout(timeout);
+    entry.pending = null;
+    if (reads.size > 100) for (const [oldKey, old] of reads) {
+      if (reads.size <= 100) break;
+      if (!old.pending && oldKey !== key) reads.delete(oldKey);
+    }
+  });
+  return entry.pending;
 }
 
 export async function apiPost(path, body) {

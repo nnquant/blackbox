@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
@@ -89,6 +89,11 @@ class Branch(TimestampMixin, Base):
 
 class Run(TimestampMixin, Base):
     __tablename__ = "runs"
+    __table_args__ = (
+        Index("ix_runs_updated_id", "updated_at", "id"),
+        Index("ix_runs_created_id", "created_at", "id"),
+        Index("ix_runs_branch_updated", "branch_id", "updated_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("run"))
     branch_id: Mapped[str] = mapped_column(ForeignKey("branches.id"), nullable=False, index=True)
