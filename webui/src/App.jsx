@@ -1,6 +1,7 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useId, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import ReactECharts from 'echarts-for-react';
+const ECharts = lazy(() => import('echarts-for-react'));
+function ReactECharts(props) { return <Suspense fallback={<div className="p-4 text-muted">加载图表…</div>}><ECharts {...props} /></Suspense>; }
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -40,7 +41,8 @@ import './index.css';
 import { savedPageQuery, usePageQuery } from './pageState';
 import { representativeRun, representativeReason } from './representative';
 import { compareScope } from './comparisonScope';
-import { apiGet, apiPatch, apiPost, apiUpload, artifactContentUrl, formatMetric, metricValue, websocketUrl } from './api';
+import { apiGet, apiPatch, apiPost, apiUpload, artifactContentUrl, formatMetric, metricValue, websocketUrl, notifyDataChange } from './api';
+import { OnDemand, Resource, Pager, useResource } from './onDemand';
 import { t, tStatus, tx } from './i18n';
 import { MapNodeCell, ResearchMapEmbed, ResearchMapsPage, ScopedResearchMapsPanel } from './ResearchMap';
 
@@ -211,78 +213,32 @@ function Sidebar({ active, onSelect, navigator }) {
 }
 
 function SidebarNavigator({ active, data, selectedProjectId, selectedResearchId, selectedBranchId, selectedMapId, selectProject, selectResearch, selectBranch, selectMap, onCreate }) {
-  const projects = data?.projects || [];
-  const researches = data?.researches || [];
-  const branches = data?.branches || [];
-  const runs = data?.runs || [];
-  const [open, setOpen] = useState(() => new Set());
-  const [maps, setMaps] = useState([]);
-  const [mapError, setMapError] = useState(null);
-  useEffect(() => {
-    let cancelled = false;
-    apiGet('/api/v1/research-maps?include_evidence=false').then((rows) => { if (!cancelled) { setMaps(rows || []); setMapError(null); } }).catch(err => { if (!cancelled) setMapError(err.message); });
-    return () => { cancelled = true; };
-  }, [data?.summary?.runs, data?.researches?.length]);
-  const currentProjectId = selectedProjectId || researches.find((r) => r.id === selectedResearchId)?.project_id || null;
-  const isOpen = (id) => open.has(id) || id === currentProjectId;
-  const toggle = (id) => setOpen((current) => { const next = new Set(current); if (next.has(`closed:${id}`)) { next.delete(`closed:${id}`); next.add(id); } else if (next.has(id) || id === currentProjectId) { next.delete(id); if (id === currentProjectId) next.add(`closed:${id}`); } else next.add(id); return next; });
-  const closed = (id) => open.has(`closed:${id}`);
-  const runCount = (pred) => runs.filter(pred).length;
-  const familyColor = { active: 'rgb(var(--c-info))', accepted: 'rgb(var(--c-positive))', kept: 'rgb(var(--c-purple))', ended: 'rgb(var(--c-subtle))' };
-  const branchColor = (branch) => ({ accepted: 'rgb(var(--c-positive))', rejected: 'rgb(var(--c-subtle))', archived: 'rgb(var(--c-subtle))', paused: 'rgb(var(--c-warning))' }[branch.status] || 'rgb(var(--c-info))');
-  return (
-    <>
-      <div className="side-h"><span>{t('Projects')}</span><button type="button" title={t('New project')} aria-label={t('New project')} onClick={() => onCreate('project')}>+</button></div>
-      <ul className="side-tree">
-        {projects.map((project) => {
-          const expanded = isOpen(project.id) && !closed(project.id);
-          const projectResearches = researches.filter((r) => r.project_id === project.id);
-          return (
-            <li key={project.id}>
-              <button className={`row lv1 ${active === 'project' && selectedProjectId === project.id ? 'on' : ''}`} type="button" aria-expanded={expanded} onClick={() => { if (active === 'project' && selectedProjectId === project.id) toggle(project.id); selectProject(project.id); }}>
-                <span className="lbl">{project.title || project.key}</span>
-                <span className="n">{runCount((run) => run.project_id === project.id)}</span>
-              </button>
-              {expanded ? (projectResearches.length ? projectResearches.map((research) => {
-                const on = selectedResearchId === research.id && (active === 'research' || active === 'branch' || active === 'run');
-                const researchBranches = branches.filter((b) => b.research_id === research.id);
-                return (
-                  <React.Fragment key={research.id}>
-                    <button className={`row lv2 ${active === 'research' && selectedResearchId === research.id ? 'on' : ''}`} type="button" onClick={() => selectResearch(research.id)}>
-                      <span className="dot" style={{ '--c': research.status === 'active' ? 'rgb(var(--c-accent))' : 'rgb(var(--c-subtle))' }} />
-                      <span className="lbl">{research.title || research.key}</span>
-                      <span className="n">{runCount((run) => run.research_id === research.id)}</span>
-                    </button>
-                    {on ? researchBranches.map((branch) => (
-                      <button className={`row lv3 ${active === 'branch' && selectedBranchId === branch.id ? 'on' : ''}`} key={branch.id} type="button" onClick={() => selectBranch(branch.id)}>
-                        <span className="dot" style={{ '--c': branchColor(branch) }} />
-                        <span className="lbl">{branch.key}</span>
-                        <span className="n">{runCount((run) => run.branch_id === branch.id)}</span>
-                      </button>
-                    )) : null}
-                  </React.Fragment>
-                );
-              }) : <div className="empty">{t('No researches yet')}</div>) : null}
-            </li>
-          );
-        })}
-        {!projects.length ? <li className="empty">{t('No projects yet')}</li> : null}
-      </ul>
-      <div className="side-h"><span>{t('Research Map')}</span></div>
-      <ul className="side-tree">
-        {maps.map((map) => (
-          <li key={map.id}>
-            <button className={`row lv2 ${active === 'maps' && selectedMapId === map.id ? 'on' : ''}`} style={{ paddingLeft: 10 }} type="button" onClick={() => selectMap(map.id)}>
-              <span className="dot" style={{ '--c': map.baseline ? 'rgb(var(--c-accent))' : familyColor.active }} />
-              <span className="lbl">{map.title}</span>
-              <span className="n">{map.node_count}</span>
-            </button>
-          </li>
-        ))}
-        {mapError ? <li className="empty"><button type="button" onClick={() => selectMap(null)}>地图加载失败 · 打开重试</button></li> : !maps.length ? <li className="empty">{t('No research maps yet')}</li> : null}
-      </ul>
-    </>
-  );
+  const projectId = ['research','branch','run'].includes(active) ? data?.researches?.[0]?.project_id : selectedProjectId;
+  const researchId = ['branch','run'].includes(active) ? data?.branches?.[0]?.research_id : selectedResearchId;
+  const [closed, setClosed] = useState(null);
+  const maps = useResource('/api/v1/ui/catalog?kind=maps&limit=100');
+  return <>
+    <div className="side-h"><span>{t('Projects')}</span><button type="button" title={t('New project')} onClick={() => onCreate('project')}>+</button></div>
+    <ul className="side-tree">{(data?.projects || []).map(project => <li key={project.id}>
+      <button className={`row lv1 ${active === 'project' && projectId === project.id ? 'on' : ''}`} type="button" aria-expanded={projectId === project.id && closed !== project.id} onClick={() => { if (active === 'project' && projectId === project.id) setClosed(closed === project.id ? null : project.id); else {setClosed(null); selectProject(project.id);} }}><span className="lbl">{project.title || project.key}</span></button>
+      {projectId === project.id && closed !== project.id ? <SidebarChildren kind="researches" parent={project.id} active={active} researchId={researchId} branchId={selectedBranchId} selectResearch={selectResearch} selectBranch={selectBranch} /> : null}
+    </li>)}</ul>
+    <div className="side-h"><button type="button" onClick={() => selectMap(null)}>{t('Research Map')}</button></div>
+    <ul className="side-tree">{(maps.data?.rows || []).map(map => <li key={map.id}><button className={`row lv2 ${active === 'maps' && selectedMapId === map.id ? 'on' : ''}`} type="button" onClick={() => selectMap(map.id)}><span className="dot" style={{'--c':'rgb(var(--c-info))'}} /><span className="lbl">{map.title}</span></button></li>)}</ul>
+    {maps.error ? <button className="empty" onClick={maps.reload}>地图目录加载失败 · 重试</button> : null}
+    {maps.data?.total > 100 ? <button className="empty" onClick={() => selectMap(null)}>查看全部地图</button> : null}
+  </>;
+}
+
+function SidebarChildren({ kind, parent, active, researchId, branchId, selectResearch, selectBranch }) {
+  const [page, setPage] = useState(1);
+  const {data, error, reload} = useResource(`/api/v1/ui/catalog?kind=${kind}&parent=${parent}&page=${page}&purpose=nav`);
+  if (error) return <button className="empty" onClick={reload}>加载失败 · 重试</button>;
+  if (!data) return <div className="empty">加载中…</div>;
+  return <>{data.rows.map(row => <React.Fragment key={row.id}>
+    <button className={`row ${kind === 'branches' ? 'lv3' : 'lv2'} ${(kind === 'branches' ? active === 'branch' && branchId === row.id : active === 'research' && researchId === row.id) ? 'on' : ''}`} type="button" onClick={() => kind === 'branches' ? selectBranch(row.id) : selectResearch(row.id)}><span className="dot" style={{'--c':'rgb(var(--c-info))'}} /><span className="lbl">{row.title || row.key}</span><span className="n">{row.run_count ?? ''}</span></button>
+    {kind === 'researches' && researchId === row.id && ['research','branch','run'].includes(active) ? <SidebarChildren kind="branches" parent={row.id} active={active} researchId={researchId} branchId={branchId} selectResearch={selectResearch} selectBranch={selectBranch} /> : null}
+  </React.Fragment>)}{data.total > data.limit ? <div className="flex justify-between text-xs p-2"><button disabled={page === 1} onClick={() => setPage(page - 1)}>上一页</button><span>{page}</span><button disabled={page * data.limit >= data.total} onClick={() => setPage(page + 1)}>下一页</button></div> : null}</>;
 }
 
 function Shell({ active, onSelect, data, onCreated, onOpenSearch, contextNav, loading = false, navigator, theme, onToggleTheme, children }) {
@@ -313,13 +269,8 @@ function QuickRunSearchModal({ open, data, onClose, onSelectRun }) {
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
-  const runs = data?.runs || [];
-  const results = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return sortRunsByRecentActivity(runs)
-      .filter((run) => !normalized || runBoardSearchText(run).includes(normalized))
-      .slice(0, 10);
-  }, [query, runs]);
+  const search = useResource(open ? `/api/v1/ui/runs?limit=10&q=${encodeURIComponent(query)}` : null);
+  const results = search.data?.runs || [];
   useEffect(() => {
     if (!open) return undefined;
     setQuery('');
@@ -400,8 +351,8 @@ function QuickRunSearchModal({ open, data, onClose, onSelectRun }) {
             );
           }) : (
             <div className="px-4 py-10 text-center">
-              <div className="text-sm font-semibold text-ink">{t('No runs found.')}</div>
-              <div className="mt-1 text-xs text-muted">{t('Try another keyword.')}</div>
+              <div className="text-sm font-semibold text-ink">{search.error || (!search.data ? '搜索中…' : t('No runs found.'))}</div>
+              {search.error ? <button className="secondary-button" onClick={search.reload}>重试</button> : <div className="mt-1 text-xs text-muted">{t('Try another keyword.')}</div>}
             </div>
           )}
         </div>
@@ -635,46 +586,25 @@ function ArtifactPressureTable({ rows }) {
   );
 }
 function Dashboard({ data, selectProject, selectResearch, selectBranch, selectRun, selectSweep, onChanged }) {
-  const summary = data?.summary || {};
-  const windowStats = dashboardWindowStats(data);
-  const runs = data?.runs || [];
-  const researches = data?.researches || [];
-  const branches = data?.branches || [];
-  const recentRuns = [...runs].sort((a, b) => dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at) - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at)).slice(0, 10);
-  const issueRuns = dashboardIssueRuns(runs).slice(0, 8);
-  const activeResearchRows = projectResearchActivityRows(researches, branches, runs).slice(0, 8);
-  const decisionRuns = researches.map(research => researchChampionRun(research, branches, runs)).filter(Boolean).slice(0, 8);
-  return (
-    <div className="space-y-4">
-      <Hero eyebrow="Workspace" title="研究总览" description="全工作区 · 查看活动历史与项目进展。质量提示不代表研究评审通过。" />
-      <DashboardActivityHeatmap data={data} />
-      <ProjectTable rows={data?.projects || []} workspaces={data?.workspaces || []} researches={data?.researches || []} runs={data?.runs || []} onSelect={selectProject} />
-      <div className="dashboard-stats-grid">
-        <StatTile label="Runs Today" value={summary.today_runs ?? windowStats.runsToday} tone="positive" />
-        <StatTile label="Running" value={summary.running_runs || 0} tone="warning" />
-        <StatTile label="Failed 24h" value={summary.failed_runs_24h ?? windowStats.failed24h} tone={(summary.failed_runs_24h ?? windowStats.failed24h) ? 'negative' : 'neutral'} />
-        <StatTile label="New Branches" value={summary.new_branches_24h ?? windowStats.branches24h} tone="info" />
-      </div>
-      <div className="grid gap-4 xl:grid-cols-12">
-        <div className="space-y-4 xl:col-span-8">
-          <RecentResultsPanel runs={recentRuns} onSelectRun={selectRun} onSelectBranch={selectBranch} />
-          <ActiveResearchPanel rows={activeResearchRows} selectResearch={selectResearch} selectRun={selectRun} />
-        </div>
-        <div className="space-y-4 xl:col-span-4">
-          <QualityInboxPanel runs={issueRuns} onSelectRun={selectRun} />
-          <DecisionCandidatesPanel runs={decisionRuns} onSelectRun={selectRun} />
-        </div>
-      </div>
-      <DashboardCollapsedSection title="System Overview">
-        <div className="space-y-4 p-3">
-          <DashboardActivityTimeline data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} />
-          <WorkspacePanel workspaces={data?.workspaces || []} projects={data?.projects || []} onChanged={onChanged} />
-          <SystemStatusPanel />
-          {SHOW_SWEEPS ? <SweepTable sweeps={data?.sweeps || []} onSelect={selectSweep} /> : null}
-        </div>
-      </DashboardCollapsedSection>
+  return <div className="space-y-4">
+    <Hero eyebrow="Workspace" title="研究总览" description="全工作区 · 查看活动历史与项目进展。质量提示不代表研究评审通过。" />
+    <Resource path="/api/v1/ui/overview?section=activity">{part => <DashboardActivityHeatmap data={part} />}</Resource>
+    <Resource path="/api/v1/ui/overview?section=projects">{part => <ProjectTable rows={part.projects} workspaces={part.workspaces} researches={[]} runs={[]} onSelect={selectProject} />}</Resource>
+    <OnDemand><Resource path="/api/v1/ui/overview">{part => <div className="dashboard-stats-grid">
+      <StatTile label="Runs Today" value={part.summary.today_runs} tone="positive" /><StatTile label="Running" value={part.summary.running_runs} tone="warning" />
+      <StatTile label="Failed 24h" value={part.summary.failed_runs_24h} tone="negative" /><StatTile label="New Branches" value={part.summary.new_branches_24h} tone="info" />
+    </div>}</Resource></OnDemand>
+    <div className="grid gap-4 xl:grid-cols-2">
+      <OnDemand title="近期结果"><Resource path="/api/v1/ui/overview?section=recent">{part => <RecentResultsPanel runs={part.runs} onSelectRun={selectRun} onSelectBranch={selectBranch} />}</Resource></OnDemand>
+      <OnDemand title="质量提示"><Resource path="/api/v1/ui/overview?section=quality">{part => <QualityInboxPanel runs={part.runs} onSelectRun={selectRun} />}</Resource></OnDemand>
+      <OnDemand title="活跃研究"><Resource path="/api/v1/ui/overview?section=researches">{part => <ActiveResearchPanel rows={projectResearchActivityRows(part.researches, [], [])} selectResearch={selectResearch} selectRun={selectRun} />}</Resource></OnDemand>
+      <OnDemand title="决策候选"><Resource path="/api/v1/ui/overview?section=decisions">{part => <DecisionCandidatesPanel runs={part.researches.map(r => r.champion_run).filter(Boolean)} onSelectRun={selectRun} />}</Resource></OnDemand>
     </div>
-  );
+    <DashboardCollapsedSection title="System Overview"><Resource path="/api/v1/ui/overview?section=system">{part => <div className="space-y-4 p-3">
+      <DashboardActivityTimeline data={part} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} />
+      <WorkspacePanel workspaces={part.workspaces} projects={part.projects} onChanged={onChanged} /><SystemStatusPanel />
+    </div>}</Resource></DashboardCollapsedSection>
+  </div>;
 }
 
 function RecentResultsPanel({ runs, onSelectRun, onSelectBranch }) {
@@ -813,15 +743,11 @@ function runQualityHint(run) {
 }
 
 function DashboardCollapsedSection({ title, children }) {
-  return (
-    <details className="group rounded-bento border border-line bg-panel">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-ink marker:hidden">
-        <span>{title}</span>
-        <CollapseToggleIcon native />
-      </summary>
-      <div className="border-t border-line">{children}</div>
-    </details>
-  );
+  const [open, setOpen] = useState(false);
+  return <details className="group rounded-bento border border-line bg-panel" onToggle={event => setOpen(event.currentTarget.open)}>
+    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-ink marker:hidden"><span>{title}</span><CollapseToggleIcon native /></summary>
+    {open ? <div className="border-t border-line">{children}</div> : null}
+  </details>;
 }
 
 function CollapseToggleIcon({ open = false, native = false }) {
@@ -1052,6 +978,46 @@ function formatMissingSchemaDetail(database) {
   return parts.join(' | ');
 }
 
+function ScopedOptions({ data, kind, children }) {
+  const projects = data?.projects || [];
+  const [project, setProject] = useState(data?.researches?.[0]?.project_id || projects[0]?.id || '');
+  const [research, setResearch] = useState(data?.researches?.[0]?.id || '');
+  const [query, setQuery] = useState('');
+  const [researchQuery, setResearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [catalogPage, setCatalogPage] = useState(1);
+  const needsResearch = !['workspace','project','research'].includes(kind);
+  const needsRuns = ['branch','run','compare-set','compare-create','actions'].includes(kind);
+  const researches = useResource(needsResearch && project ? `/api/v1/ui/catalog?kind=researches&parent=${project}&q=${encodeURIComponent(researchQuery)}&limit=100` : null);
+  const branches = useResource(needsResearch && research ? `/api/v1/ui/catalog?kind=branches&parent=${research}&page=${catalogPage}` : null);
+  const runs = useResource(needsRuns && project ? `/api/v1/ui/runs?project=${project}&research=${research}&q=${encodeURIComponent(query)}&page=${page}` : null);
+  const workspaces = useResource(kind === 'project' ? '/api/v1/ui/catalog?kind=workspaces&limit=100' : null);
+  const saved = useResource(['compare','search'].includes(kind) && project ? `/api/v1/ui/catalog?kind=${kind === 'compare' ? 'compare_sets' : 'search_views'}&parent=${project}&page=${catalogPage}` : null);
+  useEffect(() => { if (researches.data && !researches.data.rows.some(r => r.id === research)) setResearch(researches.data.rows[0]?.id || ''); }, [researches.data]);
+  useEffect(() => { setPage(1); setCatalogPage(1); }, [project, research, query]);
+  const scoped = {...data, projects:[...projects.filter(p => p.id === project), ...projects.filter(p => p.id !== project)], researches:researches.data?.rows || data?.researches || [], branches:branches.data?.rows || [], runs:runs.data?.runs || [], workspaces:workspaces.data?.rows || data?.workspaces || []};
+  const scopedForm = ['branch', 'run', 'compare-set'].includes(kind);
+  if (scopedForm) {
+    scoped.projects = projects.filter(p => p.id === project);
+    if (research) scoped.researches = scoped.researches.filter(r => r.id === research);
+  }
+  if (saved.data) scoped[kind === 'compare' ? 'compare_sets' : 'search_views'] = [...new Map([...(data?.[kind === 'compare' ? 'compare_sets' : 'search_views'] || []), ...saved.data.rows].map(row => [row.id,row])).values()];
+  const loading = (needsResearch && project && !researches.data && !researches.error) || (kind === 'project' && !workspaces.data && !workspaces.error);
+  const initialized = useRef(false);
+  if (!loading) initialized.current = true;
+  return <div className="space-y-3">
+    {needsResearch ? <div className="bento-panel space-y-2 p-3"><div className="text-sm font-semibold">选择范围</div>
+      <div className="grid gap-2 md:grid-cols-2"><Field label="Project"><SelectInput value={project} onChange={e => {setProject(e.target.value);setResearch('');}}>{projects.map(p => <option key={p.id} value={p.id}>{p.title || p.key}</option>)}</SelectInput></Field>
+      <Field label="Research"><SelectInput value={research} onChange={e => setResearch(e.target.value)}><option value="">全部研究线</option>{(researches.data?.rows || []).map(r => <option key={r.id} value={r.id}>{r.title || r.key}</option>)}</SelectInput></Field></div>
+      <TextInput aria-label="查找研究线" placeholder="查找研究线名称或 Key" value={researchQuery} onChange={e => setResearchQuery(e.target.value)} />
+      {needsRuns ? <><TextInput aria-label="查找 Run" placeholder="查找 Run 名称或 ID" value={query} onChange={e => setQuery(e.target.value)} /><Pager page={page} total={runs.data?.total} limit={50} onChange={setPage} /></> : null}
+      {(saved.data?.total || branches.data?.total || 0) > 50 ? <Pager page={catalogPage} total={Math.max(saved.data?.total || 0, branches.data?.total || 0)} limit={50} onChange={setCatalogPage} /> : null}
+    </div> : null}
+    {[researches,branches,runs,workspaces,saved].filter(r => r.error).map((r,i) => <div className="text-negative" key={i}>{r.error}<button onClick={r.reload} className="secondary-button">重试</button></div>)}
+    {loading && !initialized.current ? <div className="p-3 text-muted">加载可选项…</div> : <React.Fragment key={scopedForm ? `${project}:${research}` : kind}>{children(scoped)}</React.Fragment>}
+  </div>;
+}
+
 function CreateModal({ kind, data, onClose, onCreated }) {
   const action = createActions.find((item) => item.id === kind);
   const handleCreated = async (createdKind, entity) => {
@@ -1077,16 +1043,16 @@ function CreateModal({ kind, data, onClose, onCreated }) {
             <XCircle className="h-4 w-4" />
           </button>
         </div>
-        <div className="max-h-[calc(100vh-14rem)] overflow-y-auto p-4">
+        <div className="max-h-[calc(100vh-14rem)] overflow-y-auto p-4"><ScopedOptions data={data} kind={kind}>{options => <React.Fragment key={`${options.researches?.[0]?.project_id || ""}:${kind}`}>
           {kind === 'workspace' ? <WorkspaceForm onCreated={handleCreated} /> : null}
-          {kind === 'project' ? <ProjectForm data={data} onCreated={handleCreated} /> : null}
-          {kind === 'research' ? <ResearchForm data={data} onCreated={handleCreated} /> : null}
-          {kind === 'branch' ? <BranchForm data={data} onCreated={handleCreated} /> : null}
-          {kind === 'run' ? <RunForm data={data} onCreated={handleCreated} /> : null}
-          {kind === 'sweep' ? <GlobalSweepCreateForm branches={data?.branches || []} onChanged={async () => {}} onCreated={(id) => handleCreated('sweep', { id })} /> : null}
-          {kind === 'compare-set' ? <CompareSetCreateForm data={data} onCreated={handleCreated} /> : null}
-          {kind === 'search-view' ? <SearchViewCreateForm data={data} onCreated={handleCreated} /> : null}
-        </div>
+          {kind === 'project' ? <ProjectForm data={options} onCreated={handleCreated} /> : null}
+          {kind === 'research' ? <ResearchForm data={options} onCreated={handleCreated} /> : null}
+          {kind === 'branch' ? <BranchForm data={options} onCreated={handleCreated} /> : null}
+          {kind === 'run' ? <RunForm data={options} onCreated={handleCreated} /> : null}
+          {kind === 'sweep' ? <GlobalSweepCreateForm branches={options.branches || []} onChanged={async () => {}} onCreated={(id) => handleCreated('sweep', { id })} /> : null}
+          {kind === 'compare-set' ? <CompareSetCreateForm data={options} onCreated={handleCreated} /> : null}
+          {kind === 'search-view' ? <SearchViewCreateForm data={options} onCreated={handleCreated} /> : null}
+        </React.Fragment>}</ScopedOptions></div>
       </div>
     </div>
   );
@@ -1487,8 +1453,8 @@ function RunForm({ data, onCreated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   useEffect(() => {
-    if (!form.branch_id && firstBranchId) setForm((current) => ({ ...current, branch_id: firstBranchId }));
-  }, [firstBranchId, form.branch_id]);
+    if (firstBranchId && !(data?.branches || []).some(branch => branch.id === form.branch_id)) setForm((current) => ({ ...current, branch_id: firstBranchId, source_run_id: '' }));
+  }, [data?.branches, firstBranchId, form.branch_id]);
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const submit = async (event) => {
     event.preventDefault();
@@ -1984,66 +1950,32 @@ function ProjectTable({ rows, workspaces, researches, runs, onSelect }) {
 }
 
 function ProjectPage({ data, selectedProjectId, selectResearch, selectBranch, selectRun, selectCompareSet, selectSearchView, selectMap, onChanged }) {
-  const projectBase = (data?.projects || []).find((item) => item.id === selectedProjectId) || data?.projects?.[0];
-  const [projectDetail, setProjectDetail] = useState(null);
-  const [projectDetailError, setProjectDetailError] = useState(null);
-  useEffect(() => {
-    if (!projectBase?.id) {
-      setProjectDetail(null);
-      setProjectDetailError(null);
-      return;
-    }
-    let cancelled = false;
-    setProjectDetail(null);
-    apiGet(`/api/v1/projects/${projectBase.id}`)
-      .then((payload) => {
-        if (!cancelled) {
-          setProjectDetail(payload);
-          setProjectDetailError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setProjectDetail(null);
-          setProjectDetailError(err.message);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [projectBase?.id, projectBase?.updated_at, data?.summary?.runs, data?.summary?.compare_sets, data?.summary?.search_views]);
-  if (!projectBase) return <EmptyState title="No projects yet" detail="Create a project from Dashboard, then record research runs through SDK or bbox CLI." />;
-  const project = { ...projectBase, ...(projectDetail || {}) };
-  const researches = projectDetail?.researches || (data?.researches || []).filter((item) => item.project_id === project.id);
-  const branches = projectDetail?.branches || data?.branches || [];
-  const runs = projectDetail?.runs || (data?.runs || []).filter((run) => run.project_id === project.id);
-  const compareSets = projectDetail?.compare_sets || (data?.compare_sets || []).filter((item) => item.project_id === project.id);
-  const searchViews = projectDetail?.search_views || (data?.search_views || []).filter((item) => item.project_id === project.id);
-  const running = project.running_run_count ?? runs.filter((run) => run.status === 'running').length;
-  return (
-    <div className="space-y-4">
-      <Hero eyebrow="Project" title={project.title || project.key} description={project.description || null} />
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label="Workspace" value={project.workspace_id || 'local'} tone="info" />
-        <StatTile label="Researches" value={project.research_count ?? researches.length} tone="info" />
-        <StatTile label="Runs" value={project.run_count ?? runs.length} tone="positive" />
-        <StatTile label="Running" value={running} tone="warning" />
-      </div>
-      {projectDetailError ? <InlineError message={projectDetailError} /> : null}
-      <ResearchTable rows={researches} branches={branches} runs={runs} onSelect={selectResearch} onSelectRun={selectRun} />
-      <QuickCompareCard
-        title="Compare"
-        targets={researches.map((research) => ({ type: 'research', id: research.id }))}
-        emptyText="No researches available for compare."
-        onSelectRun={selectRun}
-      />
-      <DashboardCollapsedSection title="项目设置"><div className="p-3"><ProjectEditPanel project={project} onChanged={onChanged} /></div></DashboardCollapsedSection>
-      <ScopedResearchMapsPanel scope="project" scopeId={project.id} refreshToken={data} onSelectMap={selectMap} />
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <ProjectSavedItems title="Compare Sets" icon={Layers3} items={compareSets} renderDetail={(item) => `${item.run_ids_json?.length || 0} runs`} actionLabel="Open" onSelect={selectCompareSet} />
-        <ProjectSavedItems title="Search Views" icon={Search} items={searchViews} renderDetail={(item) => item.description || formatFilterSummary(item.filters_json)} actionLabel="Run" onSelect={selectSearchView} />
-      </div>
-      <RunsTable title="Recent Project Runs" runs={sortRunsByRecentActivity(runs).slice(0, 12)} onSelectRun={selectRun} onSelectBranch={selectBranch} />
-    </div>
-  );
+  const project = (data?.projects || []).find(item => item.id === selectedProjectId) || data?.projects?.[0];
+  const [page, setPage] = useState(1);
+  useEffect(() => setPage(1), [project?.id]);
+  if (!project) return <EmptyState title="No projects yet" detail="Create a project from Dashboard." />;
+  return <div className="space-y-4">
+    <Hero eyebrow="Project" title={project.title || project.key} description={project.description || null} />
+    <Resource path={`/api/v1/ui/scope-summary?project=${project.id}`}>{summary => <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><StatTile label="Workspace" value={summary.workspace_id || 'local'} tone="info" /><StatTile label="Researches" value={summary.research_count} tone="info" /><StatTile label="Runs" value={summary.run_count} tone="positive" /><StatTile label="Running" value={summary.running_run_count} tone="warning" /></div>}</Resource>
+    <Resource path={`/api/v1/ui/researches?project=${project.id}&page=${page}`}>{part => <>
+      <ResearchTable rows={part.researches} branches={[]} runs={[]} onSelect={selectResearch} onSelectRun={selectRun} />
+      <Pager page={page} total={part.total} limit={part.limit} onChange={setPage} />
+      <QuickCompareCard targets={part.researches.map(r => ({ type: 'research', id: r.id }))} onSelectRun={selectRun} />
+    </>}</Resource>
+    <DashboardCollapsedSection title="项目设置"><div className="p-3"><ProjectEditPanel project={project} onChanged={onChanged} /></div></DashboardCollapsedSection>
+    <OnDemand title="研究地图"><ScopedResearchMapsPanel scope="project" scopeId={project.id} onSelectMap={selectMap} /></OnDemand>
+    <DashboardCollapsedSection title="Compare Sets"><CatalogItems kind="compare_sets" parent={project.id} onSelect={selectCompareSet} /></DashboardCollapsedSection>
+    <DashboardCollapsedSection title="Search Views"><CatalogItems kind="search_views" parent={project.id} onSelect={selectSearchView} /></DashboardCollapsedSection>
+    <OnDemand title="近期 Run"><Resource path={`/api/v1/ui/runs?project=${project.id}&limit=12`}>{part => <RunsTable title="Recent Project Runs" runs={part.runs} onSelectRun={selectRun} onSelectBranch={selectBranch} />}</Resource></OnDemand>
+  </div>;
+}
+
+function CatalogItems({ kind, parent, onSelect }) {
+  const [page, setPage] = useState(1);
+  return <Resource path={`/api/v1/ui/catalog?kind=${kind}&parent=${parent}&page=${page}`}>{part => <>
+    <ProjectSavedItems title={kind === 'compare_sets' ? 'Compare Sets' : 'Search Views'} icon={Layers3} items={part.rows} renderDetail={item => item.description || `${item.run_ids_json?.length || 0} runs`} actionLabel="Open" onSelect={onSelect} />
+    <Pager page={page} total={part.total} limit={part.limit} onChange={setPage} />
+  </>}</Resource>;
 }
 
 function ProjectResearchHeatPanel({ researches, branches, runs, selectResearch, selectRun }) {
@@ -2229,7 +2161,7 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
                 <td className="table-cell text-right text-muted">{formatMetric(metricValue(run, 'strategy.summary', 'max_drawdown'))}</td>
                 <td className="table-cell text-right text-muted">{formatMetric(metricValue(run, 'strategy.summary', 'ic_mean'))}</td>
                 <td className="table-cell text-right text-muted">{runRuntime(run)}</td>
-                <td className="table-cell text-muted"><div className="break-words [overflow-wrap:anywhere]">{configSummary(run.config_json)}</div></td>
+                <td className="table-cell text-muted"><RunConfigPreview run={run} /></td>
                 <td className="table-cell"><ArtifactSummary run={run} /></td>
                 <td className="table-cell text-right text-muted">{formatDate(run.updated_at)}</td>
               </tr>
@@ -2245,12 +2177,8 @@ function RunsTable({ title, runs, onSelectRun, onSelectBranch }) {
 
 function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChanged }) {
   const projects = data?.projects || [];
-  const researches = data?.researches || [];
-  const branches = data?.branches || [];
   const dashboardRuns = data?.runs || [];
   const [allRuns, setAllRuns] = useState(dashboardRuns);
-  const [loadingRuns, setLoadingRuns] = useState(true);
-  const [runsError, setRunsError] = useState(null);
   const [query, setQuery] = usePageQuery('/runs', 'query', '');
   const [projectKey, setProjectKey] = usePageQuery('/runs', 'projectKey', '');
   const [researchKey, setResearchKey] = usePageQuery('/runs', 'researchKey', '');
@@ -2268,39 +2196,26 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
   const previousFilters = useRef(filterKey);
   const [showColumns, setShowColumns] = usePageQuery('/runs', 'columns', false);
   const [showFilters, setShowFilters] = usePageQuery('/runs', 'advanced', false);
-  const runs = allRuns.length ? allRuns : dashboardRuns;
-  const statusOptions = Array.from(new Set(runs.map((run) => run.status).filter(Boolean))).sort();
-  const creatorOptions = Array.from(new Set(runs.map((run) => run.created_by_type || 'human').filter(Boolean))).sort();
-
+  const params = new URLSearchParams({page:String(page),limit:String(pageSize),q:query,project:projectKey,research:researchKey,branch:branchKey,status,creator,artifact:artifactOnly,sort:sort.key,direction:sort.direction,with_config:String(showColumns)});
+  const projectId = projects.find(p => p.key === projectKey)?.id;
+  const researchChoices = useResource(showFilters && projectId ? `/api/v1/ui/catalog?kind=researches&parent=${projectId}&limit=100` : null);
+  const researches = researchChoices.data?.rows || [];
+  const researchId = researches.find(r => r.key === researchKey)?.id;
+  const branchChoices = useResource(showFilters && researchId ? `/api/v1/ui/catalog?kind=branches&parent=${researchId}&limit=100` : null);
+  const branches = branchChoices.data?.rows || [];
+  const result = useResource(`/api/v1/ui/runs?${params}`);
+  const loadingRuns = !result.data && !result.error;
+  const runsError = result.error;
+  const runs = allRuns;
+  const filteredRuns = result.data?.runs || [];
+  const totalRuns = result.data?.total || 0;
+  const pageCount = Math.max(1, Math.ceil(totalRuns / pageSize));
+  const pageRuns = filteredRuns;
+  const statusOptions = ['running', 'completed', 'failed', 'cancelled'];
+  const creatorOptions = ['human', 'agent', 'system'];
   useEffect(() => {
-    setAllRuns((current) => (current.length ? current : dashboardRuns));
-  }, [dashboardRuns]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoadingRuns(true);
-    setRunsError(null);
-    apiPost('/api/v1/search/runs', { limit: 1000, max_scan: 5000 })
-      .then((rows) => {
-        if (!cancelled) setAllRuns(rows);
-      })
-      .catch((err) => {
-        if (!cancelled) setRunsError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingRuns(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [data?.summary?.runs]);
-
-  const filteredRuns = useMemo(() => {
-    const filters = { query, projectKey, researchKey, branchKey, status, creator, artifactOnly };
-    return sortRunsForBoard(runs.filter((run) => runMatchesRunBoardFilters(run, filters)), sort);
-  }, [runs, query, projectKey, researchKey, branchKey, status, creator, artifactOnly, sort]);
-  const pageCount = Math.max(1, Math.ceil(filteredRuns.length / pageSize));
-  const pageRuns = filteredRuns.slice((page - 1) * pageSize, page * pageSize);
+    if (result.data) setAllRuns(current => [...new Map([...current.filter(r => selectedRunIds.includes(r.id)), ...result.data.runs].map(r => [r.id,r])).values()]);
+  }, [result.data]);
   const selectedRunSet = useMemo(() => new Set(selectedRunIds), [selectedRunIds]);
   const selectedRuns = useMemo(() => {
     const byId = new Map(runs.map((run) => [run.id, run]));
@@ -2316,11 +2231,6 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
   useEffect(() => {
     if (!loadingRuns) setPage((current) => Math.min(Math.max(Number(current) || 1, 1), pageCount));
   }, [pageCount, loadingRuns]);
-
-  useEffect(() => {
-    const availableIds = new Set(runs.map((run) => run.id));
-    setSelectedRunIds((current) => current.filter((id) => availableIds.has(id)));
-  }, [runs]);
 
   const toggleRunSelection = (runId) => {
     setCompareCreateError(null);
@@ -2384,12 +2294,12 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
 
   return (
     <div className="space-y-4">
-      <Hero eyebrow="Runs" title="Run 查询" description={`当前在已加载的 ${runs.length} 条 Run 中筛选；系统共 ${data?.summary?.runs ?? '--'} 条。最多加载 1000 条，不代表全库查询。`} />
-      <RunsBoardSummary runs={runs} filteredRuns={filteredRuns} />
+      <Hero eyebrow="Runs" title="Run 查询" description="在服务端筛选全部 Run，按页加载；跨页选择可用于比较。" />
+      <RunsBoardSummary runs={pageRuns} total={totalRuns} />
       <Panel className="overflow-hidden">
         <PanelHeader
           title="已加载的 Run"
-          action={<div className="text-xs font-semibold text-muted">{loadingRuns ? 'Loading runs...' : `${filteredRuns.length} / ${runs.length} 条（已加载范围）`}</div>}
+          action={<div className="text-xs font-semibold text-muted">{loadingRuns ? 'Loading runs...' : `匹配 ${totalRuns} 条 · 本页 ${pageRuns.length} 条`}</div>}
         />
         <InlineError message={runsError} />
         <RunCompareSelectionBar
@@ -2410,16 +2320,10 @@ function RunsBoardPage({ data, selectRun, selectBranch, selectCompareSet, onChan
             </SelectInput>
           </Field>
           <div className="run-filter-advanced"><Field label="Research">
-            <SelectInput value={researchKey} onChange={(event) => setResearchKey(event.target.value)}>
-              <option value="">{t("Any research")}</option>
-              {researches.map((research) => <option key={research.id} value={research.key}>{research.key}</option>)}
-            </SelectInput>
+            <><TextInput list="run-filter-research" value={researchKey} onChange={event => setResearchKey(event.target.value)} placeholder="输入 Key，或选择建议项" /><datalist id="run-filter-research">{researches.map(item => <option key={item.id} value={item.key}>{item.title || item.key}</option>)}</datalist></>
           </Field></div>
           <div className="run-filter-advanced"><Field label="Branch">
-            <SelectInput value={branchKey} onChange={(event) => setBranchKey(event.target.value)}>
-              <option value="">{t("Any branch")}</option>
-              {branches.map((branch) => <option key={branch.id} value={branch.key}>{branch.key}</option>)}
-            </SelectInput>
+            <><TextInput list="run-filter-branch" value={branchKey} onChange={event => setBranchKey(event.target.value)} placeholder="输入 Key，或选择建议项" /><datalist id="run-filter-branch">{branches.map(item => <option key={item.id} value={item.key}>{item.title || item.key}</option>)}</datalist></>
           </Field></div>
           <Field label="Status">
             <SelectInput value={status} onChange={(event) => setStatus(event.target.value)}>
@@ -2561,7 +2465,14 @@ function RunCompareSelectionBar({ selectedRuns, loading, error, onCreate, onClea
   );
 }
 
-function RunsBoardSummary({ runs, filteredRuns }) {
+function RunConfigPreview({ run }) {
+  const [expanded, setExpanded] = useState(false);
+  const result = useResource(expanded && run.config_json === undefined ? `/api/v1/ui/runs/${run.id}?section=config` : null);
+  if (run.config_json !== undefined || result.data) return <div className="break-words [overflow-wrap:anywhere]">{configSummary(run.config_json ?? result.data.config_json)}</div>;
+  return <button className="text-info hover:underline" onClick={() => {setExpanded(true);if (result.error) result.reload();}}>{result.error ? '重试配置' : expanded ? '加载中…' : '查看配置'}</button>;
+}
+
+function RunsBoardSummary({ runs, total }) {
   const completed = runs.filter((run) => run.status === 'completed').length;
   const running = runs.filter((run) => run.status === 'running').length;
   const failed = runs.filter((run) => run.status === 'failed').length;
@@ -2570,12 +2481,12 @@ function RunsBoardSummary({ runs, filteredRuns }) {
   return (
     <Panel className="p-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-        <ReadOnlyField label="Filtered" value={`${filteredRuns.length} / ${runs.length}`} />
-        <ReadOnlyField label="Completed" value={completed} />
-        <ReadOnlyField label="Running" value={running} />
-        <ReadOnlyField label="Failed" value={failed} />
-        <ReadOnlyField label="With Artifacts" value={withArtifacts} />
-        <ReadOnlyField label="Latest" value={formatDate(latest?.updated_at || latest?.ended_at || latest?.started_at || latest?.created_at)} />
+        <ReadOnlyField label="本页 / 匹配总数" value={`${runs.length} / ${total}`} />
+        <ReadOnlyField label="本页已完成" value={completed} />
+        <ReadOnlyField label="本页运行中" value={running} />
+        <ReadOnlyField label="本页失败" value={failed} />
+        <ReadOnlyField label="本页有产物" value={withArtifacts} />
+        <ReadOnlyField label="本页最新" value={formatDate(latest?.updated_at || latest?.ended_at || latest?.started_at || latest?.created_at)} />
       </div>
     </Panel>
   );
@@ -2732,144 +2643,52 @@ function runCreator(run) {
 }
 
 function ResearchPage({ data, selectedResearchId, selectProject, selectResearch, selectBranch, selectRun, selectCompareSet, selectMap, onChanged }) {
-  const research = (data?.researches || []).find((item) => item.id === selectedResearchId) || data?.researches?.[0];
+  const research = (data?.researches || []).find(r => r.id === selectedResearchId) || data?.researches?.[0];
+  const [view, setView] = usePageQuery(`/researches/${research?.id}`, 'view', 'map');
   const [mapIndex, setMapIndex] = useState({ byRun: {}, byBranch: {}, mapId: null });
   const [mapLocate, setMapLocate] = useState(null);
-  const locateMapNode = (key) => { setMapLocate({ key, nonce: Date.now() }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  const mapNav = { selectProject, selectResearch, selectBranch, selectRun, selectCompareSet };
-  const branches = (data?.branches || []).filter((branch) => branch.research_id === research?.id);
-  const runs = (data?.runs || []).filter((run) => branches.some((branch) => branch.id === run.branch_id));
-  const [lineage, setLineage] = useState(null);
-  const [lineageError, setLineageError] = useState(null);
-  const [lineageExpanded, setLineageExpanded] = useState(false);
-  const [researchCompareSets, setResearchCompareSets] = useState(null);
-  const [compareSetError, setCompareSetError] = useState(null);
-  const [researchReview, setResearchReview] = useState(null);
-  const [reviewError, setReviewError] = useState(null);
-  useEffect(() => {
-    if (!research?.id) {
-      setLineage(null);
-      setLineageError(null);
-      return;
-    }
-    let cancelled = false;
-    apiGet(`/api/v1/lineage/researches/${research.id}`)
-      .then((payload) => {
-        if (!cancelled) {
-          setLineage(payload);
-          setLineageError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setLineage(null);
-          setLineageError(err.message);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [research?.id, branches.length, runs.length]);
-  useEffect(() => {
-    if (!research?.id) {
-      setResearchCompareSets(null);
-      setCompareSetError(null);
-      return;
-    }
-    let cancelled = false;
-    apiGet(`/api/v1/researches/${research.id}/compare-sets`)
-      .then((payload) => {
-        if (!cancelled) {
-          setResearchCompareSets(payload);
-          setCompareSetError(null);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setResearchCompareSets(null);
-          setCompareSetError(null);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [research?.id, data?.summary?.compare_sets]);
-  useEffect(() => {
-    if (!research?.id) {
-      setResearchReview(null);
-      setReviewError(null);
-      return;
-    }
-    let cancelled = false;
-    apiGet(`/api/v1/researches/${research.id}/review-board?limit=10`)
-      .then((payload) => {
-        if (!cancelled) {
-          setResearchReview(payload);
-          setReviewError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setResearchReview(null);
-          setReviewError(err.message);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [research?.id, data?.summary?.runs, data?.summary?.compare_sets, branches.length, runs.length]);
-  const [view, setView] = usePageQuery(`/researches/${research?.id}`, 'view', 'map');
-  if (!research) return <EmptyState title="No research yet" detail="Create a run through the SDK or bbox CLI, then refresh this page." />;
-  const lineageBranches = lineage?.branches || branches;
-  const lineageRuns = lineage?.runs || runs;
-  const lineageChartOption = lineageOption(lineageBranches, lineageRuns);
-  const recentRuns = [...lineageRuns].sort((a, b) => dateMillis(b.updated_at || b.ended_at || b.started_at || b.created_at) - dateMillis(a.updated_at || a.ended_at || a.started_at || a.created_at));
-  const compareSets = researchCompareSets || (data?.compare_sets || []).filter((item) => item.research_id === research.id);
-  return (
-    <div className="space-y-4">
-      <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
-      <ResearchWorkspaceSummary research={research} branches={lineageBranches} runs={lineageRuns} />
-      <PageTabs label="研究线视图" prefix="research-view" value={view} onChange={setView} tabs={[{id:'map',label:'研究脉络'},{id:'runs',label:'分支与 Run'},{id:'review',label:'评审记录'},{id:'history',label:'来源与历史'}]} />
-      <div hidden={view !== 'map'} role="tabpanel" id="research-view-panel-map" aria-labelledby="research-view-tab-map">
-      <ResearchMapEmbed researchId={research.id} refreshToken={data} nav={mapNav} onIndex={setMapIndex} locate={mapLocate} selectMap={selectMap} />
-      </div>
-      <div hidden={view !== 'review'} role="tabpanel" id="research-view-panel-review" aria-labelledby="research-view-tab-review">
-      <ResearchReviewPanel
-        review={researchReview}
-        error={reviewError}
-        onSelectRun={selectRun}
-        onSelectBranch={selectBranch}
-        onSelectCompareSet={selectCompareSet}
-        onChanged={onChanged}
-      />
-      </div>
-      <div hidden={view !== 'runs'} className="space-y-4" role="tabpanel" id="research-view-panel-runs" aria-labelledby="research-view-tab-runs">
-        <BranchesTable branches={lineageBranches} runs={lineageRuns} onSelect={selectBranch} onChanged={onChanged} mapIndex={mapIndex} onLocateMapNode={(...args) => { setView('map'); locateMapNode(...args); }} />
-        <ResearchRecentRunsPanel runs={recentRuns} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} mapIndex={mapIndex} onLocateMapNode={(...args) => { setView('map'); locateMapNode(...args); }} />
-        <ResearchCompareSetsPanel compareSets={compareSets} error={compareSetError} onSelectCompareSet={selectCompareSet} />
-      {lineageExpanded ? <LineageChartModal option={lineageChartOption} onClose={() => setLineageExpanded(false)} /> : null}
-      <QuickCompareCard
-        title="Compare"
-        targets={lineageBranches.map((branch) => ({ type: 'branch', id: branch.id }))}
-        emptyText="No branches available for compare."
-        onSelectRun={selectRun}
-      />
-      </div>
-      <div hidden={view !== 'history'} role="tabpanel" id="research-view-panel-history" aria-labelledby="research-view-tab-history">
-        <div className="space-y-4 p-3">
-          <ResearchEditPanel research={research} onChanged={onChanged} />
-          <Panel className="overflow-hidden">
-            <PanelHeader
-              title="实验来源关系"
-              icon={GitBranch}
-              action={(
-                <button className="icon-button" type="button" onClick={() => setLineageExpanded(true)} aria-label="Expand branch lineage">
-                  <Maximize2 className="h-4 w-4" />
-                </button>
-              )}
-            />
-            {lineageError ? <div className="px-4 pt-3"><InlineError message={lineageError} /></div> : null}
-            <div className="h-[360px] cursor-grab p-3 active:cursor-grabbing"><ReactECharts option={lineageChartOption} style={{ height: '100%', width: '100%' }} /></div>
-          </Panel>
-          <ResearchTimelinePanel research={research} branches={lineageBranches} runs={lineageRuns} notes={data?.notes || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
-        </div>
-      </div>
+  const locate = key => { setView('map'); setMapLocate({ key, nonce: Date.now() }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  if (!research) return <EmptyState title="No research yet" detail="Create a research first." />;
+  return <div className="space-y-4">
+    <Hero eyebrow={`Project / ${research.project_key || '--'}`} title={research.title || research.key} description={research.goal || research.hypothesis || null} />
+    <Resource path={`/api/v1/ui/scope-summary?research=${research.id}`}>{summary => <ResearchWorkspaceSummary research={summary} branches={[]} runs={[]} />}</Resource>
+    <PageTabs label="研究线视图" prefix="research-view" value={view} onChange={setView} tabs={[{id:'map',label:'研究脉络'},{id:'runs',label:'分支与 Run'},{id:'review',label:'评审记录'},{id:'history',label:'来源与历史'}]} />
+    <div role="tabpanel" id={`research-view-panel-${view}`} aria-labelledby={`research-view-tab-${view}`}>
+      {view === 'map' ? <ResearchMapEmbed researchId={research.id} nav={{selectProject,selectResearch,selectBranch,selectRun,selectCompareSet}} onIndex={setMapIndex} locate={mapLocate} selectMap={selectMap} /> : null}
+      {view === 'runs' ? <ResearchRunsView research={research} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} onChanged={onChanged} mapIndex={mapIndex} locate={locate} /> : null}
+      {view === 'review' ? <Resource path={`/api/v1/researches/${research.id}/review-board?limit=10`}>{review => <ResearchReviewPanel review={review} onSelectRun={selectRun} onSelectBranch={selectBranch} onSelectCompareSet={selectCompareSet} onChanged={onChanged} />}</Resource> : null}
+      {view === 'history' ? <ResearchHistory research={research} onChanged={onChanged} selectBranch={selectBranch} selectRun={selectRun} /> : null}
     </div>
-  );
+  </div>;
+}
+
+function ResearchHistory({ research, onChanged, selectBranch, selectRun }) {
+  const [page, setPage] = useState(1);
+  const [expanded, setExpanded] = useState(false);
+  return <div className="space-y-4"><ResearchEditPanel research={research} onChanged={onChanged} /><Resource path={`/api/v1/ui/lineage?research=${research.id}&page=${page}`}>{lineage => <>
+    <ResearchLineageEdgesPanel edges={lineage.edges} branches={lineage.branches} runs={lineage.runs} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+    <Panel><PanelHeader title="来源与历史" action={<button className="icon-button" aria-label="全屏谱系" onClick={() => setExpanded(true)}><Maximize2 className="h-4 w-4" /></button>} /><div className="h-[360px]"><ReactECharts option={lineageOption(lineage.branches,lineage.runs)} style={{height:'100%'}} /></div></Panel>
+    {expanded ? <LineageChartModal option={lineageOption(lineage.branches,lineage.runs)} onClose={() => setExpanded(false)} /> : null}
+    <ResearchTimelinePanel research={research} branches={lineage.branches} runs={lineage.runs} notes={lineage.notes} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+    <Pager page={page} total={lineage.total} limit={lineage.limit} onChange={setPage} />
+  </>}</Resource></div>;
+}
+
+function ResearchRunsView({ research, selectBranch, selectRun, selectCompareSet, onChanged, mapIndex, locate }) {
+  const [page, setPage] = useState(1);
+  const [branchPage, setBranchPage] = useState(1);
+  return <div className="space-y-4">
+    <Resource path={`/api/v1/ui/catalog?kind=branches&parent=${research.id}&page=${branchPage}`}>{part => <>
+      <BranchesTable branches={part.rows} runs={[]} onSelect={selectBranch} onChanged={onChanged} mapIndex={mapIndex} onLocateMapNode={locate} />
+      <Pager page={branchPage} total={part.total} limit={part.limit} onChange={setBranchPage} />
+      <QuickCompareCard targets={part.rows.map(b => ({type:'branch',id:b.id}))} onSelectRun={selectRun} />
+    </>}</Resource>
+    <Resource path={`/api/v1/ui/runs?research=${research.id}&page=${page}`}>{part => <>
+      <ResearchRecentRunsPanel runs={part.runs} scopeKey={research.id} onSelectBranch={selectBranch} onSelectRun={selectRun} mapIndex={mapIndex} onLocateMapNode={locate} />
+      <Pager page={page} total={part.total} limit={part.limit} onChange={setPage} />
+    </>}</Resource>
+    <DashboardCollapsedSection title="Compare Sets"><Resource path={`/api/v1/researches/${research.id}/compare-sets`}>{rows => <ResearchCompareSetsPanel compareSets={rows} onSelectCompareSet={selectCompareSet} />}</Resource></DashboardCollapsedSection>
+  </div>;
 }
 
 function ResearchWorkspaceSummary({ research, branches, runs }) {
@@ -2881,11 +2700,11 @@ function ResearchWorkspaceSummary({ research, branches, runs }) {
     <Panel className="p-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
         <ReadOnlyField label="Status" value={tStatus(research.status || 'active')} />
-        <ReadOnlyField label="Branches" value={branches.length} />
-        <ReadOnlyField label="Completed Runs" value={completedRuns} />
-        <ReadOnlyField label="Running" value={runningRuns} />
-        <ReadOnlyField label="Failed" value={failedRuns} />
-        <ReadOnlyField label="Latest Run" value={latestRun?.name || '--'} />
+        <ReadOnlyField label="Branches" value={research.branch_count ?? branches.length} />
+        <ReadOnlyField label="Completed Runs" value={research.completed_run_count ?? completedRuns} />
+        <ReadOnlyField label="Running" value={research.running_run_count ?? runningRuns} />
+        <ReadOnlyField label="Failed" value={research.failed_run_count ?? failedRuns} />
+        <ReadOnlyField label="Latest Run" value={research.latest_run_name || latestRun?.name || '--'} />
       </div>
     </Panel>
   );
@@ -3284,7 +3103,7 @@ function BranchesTable({ branches, runs, onSelect, onChanged, mapIndex = null, o
                 <td className="table-cell font-semibold text-ink">{branch.title || branch.key}</td>
                 <td className="table-cell"><Badge tone={branch.status === 'active' ? 'positive' : 'neutral'}>{tStatus(branch.status)}</Badge></td>
                 <td className="table-cell text-muted">{branch.reason_summary || '--'}</td>
-                <td className="table-cell text-right">{runs.filter((run) => run.branch_id === branch.id).length}</td>
+                <td className="table-cell text-right">{branch.run_count ?? runs.filter((run) => run.branch_id === branch.id).length}</td>
                 {showMap ? <td className="table-cell" onClick={(event) => event.stopPropagation()}><MapNodeCell nodes={mapIndex.byBranch[branch.id]} onLocate={onLocateMapNode} /></td> : null}
                 <td className="table-cell text-right text-muted">{formatDate(branch.updated_at)}</td>
               </tr>
@@ -3298,123 +3117,43 @@ function BranchesTable({ branches, runs, onSelect, onChanged, mapIndex = null, o
 }
 
 function BranchPage({ data, selectedBranchId, selectBranch, selectRun, onChanged }) {
-  const branch = (data?.branches || []).find((item) => item.id === selectedBranchId) || data?.branches?.[0];
-  const dashboardRuns = (data?.runs || []).filter((run) => run.branch_id === branch?.id);
-  const dashboardSweeps = (data?.sweeps || []).filter((sweep) => sweep.branch_id === branch?.id);
-  const [lineage, setLineage] = useState(null);
-  const [lineageError, setLineageError] = useState(null);
-  const [branchSweeps, setBranchSweeps] = useState(null);
-  const [branchSweepsError, setBranchSweepsError] = useState(null);
-  useEffect(() => {
-    if (!branch?.id) {
-      setLineage(null);
-      setLineageError(null);
-      return;
-    }
-    let cancelled = false;
-    apiGet(`/api/v1/lineage/branches/${branch.id}`)
-      .then((payload) => {
-        if (!cancelled) {
-          setLineage(payload);
-          setLineageError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setLineage(null);
-          setLineageError(err.message);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [branch?.id, data?.branches?.length, data?.runs?.length]);
-  useEffect(() => {
-    if (!SHOW_SWEEPS) {
-      setBranchSweeps(null);
-      setBranchSweepsError(null);
-      return undefined;
-    }
-    if (!branch?.id) {
-      setBranchSweeps(null);
-      setBranchSweepsError(null);
-      return;
-    }
-    let cancelled = false;
-    setBranchSweeps(null);
-    apiGet(`/api/v1/branches/${branch.id}/sweeps`)
-      .then((payload) => {
-        if (!cancelled) {
-          setBranchSweeps(payload);
-          setBranchSweepsError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setBranchSweeps(dashboardSweeps);
-          setBranchSweepsError(err.message);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [branch?.id, data?.sweeps?.length]);
+  const branch = (data?.branches || []).find(b => b.id === selectedBranchId) || data?.branches?.[0];
+  const [page, setPage] = useState(1);
+  useEffect(() => setPage(1), [branch?.id]);
   if (!branch) return <EmptyState title="No branches yet" detail="Branches appear after the first run is recorded." />;
-  const sweeps = SHOW_SWEEPS ? (branchSweeps || dashboardSweeps) : [];
-  const branchRuns = (lineage?.runs || dashboardRuns).filter((run) => run.branch_id === branch.id);
-  const orderedRuns = [...branchRuns].sort((a, b) => new Date(a.created_at || a.updated_at) - new Date(b.created_at || b.updated_at));
-  const handleBranchChanged = async () => {
-    await onChanged();
-    try {
-          const payload = await apiGet(`/api/v1/branches/${branch.id}/sweeps`);
-      setBranchSweeps(payload);
-      setBranchSweepsError(null);
-    } catch (err) {
-      setBranchSweeps(dashboardSweeps);
-      setBranchSweepsError(err.message);
-    }
-  };
-  return (
-    <div className="space-y-4">
-      <Hero eyebrow={`Research / ${branch.research_key || '--'}`} title={branch.title || branch.key} description={branch.hypothesis || branch.reason_summary || null} />
-      <BranchWorkspaceSummary branch={branch} runs={branchRuns} sweeps={sweeps} />
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className="space-y-4 xl:col-span-8">
-          <DecisionRunsPanel title="Branch Runs" runs={branchRuns} onSelectRun={selectRun} onSelectBranch={() => {}} />
-          {SHOW_SWEEPS ? <BranchSweepPanel branch={branch} runs={branchRuns} sweeps={sweeps} error={branchSweepsError} onChanged={handleBranchChanged} onSelectRun={selectRun} /> : null}
-        </div>
-        <BranchChampionPanel runs={branchRuns} onSelectRun={selectRun} />
-      </div>
-          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-            <BranchMetricEvolution runs={orderedRuns} onSelectRun={selectRun} />
-            <BranchConfigEvolution runs={orderedRuns} onSelectRun={selectRun} />
-          </div>
-      <QuickCompareCard
-        title="Compare"
-        targets={orderedRuns.map((run) => ({ type: 'run', id: run.id }))}
-        emptyText="No runs on this branch."
-        onSelectRun={selectRun}
-      />
-      <DashboardCollapsedSection title="Branch Context">
-        <div className="space-y-4 p-3">
-          <BranchEditPanel branch={branch} onChanged={onChanged} />
-          <BranchLineagePanel lineage={lineage} error={lineageError} fallbackBranch={branch} fallbackBranches={data?.branches || []} fallbackRuns={data?.runs || []} onSelectBranch={selectBranch} onSelectRun={selectRun} />
+  return <div className="space-y-4">
+    <Hero eyebrow={`Research / ${branch.research_id}`} title={branch.title || branch.key} description={branch.hypothesis || branch.reason_summary || null} />
+    <Resource path={`/api/v1/ui/branches/${branch.id}/summary`}>{part => <><BranchWorkspaceSummary branch={part.branch} runs={[]} sweeps={[]} /><BranchChampionPanel runs={part.champion ? [part.champion] : []} onSelectRun={selectRun} /></>}</Resource>
+    <Resource path={`/api/v1/ui/runs?branch=${branch.id}&page=${page}`}>{part => <>
+      <DecisionRunsPanel title="Branch Runs" runs={part.runs} onSelectRun={selectRun} onSelectBranch={selectBranch} /><Pager page={page} total={part.total} limit={part.limit} onChange={setPage} />
+      <DashboardCollapsedSection title="指标与配置演进（当前页）"><Resource path={`/api/v1/ui/branches/${branch.id}/evolution?page=${page}`}>{evolution => <div className="grid gap-3 xl:grid-cols-2"><BranchMetricEvolution runs={evolution.runs} onSelectRun={selectRun} /><BranchConfigEvolution runs={evolution.runs} /></div>}</Resource></DashboardCollapsedSection>
+      <QuickCompareCard targets={part.runs.map(run => ({type:'run',id:run.id}))} onSelectRun={selectRun} />
+      {SHOW_SWEEPS ? <DashboardCollapsedSection title="Sweeps"><Resource path={`/api/v1/branches/${branch.id}/sweeps`}>{sweeps => <BranchSweepPanel branch={branch} runs={part.runs} sweeps={sweeps} onChanged={onChanged} onSelectRun={selectRun} />}</Resource></DashboardCollapsedSection> : null}
+    </>}</Resource>
+    <DashboardCollapsedSection title="Branch Context"><div className="space-y-4 p-3"><BranchEditPanel branch={branch} onChanged={onChanged} />
+      <BranchHistory branch={branch} selectBranch={selectBranch} selectRun={selectRun} />
+    </div></DashboardCollapsedSection>
+  </div>;
+}
 
-        </div>
-      </DashboardCollapsedSection>
-    </div>
-  );
+function BranchHistory({ branch, selectBranch, selectRun }) {
+  const [page, setPage] = useState(1);
+  return <Resource path={`/api/v1/ui/lineage?branch=${branch.id}&page=${page}`}>{lineage => <><BranchLineagePanel lineage={lineage} fallbackBranch={branch} fallbackBranches={[]} fallbackRuns={[]} onSelectBranch={selectBranch} onSelectRun={selectRun} /><Pager page={page} total={lineage.total} limit={lineage.limit} onChange={setPage} /></>}</Resource>;
 }
 
 function BranchWorkspaceSummary({ branch, runs, sweeps }) {
-  const completedRuns = runs.filter((run) => run.status === 'completed').length;
-  const runningRuns = runs.filter((run) => run.status === 'running').length;
+  const completedRuns = branch.completed_run_count ?? runs.filter((run) => run.status === 'completed').length;
+  const runningRuns = branch.running_run_count ?? runs.filter((run) => run.status === 'running').length;
   const latestRun = [...runs].sort((a, b) => dateMillis(b.updated_at || b.created_at) - dateMillis(a.updated_at || a.created_at))[0];
   return (
     <Panel className="p-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
         <ReadOnlyField label="Status" value={tStatus(branch.status)} />
-        <ReadOnlyField label="Runs" value={runs.length} />
+        <ReadOnlyField label="Runs" value={branch.run_count ?? runs.length} />
         <ReadOnlyField label="Completed" value={completedRuns} />
         <ReadOnlyField label="Running" value={runningRuns} />
         {SHOW_SWEEPS ? <ReadOnlyField label="Sweeps" value={sweeps.length} /> : null}
-        <ReadOnlyField label="Latest Run" value={latestRun?.name || '--'} />
+        <ReadOnlyField label="Latest Run" value={branch.latest_run_name || latestRun?.name || '--'} />
       </div>
     </Panel>
   );
@@ -3617,7 +3356,11 @@ const quickCompareMetrics = [
   'strategy.summary.turnover',
 ];
 
-function QuickCompareCard({ title = 'Compare', targets, emptyText = 'No targets available for compare.', onSelectRun }) {
+function QuickCompareCard(props) {
+  return <DashboardCollapsedSection title={props.title || 'Compare'}><QuickCompareContent {...props} /></DashboardCollapsedSection>;
+}
+
+function QuickCompareContent({ title = 'Compare', targets, emptyText = 'No targets available for compare.', onSelectRun }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [selectedRunIds, setSelectedRunIds] = useState([]);
@@ -4376,9 +4119,15 @@ function SweepParetoPanel({ summary, runs, onSelectRun }) {
   );
 }
 
-function RunPage({ runDetail, data, onRunChanged }) {
-  const [activeTab, setActiveTab] = usePageQuery(`/runs/${runDetail?.id}`, 'tab', ['running', 'failed'].includes(runDetail?.status) ? 'events' : 'results');
-  if (!runDetail) return <EmptyState title="No run selected" detail="Select a run from Dashboard, Research, or Branch." />;
+function RunPage({ runDetail: initialRun, data, onRunChanged }) {
+  const summary = useResource(initialRun?.id ? `/api/v1/ui/runs/${initialRun.id}` : null);
+  const baseRun = summary.data || initialRun;
+  const [activeTab, setActiveTab] = usePageQuery(`/runs/${baseRun?.id}`, 'tab', ['running', 'failed'].includes(baseRun?.status) ? 'events' : 'results');
+  const [contentPage, setContentPage] = useState(1);
+  useEffect(() => setContentPage(1), [activeTab, baseRun?.id]);
+  const content = useResource(baseRun?.id ? `/api/v1/ui/runs/${baseRun.id}?section=${activeTab}&page=${contentPage}` : null);
+  const runDetail = { ...baseRun, ...(content.data || {}) };
+  if (!baseRun) return <EmptyState title="No run selected" detail="Select a run from Dashboard, Research, or Branch." />;
   const metrics = runDetail.metrics || [];
   const artifacts = runDetail.artifacts || [];
   const events = runDetail.events || [];
@@ -4398,7 +4147,7 @@ function RunPage({ runDetail, data, onRunChanged }) {
       />
       <details className="bento-panel p-4"><summary className="cursor-pointer font-semibold">运行状态操作 · {tStatus(runDetail.status)}</summary><p className="my-3 text-sm text-muted">仅记录当前 Run 的完成、失败或取消；取消记录不代表远程进程已停止。终态操作受现有服务端规则约束。</p><RunStatusActions run={runDetail} onRunChanged={onRunChanged} /></details>
       <RunSummaryStrip run={runDetail} />
-      <RunResultSummaryPanel
+      {activeTab === 'results' && content.data ? <><RunResultSummaryPanel
         run={runDetail}
         diagnostics={diagnostics}
         resultItems={resultItems}
@@ -4406,7 +4155,9 @@ function RunPage({ runDetail, data, onRunChanged }) {
         equityChart={equityChart}
         seriesArtifacts={seriesArtifacts}
       />
-      <RunQualityDiagnosticsCard diagnostics={diagnostics} />
+      <RunQualityDiagnosticsCard diagnostics={diagnostics} /></> : null}
+      {content.error ? <InlineError message={content.error} /> : null}
+      {!content.data && !content.error ? <p className="p-3 text-muted">加载当前标签…</p> : null}
       <RunTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -4419,9 +4170,10 @@ function RunPage({ runDetail, data, onRunChanged }) {
         run={runDetail}
         notes={notes}
       />
+      {content.data?.section_total != null ? <Pager page={contentPage} total={content.data.section_total} limit={100} onChange={setContentPage} /> : null}
       <DashboardCollapsedSection title="Actions">
         <div className="p-4">
-          <RunWritePanel run={runDetail} data={data} onRunChanged={onRunChanged} />
+          <Resource path={`/api/v1/ui/runs/${runDetail.id}?section=config`}>{config => <ScopedOptions data={data} kind="actions">{options => <RunWritePanel run={{...runDetail,...config}} data={options} onRunChanged={onRunChanged} />}</ScopedOptions>}</Resource>
         </div>
       </DashboardCollapsedSection>
     </div>
@@ -6693,7 +6445,7 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
       />
       <Panel className="p-4 space-y-3"><Field label="比较基准（仅影响本页差值）"><SelectInput value={baselineRun?.id || ''} onChange={event => setBaselineId(event.target.value)}>
         {comparedRuns.map(run => <option key={run.id} value={run.id}>{run.name}</option>)}
-      </SelectInput></Field><p className="text-xs text-muted">{baselineId && comparedRuns.some(run => run.id === baselineId) ? '本页手动选择' : `默认：${representativeReason(baselineRun)}`}。不会修改研究地图基准或研究评审结论。</p></Panel>
+      </SelectInput></Field><p className="text-xs text-muted">{baselineId && comparedRuns.some(run => run.id === baselineId) ? '本页手动选择' : `默认：${representativeReason(baselineRun)}`}。不会修改研究地图最优候选或研究评审结论。</p></Panel>
       <ComparisonScopePanel runs={sortedRuns} />
       <CompareDecisionSummaryPanel
         metrics={result?.metrics || {}}
@@ -6734,7 +6486,7 @@ function ComparePage({ data, selectProject, selectResearch, selectRun, selectBra
           />
           <CompareSetListPanel compareSets={compareSets} selectedCompareSet={selectedCompareSet} onRun={runCompareSet} />
           <BatchComparePanel selectedIds={selectedIds} metricsText={metricsText} seriesText={seriesText} />
-          <RunSelectionTable runs={runs} selectedIds={selectedIds} onToggle={toggleRun} onSelectRun={selectRun} />
+          <ScopedOptions data={data} kind="compare-create">{options => <RunSelectionTable runs={options.runs} selectedIds={selectedIds} onToggle={toggleRun} onSelectRun={selectRun} />}</ScopedOptions>
         </div>
       </DashboardCollapsedSection>
       <DashboardCollapsedSection title="高级诊断与原始明细">
@@ -6780,10 +6532,10 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
   return (
     <div className="space-y-4">
       <Hero eyebrow="Compare" title="对比工作台" description="按项目和研究阶段管理保存的对比集合，再进入具体对比结果。" action={<button className="primary-button" type="button" onClick={() => setCreating(current => !current)}>{creating ? '返回对比目录' : '新建对比'}</button>} />
-      <div hidden={!creating} className="bento-panel" aria-label="新建对比">
+      {creating ? <div className="bento-panel" aria-label="新建对比"><ScopedOptions data={data} kind="compare-create">{options => <>
         <div className="space-y-4 p-4">
           <CompareControlPanel
-            data={data}
+            data={options}
             metricsText={metricsText}
             onMetricsChange={onMetricsChange}
             seriesText={seriesText}
@@ -6800,9 +6552,9 @@ function CompareWorkbenchPage({ data, runs, selectedIds, selectedCompareSet, res
             comparedRuns={comparedRuns}
             onClearCompareSet={onClearCompareSet}
           />
-          <RunSelectionTable runs={runs} selectedIds={selectedIds} onToggle={onToggleRun} onSelectRun={onSelectRun} />
+          <RunSelectionTable runs={options.runs} selectedIds={selectedIds} onToggle={onToggleRun} onSelectRun={onSelectRun} />
         </div>
-      </div>
+      </>}</ScopedOptions></div> : null}
       <div className="dashboard-stats-grid">
         <Panel><ReadOnlyField label="Compare Sets" value={String(rows.length)} /></Panel>
         <Panel><ReadOnlyField label="Projects" value={String(projectCount)} /></Panel>
@@ -9632,7 +9384,7 @@ function projectResearchActivityRows(researches, branches, runs) {
     const failed7d = research.failed_run_count_7d ?? researchRuns.filter((run) => run.status === 'failed' && new Date(run.updated_at || run.ended_at || run.created_at).getTime() >= since7d).length;
     const champion = researchChampionRun(research, researchBranches, researchRuns);
     const latestRun = sortRunsByRecentActivity(researchRuns)[0] || null;
-    const lastRunTime = latestRun?.updated_at || latestRun?.ended_at || latestRun?.started_at || latestRun?.created_at || research.updated_at || research.created_at;
+    const lastRunTime = research.latest_run_at || latestRun?.updated_at || latestRun?.ended_at || latestRun?.started_at || latestRun?.created_at || research.updated_at || research.created_at;
     const lastRunAt = dateMillis(lastRunTime);
     return {
       research,
@@ -11350,16 +11102,24 @@ function App() {
   const [createRequest, setCreateRequest] = useState(null);
   const toggleTheme = () => setTheme((current) => { const next = current === 'light' ? 'dark' : 'light'; applyTheme(next); return next; });
 
+  const contextId = ({ project: selectedProjectId, research: selectedResearchId, branch: selectedBranchId, run: selectedRunId, compare: selectedCompareSetId, search: selectedSearchViewId })[active];
+  const contextPath = `/api/v1/ui/context?view=${active}${contextId ? `&id=${encodeURIComponent(contextId)}` : ''}`;
+  const currentContext = useRef(contextPath);
+  currentContext.current = contextPath;
+  const dataContext = useRef(null);
+
   const refresh = async () => {
     setLoading(true);
     setError(null);
     try {
-      const dashboard = await apiGet('/api/v1/dashboard');
+      const dashboard = await apiGet(contextPath);
+      if (currentContext.current !== contextPath) return null;
+      dataContext.current = contextPath;
       setData(dashboard);
-      setSelectedProjectId((current) => current || dashboard.projects?.[0]?.id || null);
-      setSelectedResearchId((current) => current || dashboard.researches?.[0]?.id || null);
-      setSelectedBranchId((current) => current || dashboard.branches?.[0]?.id || null);
-      setSelectedRunId((current) => current || dashboard.runs?.[0]?.id || null);
+      if (active === 'project') setSelectedProjectId((current) => current || dashboard.projects?.[0]?.id || null);
+      if (active === 'research') setSelectedResearchId((current) => current || dashboard.researches?.[0]?.id || null);
+      if (active === 'branch') setSelectedBranchId((current) => current || dashboard.branches?.[0]?.id || null);
+      if (active === 'run') setSelectedRunId((current) => current || dashboard.runs?.[0]?.id || null);
       setSelectedSweepId((current) => current || dashboard.sweeps?.[0]?.id || null);
       return dashboard;
     } catch (err) {
@@ -11370,7 +11130,7 @@ function App() {
     }
   };
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { refresh(); }, [contextPath]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -11438,12 +11198,18 @@ function App() {
   }, [active, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedRunId, selectedSearchViewId, selectedSweepId]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      refresh();
-      if (active === 'run' && selectedRunId) loadRunDetail(selectedRunId);
-    }, 15000);
-    return () => window.clearInterval(timer);
-  }, [active, selectedRunId]);
+    let stopped = false;
+    let timer;
+    const poll = async () => {
+      if (!document.hidden) await refresh();
+      if (!stopped) timer = setTimeout(poll, 30000);
+    };
+    const changed = () => { clearTimeout(timer); timer = setTimeout(poll, 500); };
+    timer = setTimeout(poll, 30000);
+    window.addEventListener('blackbox:data-change', changed);
+    document.addEventListener('visibilitychange', changed);
+    return () => { stopped = true; clearTimeout(timer); window.removeEventListener('blackbox:data-change', changed); document.removeEventListener('visibilitychange', changed); };
+  }, [contextPath]);
 
   useEffect(() => {
     if (!window.WebSocket) {
@@ -11458,8 +11224,7 @@ function App() {
     const scheduleRefresh = () => {
       window.clearTimeout(refreshTimer);
       refreshTimer = window.setTimeout(() => {
-        refresh();
-        if (active === 'run' && selectedRunId) loadRunDetail(selectedRunId);
+        notifyDataChange();
       }, 250);
     };
     const connect = () => {
@@ -11468,7 +11233,7 @@ function App() {
       socket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          if (message.type !== 'connected') scheduleRefresh();
+          if (message.type !== 'connected') notifyDataChange(message);
         } catch {
           scheduleRefresh();
         }
@@ -11495,7 +11260,7 @@ function App() {
       return null;
     }
     try {
-      const detail = await apiGet(`/api/v1/runs/${runId}`);
+      const detail = await apiGet(`/api/v1/ui/runs/${runId}`);
       setRunDetail(detail);
       return detail;
     } catch {
@@ -11537,11 +11302,13 @@ function App() {
     if (kind === 'search-view') selectSearchView(entity.id);
   };
   const onRunChanged = async (runId) => {
+    notifyDataChange();
     setSelectedRunId(runId);
     await loadRunDetail(runId);
     await refresh();
   };
   const onChanged = async () => {
+    notifyDataChange();
     await refresh();
   };
 
@@ -11570,7 +11337,7 @@ function App() {
 
   const page = useMemo(() => {
     if (error) return <EmptyState title="API unavailable" detail={error} />;
-    if (!data && loading) return <AppLoadingAnimation />;
+    if (!data || dataContext.current !== contextPath) return <AppLoadingAnimation />;
     if (!data) return <EmptyState title="No API data" detail="Start the FastAPI server or set VITE_BLACKBOX_API_BASE." />;
     if (active === 'management') return <ManagementPage data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} />;
     if (active === 'project') return <ProjectPage data={data} selectedProjectId={selectedProjectId} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectCompareSet={selectCompareSet} selectSearchView={selectSearchView} selectMap={selectMap} onChanged={onChanged} />;
@@ -11581,8 +11348,8 @@ function App() {
     if (active === 'run') return <RunPage runDetail={runDetail} data={data} onRunChanged={onRunChanged} />;
     if (active === 'sweep' && !SHOW_SWEEPS) return <Dashboard data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectSweep={selectSweep} onChanged={onChanged} />;
     if (active === 'sweep') return <SweepPage data={data} selectedSweepId={selectedSweepId} selectSweep={selectSweep} selectRun={selectRun} onChanged={onChanged} />;
-    if (active === 'search') return <SearchPage data={data} selectRun={selectRun} selectResearch={selectResearch} selectBranch={selectBranch} selectedSearchViewId={selectedSearchViewId} quickSearch={quickSearch} onChanged={onChanged} />;
-    if (active === 'compare') return <ComparePage data={data} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} selectBranch={selectBranch} selectCompareSet={selectCompareSet} selectedCompareSetId={selectedCompareSetId} onChanged={onChanged} />;
+    if (active === 'search') return <ScopedOptions data={data} kind="search">{options => <SearchPage data={options} selectRun={selectRun} selectResearch={selectResearch} selectBranch={selectBranch} selectedSearchViewId={selectedSearchViewId} quickSearch={quickSearch} onChanged={onChanged} />}</ScopedOptions>;
+    if (active === 'compare') return <ScopedOptions data={data} kind="compare">{options => <ComparePage data={options} selectProject={selectProject} selectResearch={selectResearch} selectRun={selectRun} selectBranch={selectBranch} selectCompareSet={selectCompareSet} selectedCompareSetId={selectedCompareSetId} onChanged={onChanged} />}</ScopedOptions>;
     return <Dashboard data={data} selectProject={selectProject} selectResearch={selectResearch} selectBranch={selectBranch} selectRun={selectRun} selectSweep={selectSweep} onChanged={onChanged} />;
   }, [active, data, error, loading, quickSearch, runDetail, selectedBranchId, selectedCompareSetId, selectedMapId, selectedProjectId, selectedResearchId, selectedSearchViewId, selectedSweepId, theme]);
 

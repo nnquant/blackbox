@@ -1,3 +1,4 @@
+import { useResource } from './onDemand';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, ExternalLink, Maximize2, Minimize2, Network, RefreshCw } from 'lucide-react';
@@ -70,7 +71,7 @@ function fileHref(file, settings) {
   if (!base) return null;
   return `${String(base).replace(/\/+$/, '')}/${String(file).split('/').map(encodeURIComponent).join('/')}`;
 }
-const qualityLabel = (sev) => ({ ok: t('passed'), warning: t('warning'), error: t('failed'), pending: t('pending run') }[sev] || sev || '--');
+const qualityLabel = (sev) => ({ ok: t('passed'), warning: t('warning'), error: t('failed'), pending: t('pending run'), not_loaded: '选择节点后查看', unknown: '暂无法检查' }[sev] || sev || '--');
 function metricLabel(path) {
   const key = String(path || '').split('.').pop();
   return { sharpe: 'Sharpe', calmar: 'Calmar', sortino: 'Sortino', annual_return: t('Annual'), max_drawdown: t('MDD') }[key] || key;
@@ -372,7 +373,7 @@ function EvidenceSection({ binding, nav }) {
   const run = binding.run;
   const br = binding.branch;
   if (!run) return <section className="sec"><h4>{t('Evidence')}{br ? <button className="lnk" type="button" onClick={() => nav.selectBranch(br.id)}>{t('Open branch')} →</button> : null}</h4><div className="text-xs text-subtle">{t('No runs on this branch yet')}</div></section>;
-  const q = run.status === 'running' ? <span className="badge run">● {t('running')}</span> : run.status !== 'completed' ? <span className="badge warn">{run.status}</span> : run.quality?.severity === 'ok' ? <span className="badge ok">✓ {t('quality gate')} {qualityLabel('ok')}</span> : run.quality?.severity === 'warning' ? <span className="badge warn">! {t('quality gate')} {qualityLabel('warning')}</span> : <span className="badge err">✕ {t('quality gate')} {qualityLabel('error')}</span>;
+  const q = run.status === 'running' ? <span className="badge run">● {t('running')}</span> : run.status !== 'completed' ? <span className="badge warn">{run.status}</span> : run.quality?.severity === 'ok' ? <span className="badge ok">✓ {t('quality gate')} {qualityLabel('ok')}</span> : run.quality?.severity === 'warning' ? <span className="badge warn">! {t('quality gate')} {qualityLabel('warning')}</span> : run.quality?.severity === 'error' ? <span className="badge err">✕ {t('quality gate')} {qualityLabel('error')}</span> : <span className="badge warn">{qualityLabel(run.quality?.severity || 'unknown')}</span>;
   return (
     <section className="sec">
       <h4>{t('Evidence')}<button className="lnk" type="button" onClick={() => nav.selectRun(run.id)}>{t('Open run')} →</button></h4>
@@ -500,7 +501,7 @@ export function ResearchMapView({ map, embedded = false, nav, locate, onOpenPage
       <div className="rmap-tabbody">
         {tab === 'overview'
           ? <MapOverview map={map} index={index} nav={nav} reveal={reveal} hiddenFamilies={hiddenFamilies} hiddenStages={hiddenStages} toggleFamily={toggleIn(setHiddenFamilies)} toggleStage={toggleIn(setHiddenStages)} />
-          : <NodeDetail node={selected} index={index} map={map} onSelectNode={reveal} nav={nav} />}
+          : <LazyNodeDetail node={selected} index={index} map={map} onSelectNode={reveal} nav={nav} />}
       </div>
     </aside>
   );
@@ -581,18 +582,23 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
 // Pages and panels
 // ---------------------------------------------------------------------------
 
-function useMap(mapId, refreshToken) {
-  const [map, setMap] = useState(null);
-  const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    setError(null);
-    if (!mapId) { setMap(null); return undefined; }
-    let cancelled = false;
-    apiGet(`/api/v1/research-maps/${mapId}`).then((payload) => { if (!cancelled) { setMap(current => JSON.stringify(current) === JSON.stringify(payload) ? current : payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
-    return () => { cancelled = true; };
-  }, [mapId, refreshToken, retry]);
-  return { map: map?.id === mapId ? map : null, error, reload: () => setRetry(value => value + 1) };
+function useMap(mapId) {
+  const { data: map, error, reload } = useResource(mapId ? `/api/v1/ui/maps/${mapId}` : null, {
+    accepts: event => {
+      const p = event.payload || {};
+      if (p.map_id) return p.map_id === mapId;
+      if (p.run_id && map) return map.nodes.some(n => n.binding?.id === p.run_id || n.binding?.run?.id === p.run_id || (p.branch_id && n.binding?.id === p.branch_id));
+      return /run|metric|artifact|branch|compare|research_map/.test(event.type || '');
+    },
+  });
+  return { map, error, reload };
+}
+
+function LazyNodeDetail({ node, index, map, ...props }) {
+  const { data, error, reload } = useResource(node ? `/api/v1/ui/maps/${map.id}/nodes/${encodeURIComponent(node.key)}` : null);
+  if (!node) return <div className="p-4 text-muted">请选择节点</div>;
+  if (!data) return <div className="p-4 text-muted">{error || '加载节点证据…'}{error ? <button className="secondary-button" onClick={reload}>重试</button> : null}</div>;
+  return <>{error ? <div className="p-2 text-negative">更新失败：{error}</div> : null}<NodeDetail node={{...node,...data}} index={index} map={map} {...props} /></>;
 }
 
 export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject, selectResearch, selectBranch, selectRun, selectCompareSet }) {
@@ -607,15 +613,8 @@ export function ResearchMapsPage({ data, selectedMapId, selectMap, selectProject
 }
 
 function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResearch }) {
-  const [maps, setMaps] = useState(null);
-  const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0);
+  const { data: maps, error, reload } = useResource('/api/v1/research-maps?include_evidence=false');
   const [query, setQuery] = usePageQuery('/maps', 'query', '');
-  useEffect(() => {
-    let cancelled = false;
-    apiGet('/api/v1/research-maps?include_evidence=false').then((payload) => { if (!cancelled) { setMaps(payload); setError(null); } }).catch((err) => { if (!cancelled) setError(err.message); });
-    return () => { cancelled = true; };
-  }, [refreshToken, retry]);
   const rows = (maps || []).filter(map => [map.title,map.key,map.project_key,map.research_key].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
   return (
     <div className="space-y-4">
@@ -625,7 +624,7 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
         <p className="mt-2 max-w-4xl text-sm leading-5 text-muted">{t('Research maps are maintained by research agents by hand. Structure and narrative are written; evidence is read from the bound run, branch, or compare set.')}</p>
       </section>
       <input className="form-control" type="search" aria-label="搜索地图" placeholder="搜索地图、项目、研究线" value={query} onChange={event => setQuery(event.target.value)} />
-      {error ? <div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}<button className="secondary-button ml-3" type="button" onClick={() => setRetry(value => value + 1)}>重试</button></div> : null}
+      {error ? <div className="rounded-md bg-negativeSoft px-3 py-2 text-xs font-semibold text-negative">{error}<button className="secondary-button ml-3" type="button" onClick={reload}>重试</button></div> : null}
       <section className="bento-panel overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3"><h2 className="text-sm font-semibold text-ink">{t('Research Maps')}</h2><span className="text-xs text-muted">{rows.length}</span></div>
         {error ? <p className="p-4 text-sm text-muted">地图加载失败，当前数量未知。</p> : maps === null ? <div className="flex items-center gap-2 px-4 py-6 text-sm text-muted"><RefreshCw className="h-4 w-4 animate-spin" />{t('Loading')}</div> : rows.length === 0 ? (
@@ -660,20 +659,12 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
 }
 
 export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelectMap }) {
-  const [maps, setMaps] = useState(null);
-  const [listError, setListError] = useState(null);
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    if (!scopeId) { setMaps(null); return undefined; }
-    let cancelled = false;
-    apiGet(`/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps?include_evidence=false`).then((payload) => { if (!cancelled) { setMaps(payload); setListError(null); } }).catch(err => { if (!cancelled) setListError(err.message); });
-    return () => { cancelled = true; };
-  }, [scope, scopeId, refreshToken, retry]);
+  const { data: maps, error: listError, reload } = useResource(scopeId ? `/api/v1/${scope === 'research' ? 'researches' : 'projects'}/${scopeId}/research-maps?include_evidence=false` : null);
   const rows = maps || [];
   return (
     <section className="bento-panel overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3"><div className="flex items-center gap-2"><Network className="h-4 w-4 text-muted" /><h2 className="text-sm font-semibold text-ink">{t('Research Maps')}</h2></div><span className="text-xs text-muted">{rows.length}</span></div>
-      {listError ? <div className="p-4 text-sm text-negative">地图加载失败：{listError}<button className="secondary-button ml-3" onClick={() => setRetry(value => value + 1)}>重试</button></div> : maps === null ? <p className="p-4">加载地图中…</p> : rows.length === 0 ? <div className="px-4 py-4 text-sm text-muted">{t('No research map for this scope yet. Agents maintain maps with bbox map.')}</div> : (
+      {listError ? <div className="p-4 text-sm text-negative">地图加载失败：{listError}<button className="secondary-button ml-3" onClick={reload}>重试</button></div> : maps === null ? <p className="p-4">加载地图中…</p> : rows.length === 0 ? <div className="px-4 py-4 text-sm text-muted">{t('No research map for this scope yet. Agents maintain maps with bbox map.')}</div> : (
         <ul className="divide-y divide-line/70">
           {rows.map((row) => (
             <li className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5" key={row.id}>
@@ -692,16 +683,9 @@ export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelect
 
 /** Embedded map for the Research page. Reports an entity→nodes index so tables can show the map-node column. */
 export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locate, selectMap }) {
-  const [maps, setMaps] = useState(null);
-  const [listError, setListError] = useState(null);
-  const [retry, setRetry] = useState(0);
+  const { data: maps, error: listError, reload: reloadList } = useResource(researchId ? `/api/v1/researches/${researchId}/research-maps?include_evidence=false` : null);
   const [mapId, setMapId] = useState(null);
-  useEffect(() => {
-    if (!researchId) { setMaps(null); setMapId(null); return undefined; }
-    let cancelled = false;
-    apiGet(`/api/v1/researches/${researchId}/research-maps?include_evidence=false`).then((payload) => { if (!cancelled) { setListError(null); setMaps(payload); setMapId((current) => (payload.some((m) => m.id === current) ? current : payload[0]?.id || null)); } }).catch(err => { if (!cancelled) setListError(err.message); });
-    return () => { cancelled = true; };
-  }, [researchId, refreshToken, retry]);
+  useEffect(() => { if (maps) setMapId(current => maps.some(m => m.id === current) ? current : maps[0]?.id || null); }, [maps]);
   const { map, error: mapError, reload } = useMap(mapId, refreshToken);
   useEffect(() => {
     if (!onIndex) return;
@@ -715,7 +699,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     });
     onIndex({ byRun, byBranch, mapId: map.id });
   }, [map, onIndex]);
-  if ((listError || mapError) && !map) return <section className="bento-panel p-4 text-sm text-negative">地图加载失败：{listError || mapError}<button className="secondary-button ml-3" onClick={() => { setRetry(value => value + 1); reload(); }}>重试</button></section>;
+  if ((listError || mapError) && !map) return <section className="bento-panel p-4 text-sm text-negative">地图加载失败：{listError || mapError}<button className="secondary-button ml-3" onClick={() => { reloadList(); reload(); }}>重试</button></section>;
   if (maps === null) return <p className="text-sm text-muted">加载地图中…</p>;
   if (!maps.length) {
     return (
@@ -730,7 +714,7 @@ export function ResearchMapEmbed({ researchId, refreshToken, nav, onIndex, locat
     </select>
   ) : null;
   if (!map) return <section className="bento-panel px-4 py-3 text-sm text-muted"><RefreshCw className="inline h-4 w-4 animate-spin" /> {t('Loading')}</section>;
-  return <ResearchMapView key={map.id} map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={<>{switcher}{listError || mapError ? <button className="secondary-button text-negative" title={listError || mapError} onClick={() => { setRetry(value => value + 1); reload(); }}>更新失败，点击重试</button> : null}</>} />;
+  return <ResearchMapView key={map.id} map={map} embedded nav={nav} locate={locate} onOpenPage={() => selectMap(map.id)} headerExtra={<>{switcher}{listError || mapError ? <button className="secondary-button text-negative" title={listError || mapError} onClick={() => { reloadList(); reload(); }}>更新失败，点击重试</button> : null}</>} />;
 }
 
 /** Table cell: which map nodes bind this entity. */

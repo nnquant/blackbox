@@ -9,7 +9,7 @@ from sqlalchemy.schema import CreateColumn
 from .db import Base
 
 
-CURRENT_SCHEMA_VERSION = 9
+CURRENT_SCHEMA_VERSION = 10
 MIGRATION_TABLE = "schema_migrations"
 
 
@@ -25,6 +25,10 @@ def migrate_database(engine: Engine) -> dict[str, Any]:
     Base.metadata.create_all(bind=engine)
     ensure_migration_table(engine)
     added_columns = ensure_missing_columns(engine)
+    # create_all does not add indexes to existing tables.
+    from .models import Run
+    for index in Run.__table__.indexes:
+        index.create(bind=engine, checkfirst=True)
     ensure_default_workspace(engine)
     applied = stamp_current_version(engine)
     after = schema_status(engine)

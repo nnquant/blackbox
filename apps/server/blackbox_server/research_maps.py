@@ -228,7 +228,11 @@ def run_quality(db: Session, run: Run) -> dict[str, Any]:
     if cache is not None and key in cache:
         return cache[key]
     try:
-        report = run_quality_gate_report(db, run)
+        if db.info.get("ui_quality_cache"):
+            from .ui_quality import display_quality
+            report = display_quality(db, run, lambda: run_quality_gate_report(db, run))
+        else:
+            report = run_quality_gate_report(db, run)
     except Exception:  # pragma: no cover - evidence must never break the map
         return {"severity": "unknown", "error_count": 0, "warning_count": 0}
     result = {"severity": report.get("severity"), "error_count": report.get("error_count", 0), "warning_count": report.get("warning_count", 0)}

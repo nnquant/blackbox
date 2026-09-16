@@ -103,6 +103,8 @@ from .models import (
 )
 from .realtime import event_hub, publish_change
 from .research_maps import register_research_map_routes
+from .ui import register_ui_routes
+from starlette.middleware.gzip import GZipMiddleware
 from .representatives import choose_representative, manual_baseline_ids, representative_rows
 from .settings import get_settings
 from .storage import get_artifact_content_target, get_storage
@@ -128,10 +130,14 @@ class SpaStaticFiles(StaticFiles):
         ):
             raise StarletteHTTPException(status_code=404)
         try:
-            return await super().get_response(path, scope)
+            response = await super().get_response(path, scope)
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable" if path_text.startswith("assets/") else "no-cache"
+            return response
         except StarletteHTTPException as exc:
             if exc.status_code == 404 and scope.get("method") in {"GET", "HEAD"}:
-                return await super().get_response("index.html", scope)
+                response = await super().get_response("index.html", scope)
+                response.headers["Cache-Control"] = "no-cache"
+                return response
             raise
 
 
@@ -145,6 +151,7 @@ async def lifespan(_: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(title="blackbox", version="0.1.0", lifespan=lifespan)
+    app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
@@ -302,6 +309,9 @@ def create_app() -> FastAPI:
         branch_run_stats = dashboard_branch_run_stats(db, since_7d)
         champion_by_research = dashboard_champion_runs_by_research(db, branch_by_id, research_by_id, project_by_id)
         pins = manual_baseline_ids(db)
+        branches_by_research = {}
+        for branch in branches:
+            branches_by_research.setdefault(branch.research_id, []).append(branch)
         return ok(
             {
                 "summary": {
@@ -330,7 +340,7 @@ def create_app() -> FastAPI:
                     research_summary_for_dashboard_stats(
                         item,
                         project_by_id,
-                        [branch for branch in branches if branch.research_id == item.id],
+                        branches_by_research.get(item.id, []),
                         branch_run_stats,
                         champion_by_research.get(item.id),
                     )
@@ -1336,10 +1346,10 @@ def create_app() -> FastAPI:
     @app.post("/api/v1/search/researches")
     def search_researches(payload: dict[str, Any], db: Session = Depends(get_db)) -> dict[str, Any]:
         researches = search_research_records(db, payload)
-        all_branches = db.scalars(select(Branch)).all()
-        all_runs = db.scalars(select(Run)).all()
+        all_branches = db.scalars(select(Branch).where(Branch.research_id.in_([r.id for r in researches]))).all()
+        all_runs = db.scalars(select(Run).where(Run.branch_id.in_([b.id for b in all_branches]))).all()
         pins = manual_baseline_ids(db)
-        projects = db.scalars(select(Project)).all()
+        projects = db.scalars(select(Project).where(Project.id.in_({r.project_id for r in researches}))).all()
         return ok(
             [
                 research_summary_for_dashboard(
@@ -1527,6 +1537,7 @@ def create_app() -> FastAPI:
             }
         )
 
+    register_ui_routes(app)
     register_research_map_routes(app)
 
     webui_dist = Path(__file__).resolve().parents[3] / "webui" / "dist"
