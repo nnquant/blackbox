@@ -241,7 +241,7 @@ export const TreeCanvas = forwardRef(function TreeCanvas({ index, collapsed, onT
           </g>
         </g>
       </svg>
-      {hint ? <div className="rmap-hint">{t('Drag to pan · scroll to zoom · click a node for details · click ± to collapse · thick lines mark the mainline to the baseline')}</div> : null}
+      {hint ? <div className="rmap-hint">{t('Drag to pan · scroll to zoom · click a node for details · click ± to collapse · thick lines mark the mainline to the best candidate')}</div> : null}
     </div>
   );
 });
@@ -276,7 +276,7 @@ export function NodeDetail({ node, index, map, onSelectNode, nav }) {
   const baseline = index.baseline && index.baseline.key !== node.key && metricsOf(index.baseline) ? { node: index.baseline, metrics: metricsOf(index.baseline), run: runOf(index.baseline) } : null;
   const par = me ? nearestWithMetrics(node, me) : null;
   const cols = [];
-  if (me && baseline) cols.push({ h: t('vs baseline'), node: baseline.node, metrics: baseline.metrics });
+  if (me && baseline) cols.push({ h: t('vs best candidate'), node: baseline.node, metrics: baseline.metrics });
   if (me && par && (!baseline || !baseline.run || !runOf(par.node) || runOf(par.node).id !== baseline.run.id)) cols.push({ h: par.node === node.parentNode ? t('vs parent') : t('vs ancestor'), node: par.node, metrics: par.metrics });
   const hintText = node.stage === 'idea' ? t('Idea stage, not started yet.') : node.stage === 'hypothesis' ? t('Registered, no experiment result yet.') : ready ? t('Results are in, waiting for a verdict.') : node.decision === 'pending' ? t('Pending: results reviewed, no verdict yet.') : t('In progress, the bound run has not completed.');
   const binding = node.binding;
@@ -293,7 +293,7 @@ export function NodeDetail({ node, index, map, onSelectNode, nav }) {
         <div className="hdrow">
           <span className="pill" style={{ '--c': fam.color, '--cs': fam.soft }}><i />{stageLabel(node)}</span>
           {node.decision ? <span className="pill dec" style={{ '--c': fam.color }}>{decisionLabel(node)}</span> : null}
-          {node.is_baseline ? <span className="pill" style={{ '--c': 'var(--map-red)', '--cs': 'var(--raised)' }}>{t('Current baseline')}</span> : null}
+          {node.is_baseline ? <span className="pill" style={{ '--c': 'var(--map-red)', '--cs': 'var(--raised)' }}>{t('Current best candidate')}</span> : null}
           {node.is_mainline && !node.is_baseline ? <span className="tag">{t('Mainline')}</span> : null}
           {node.parentNode ? <button className="parent" type="button" title={t('Jump to parent')} onClick={() => onSelectNode(node.parentNode.key)}><small>{t('Parent')}</small>{node.parentNode.title}</button> : null}
         </div>
@@ -537,15 +537,15 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
         <dt>{t('Project')}</dt><dd><button type="button" onClick={() => nav.selectProject(map.project_id)}>{map.project_key || map.project_id}</button></dd>
         <dt>{t('Research')}</dt><dd>{map.research_id ? <button type="button" onClick={() => nav.selectResearch(map.research_id)}>{map.research_key || map.research_id}</button> : <span className="text-subtle">—</span>}</dd>
         <dt>{t('Nodes')}</dt><dd>{map.node_count} · {counts.undecided ?? 0} {t('undecided')}</dd>
-        <dt>{t('Mainline')}</dt><dd>{index.mainSet.size} · {t('derived from root to baseline')}</dd>
+        <dt>{t('Mainline')}</dt><dd>{index.mainSet.size} · {t('derived from root to best candidate')}</dd>
         <dt>{t('primary metric')}</dt><dd>{metricLabel(map.primary_metric)}</dd>
         <dt>{t('Updated')}</dt><dd>{ago(map.last_updated_at)} · {formatWhen(map.last_updated_at)}</dd>
         <dt>{t('Key')}</dt><dd className="mono">{map.key}</dd>
       </dl>
       <section className="sec">
-        <h4>{t('Current baseline')}</h4>
+        <h4>{t('Current best candidate')}</h4>
         {baseline ? (
-          <button className="rmap-baseline" type="button" onClick={() => reveal(baseline.key)} title={t('Jump to the baseline node')}>
+          <button className="rmap-baseline" type="button" onClick={() => reveal(baseline.key)} title={t('Jump to the best candidate node')}>
             <span className="k">{baseline.title}</span>
             {baseMetrics ? <>
               <span className="m"><small>{t('Annual')}</small>{fmtPct(baseMetrics.annual_return)}</span>
@@ -555,7 +555,7 @@ function MapOverview({ map, index, nav, reveal, hiddenFamilies, hiddenStages, to
             </> : <span className="m"><small>{t('No bound run metrics')}</small></span>}
             {baseRun ? <span className="m"><small>{t('quality gate')}</small>{qualityLabel(baseRun.quality?.severity)}</span> : null}
           </button>
-        ) : <div className="text-xs text-subtle">{t('No baseline')}</div>}
+        ) : <div className="text-xs text-subtle">{t('No best candidate')}</div>}
       </section>
       <section className="sec">
         <h4>{t('Decision')}<span className="src">点击淡化 / 恢复，保留树结构</span></h4>
@@ -634,7 +634,7 @@ function ResearchMapList({ refreshToken, onSelectMap, selectProject, selectResea
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[820px] border-collapse">
-              <thead className="table-head"><tr>{['Title', 'Key', 'Project', 'Research', 'Nodes', 'Baseline', 'Undecided', 'Status', 'Updated'].map((l) => <th className="px-3 py-2" key={l}>{t(l)}</th>)}</tr></thead>
+              <thead className="table-head"><tr>{['Title', 'Key', 'Project', 'Research', 'Nodes', 'Best candidate', 'Undecided', 'Status', 'Updated'].map((l) => <th className="px-3 py-2" key={l}>{t(l)}</th>)}</tr></thead>
               <tbody>
                 {rows.map((row) => (
                   <tr className="cursor-pointer hover:bg-white/45" key={row.id} onClick={() => onSelectMap(row.id)}>
@@ -670,7 +670,7 @@ export function ScopedResearchMapsPanel({ scope, scopeId, refreshToken, onSelect
             <li className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5" key={row.id}>
               <div className="min-w-0">
                 <button className="truncate text-sm font-semibold text-ink hover:text-info" type="button" onClick={() => onSelectMap(row.id)}>{row.title}</button>
-                <div className="text-xs text-muted"><span className="font-mono">{row.key}</span> · {row.node_count} {t('nodes')} · {row.counts?.undecided ?? 0} {t('undecided')}{row.baseline ? ` · ${t('Baseline')} ${row.baseline.title}` : ''} · {ago(row.last_updated_at)}</div>
+                <div className="text-xs text-muted"><span className="font-mono">{row.key}</span> · {row.node_count} {t('nodes')} · {row.counts?.undecided ?? 0} {t('undecided')}{row.baseline ? ` · ${t('Best candidate')} ${row.baseline.title}` : ''} · {ago(row.last_updated_at)}</div>
               </div>
               <button className="secondary-button" type="button" onClick={() => onSelectMap(row.id)}>{t('Open')}</button>
             </li>

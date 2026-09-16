@@ -1,8 +1,8 @@
 # Research Map (研究地图)
 
-A research map is a **manually maintained tree** of research nodes. Every node carries a short narrative (hypothesis, change, reading, verdict, caveats, next step), a lifecycle **stage**, a review **decision**, and at most one **binding** to a Blackbox entity (run, branch, compare set, or research). The WebUI renders the tree with a structured detail panel: verdict first, then a metric comparison against the parent and the baseline, then changes, reading, caveats, evidence, and revisions.
+A research map is a **manually maintained tree** of research nodes. Every node carries a short narrative (hypothesis, change, reading, verdict, caveats, next step), a lifecycle **stage**, a review **decision**, and at most one **binding** to a Blackbox entity (run, branch, compare set, or research). The WebUI renders the tree with a structured detail panel: verdict first, then a metric comparison against the parent and the best candidate, then changes, reading, caveats, evidence, and revisions.
 
-**Principle: structure and narrative are written by hand; evidence is read automatically.** Agents decide which nodes exist, where they hang, what was tested, and what was concluded. Metrics, quality-gate status, artifacts, and decision notes come from the bound entity and are never stored in the map. Blackbox never creates nodes, changes a stage or a decision, or moves the baseline on its own.
+**Principle: structure and narrative are written by hand; evidence is read automatically.** Agents decide which nodes exist, where they hang, what was tested, and what was concluded. Metrics, quality-gate status, artifacts, and decision notes come from the bound entity and are never stored in the map. Blackbox never creates nodes, changes a stage or a decision, or changes the best candidate on its own.
 
 ## Scope
 
@@ -37,7 +37,7 @@ Rules:
 
 - Stages only move forward. Moving back requires a `reason`, which is recorded in the revisions.
 - Colour on the map follows the decision family (in progress / accepted / kept / ended); the card text shows the stage.
-- The **baseline** is a map-level pointer (`baseline`) to one node. The **mainline** is derived: the path from the root to the baseline. Neither is a node field.
+- The **best candidate（最优候选）** is the manually selected, currently preferred node in a map. It is not an automatically ranked winner or a claim of completed validation. The **mainline** is derived: the path from the root to the best candidate. Neither is a node field. Existing API fields (`baseline`, `baseline_node_key`, `is_baseline`) and the `bbox map baseline` command keep their names for compatibility; they refer to this best candidate. A comparison-page baseline remains a separate reference for metric differences.
 - `bbox map lint` warns when an accepted node has no binding, when its run fails the quality gate, or when tracking / simulation / live nodes are not accepted.
 - Runs carry a `mode` (`backtest`, `paper`, `sim`, `live`) so tracking, simulation, and live evidence can be bound exactly like backtests.
 
@@ -80,8 +80,8 @@ bbox map node decide --map quadrant-lab/quadrant-options-tree --key roll --decis
 # 5. Advance an accepted node through the lifecycle
 bbox map node advance --map quadrant-lab/quadrant-options-tree --key hold --stage validation --date 09-14
 
-# 6. Move the baseline (reason required for the record)
-bbox map baseline --map quadrant-lab/quadrant-options-tree --key hold --reason "用户选为后续 S2 研究的比较基准" --created-by-id human:jiang --created-by-type human
+# 6. Select the best candidate (reason required for the record)
+bbox map baseline --map quadrant-lab/quadrant-options-tree --key hold --reason "用户选为后续 S2 研究的最优候选" --created-by-id human:jiang --created-by-type human
 
 # 7. Review
 bbox map status --map quadrant-lab/quadrant-options-tree   # ready / stale / not advanced / broken bindings / runs without a node
@@ -115,14 +115,14 @@ nodes:
     binding: {kind: research, id: rsr_...}
     children:
       - key: hold
-        title: HOLD（当前基准）
+        title: HOLD（当前最优候选）
         stage: experiment
         decision: accepted
         hypothesis: 进入高估高波不退出……右尾能否完整保留？
         change:
           - {what: 退出规则, from: 满 10 日后离开即退, to: 只在估值翻转到低估或高估高波变老时全平}
         reading: [逐年 2022→2026：+9.3 / +24.6 / +85.3 / +167.4 / +29.3%]
-        verdict: 采纳为比较基准：不因波动膨胀退出，右尾完整保留。
+        verdict: 选为最优候选：不因波动膨胀退出，右尾完整保留。
         caveats: [2024/25 贡献集中, C2 成本情景敏感]
         binding: {kind: run, id: run_...}
 ```
@@ -154,7 +154,7 @@ detail = bb.get_research_map("quadrant-lab/quadrant-options-tree")   # nodes wit
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/v1/research-maps` | Create (idempotent on project + key) |
-| `GET` | `/api/v1/research-maps?project=&research=&key=&status=` | List with counts, baseline summary, recent nodes |
+| `GET` | `/api/v1/research-maps?project=&research=&key=&status=` | List with counts, best-candidate summary, recent nodes |
 | `GET` | `/api/v1/projects/{id}/research-maps`, `/api/v1/researches/{id}/research-maps` | Maps for a scope (research: attached or bound) |
 | `GET` | `/api/v1/research-maps/{id}` | Map + `nodes` (with `binding` evidence, `family`, `flags`, `is_mainline`) + `tree` |
 | `PATCH` | `/api/v1/research-maps/{id}` | Title, subtitle, description, status, primary_metric, settings, research |
@@ -166,12 +166,12 @@ detail = bb.get_research_map("quadrant-lab/quadrant-options-tree")   # nodes wit
 | `POST` | `/api/v1/research-maps/{id}/nodes/{key}/decide` | `{decision, reading, verdict, caveats, next, note}` |
 | `POST` | `/api/v1/research-maps/{id}/nodes/{key}/advance` | `{stage, reason, date_label}` |
 
-Errors use the standard envelope: `NOT_FOUND` for unknown maps, nodes, parents, or binding targets; `VALIDATION_ERROR` for cycles, backwards stages without a reason, duplicate keys in a document, or a baseline that matches no node; `STATE_ERROR` when deleting a node that still has descendants. Every write publishes `research_map.created` / `research_map.updated` over the websocket.
+Errors use the standard envelope: `NOT_FOUND` for unknown maps, nodes, parents, or binding targets; `VALIDATION_ERROR` for cycles, backwards stages without a reason, duplicate keys in a document, or a best-candidate pointer that matches no node; `STATE_ERROR` when deleting a node that still has descendants. Every write publishes `research_map.created` / `research_map.updated` over the websocket.
 
 ## WebUI
 
 - **Research page**: the map is embedded at the top (fullscreen available). The branch table and the recent-runs table show a **Map node** column with a *Locate* action; selecting a node in the map is independent of those tables.
-- **Research Map** in the sidebar lists every map. The map page shows the baseline strip (metrics from the bound run), the decision / stage legend with filters, recent updates, the tree, and the structured node detail.
+- **Research Map** in the sidebar lists every map. The map page shows the best-candidate strip (metrics from the bound run), the decision / stage legend with filters, recent updates, the tree, and the structured node detail.
 - The WebUI is read-only for maps. Edits go through the CLI, SDK, or API.
 
 ## Example
